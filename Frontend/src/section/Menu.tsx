@@ -9,10 +9,12 @@ const Menu = () => {
           <img src={website} alt="QR Code Generator" className="w-full max-w-lg" />
         </div>
 
-        <div className="flex flex-col justify-center max-w-md">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-5">Menu</h2>
-            <p className="text-gray-600 text-xl mb-8">With just one click, send directly to the address you choose on your page or application, to facilitate access and improve the experience of new users or clients.</p>
-            <button className="bg-blue-600 text-white text-lg px-6 py-3 rounded-full font-bold hover:bg-blue-700 transition w-[50%] mb-5 hover:scale-102">Create QR code</button>
+        <div className="flex flex-col justify-center max-w-md md:max-w-2xl lg:max-w-3xl text-center md:text-left mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Menu</h2>
+          <p className="text-gray-600 text-base sm:text-md md:text-lg lg:text-xl mb-6">With just one click, send directly to the address you choose on your page or application, to facilitate access and improve the experience of new users or clients.</p>
+          <div className="flex justify-center md:justify-start">
+            <button className="bg-blue-600 text-white text-base sm:text-lg px-6 py-3 rounded-full font-bold hover:bg-blue-700 transition-transform duration-200 hover:scale-105 w-[70%] sm:w-[50%] md:w-auto">Create QR code</button>
+          </div>
         </div>
 
       </div>

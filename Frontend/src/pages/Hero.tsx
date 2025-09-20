@@ -1,14 +1,14 @@
-import { Language, PictureAsPdf, AccountBox, Image, Videocam, List, Store, MenuBook, LocalOffer, Apps, Audiotrack, Event, Web, QueueMusic } from "@mui/icons-material"
+import { Language, PictureAsPdf, AccountBox, Image, Videocam, MenuBook, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback } from "@mui/icons-material"
 import Footer from "../components/Footer.js"
 import NavigationBar from "../components/NavigationBar.js"
 import Website from "../section/Website.js"
 import Pdf from "../section/Pdf.js"
 import Whatsapp from '../section/Whatsapp.js'
-import Email from '../section/Email.js'
-import Wifi from '../section/Wifi.js'
+import Emails from '../section/Email.js'
+import Wifis from '../section/Wifi.js'
 import SocialMedia from "../section/SocialMedia.js"
 import App from "../section/Apps.js"
-import Feedback from "../section/Feedback.js"
+import Feedbacks from "../section/Feedback.js"
 import VisitingCard from "../section/VisitingCard.js"
 import Events from "../section/Event.js"
 import Menu from "../section/Menu.js"
@@ -19,18 +19,18 @@ import Images from "../section/Image.js"
 const qrTypes = [
   { icon: <Language fontSize="large" />, label: "Website" },
   { icon: <PictureAsPdf fontSize="large" />, label: "PDF" },
+  { icon: <WhatsApp fontSize="large" />, label: "WhatsApp" },
+  { icon: <Email fontSize="large" />, label: "Email" },
+  { icon: <Wifi fontSize="large" />, label: "WiFi" },
+  { icon: <People fontSize="large" />, label: "Social Media" },
+  { icon: <Apps fontSize="large" />, label: "Apps" },
+  { icon: <Feedback fontSize="large" />, label: "Feedback" },
   { icon: <AccountBox fontSize="large" />, label: "Visiting Card" },
+  { icon: <Event fontSize="large" />, label: "Event" },
+  { icon: <MenuBook fontSize="large" />, label: "Menu" },
   { icon: <Image fontSize="large" />, label: "Images" },
   { icon: <Videocam fontSize="large" />, label: "Video" },
-  { icon: <List fontSize="large" />, label: "List of links" },
-  { icon: <Store fontSize="large" />, label: "Business" },
-  { icon: <MenuBook fontSize="large" />, label: "Menu" },
-  { icon: <LocalOffer fontSize="large" />, label: "Coupon" },
-  { icon: <Apps fontSize="large" />, label: "Apps" },
-  { icon: <Web  fontSize="large" />, label: "Landing Page" },
-  { icon: <Event fontSize="large" />, label: "Event" },
-  { icon: <Audiotrack fontSize="large" />, label: "MP3" },
-  { icon: <QueueMusic fontSize="large" />, label: "Playlist" },
+  { icon: <QueueMusic fontSize="large" />, label: "MP3" },
 ];
 
 const Hero = () => {
@@ -59,11 +59,11 @@ const Hero = () => {
         <Website />
         <Pdf />
         <Whatsapp />
-        <Email />
-        <Wifi />
+        <Emails />
+        <Wifis />
         <SocialMedia />
         <App />
-        <Feedback />
+        <Feedbacks />
         <VisitingCard />
         <Events />
         <Menu />
