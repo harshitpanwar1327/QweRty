@@ -10,7 +10,7 @@ import Wifis from '../section/Wifi.js'
 import SocialMedia from "../section/SocialMedia.js"
 import App from "../section/Apps.js"
 import Feedbacks from "../section/Feedback.js"
-import Contact from "../section/Contact.js"
+import Contact from "../section/vCard.js"
 import Events from "../section/Event.js"
 import Location from "../section/Location.js"
 import MP3 from "../section/MP3.js"
@@ -32,7 +32,7 @@ const qrTypes = [
   { icon: <QueueMusic fontSize="large" />, label: "MP3" },
   { icon: <LocationOn fontSize="large" />, label: "Location" },
   { icon: <Event fontSize="large" />, label: "Event" },
-  { icon: <AccountBox fontSize="large" />, label: "Contact(vCard)" },
+  { icon: <AccountBox fontSize="large" />, label: "vCard" },
 ];
 
 const Hero = () => {
@@ -50,7 +50,7 @@ const Hero = () => {
           {qrTypes.map((item, index) => (
             <div key={index} className="border border-gray-300 rounded-xl flex flex-col items-center justify-center gap-2 p-4 shadow-sm hover:shadow-xl hover:scale-105 hover:border-pink-500 cursor-pointer transition duration-300">
               <div className="text-pink-500">{item.icon}</div>
-              <p className="font-medium text-gray-800">{item.label}</p>
+              <p className="text-center text-gray-800">{item.label}</p>
             </div>
           ))}
         </div>
