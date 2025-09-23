@@ -2,7 +2,7 @@ import website from '../assets/website.jpg'
 
 const Pdf = () => {
   return (
-    <div className="w-full min-h-[80vh] bg-gradient-to-l from-blue-600 via-blue-100 to-white flex justify-center items-center px-6 md:px-15 lg:px-28">
+    <div className="w-full min-h-[80vh] bg-[linear-gradient(-135deg,theme(colors.blue.500),theme(colors.blue.100),white)] flex justify-center items-center px-6 md:px-15 lg:px-28">
       <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-12 max-w-7xl">
 
         <div className="flex flex-col justify-center max-w-md md:max-w-2xl lg:max-w-3xl text-center md:text-left mx-auto px-4">
