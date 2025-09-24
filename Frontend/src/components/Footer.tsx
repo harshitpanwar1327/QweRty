@@ -2,6 +2,7 @@ import TwitterIcon from "@mui/icons-material/Twitter"
 import FacebookIcon from "@mui/icons-material/Facebook"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import FooterQr from '../assets/FooterQr.png'
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -19,7 +20,7 @@ const Footer = () => {
           <div className="flex flex-col gap-3">
             <h3 className="font-semibold">QweRty</h3>
               <a href="#" target="_blank" className="!text-gray-400 hover:!text-white">QR Code Generator</a>
-              <a href="#" target="_blank" className="!text-gray-400 hover:!text-white">Plans and prices</a>
+              <Link to="/pricing" className="!text-gray-400 hover:!text-white">Plan and Pricing</Link>
           </div>
           <div className="flex flex-col gap-3">
             <h3 className="font-semibold">Company</h3>
@@ -28,7 +29,7 @@ const Footer = () => {
           </div>
           <div className="flex flex-col gap-3">
             <h3 className="font-semibold">Help</h3>
-              <a href="#" target="_blank" className="!text-gray-400 hover:!text-white">Contact us</a>
+              <Link to="/contact" target="_blank" className="!text-gray-400 hover:!text-white">Contact us</Link>
               <a href="#" target="_blank" className="!text-gray-400 hover:!text-white">FAQ</a>
           </div>
         </div>
