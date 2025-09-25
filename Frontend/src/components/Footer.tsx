@@ -1,5 +1,5 @@
-import TwitterIcon from "@mui/icons-material/Twitter"
-import FacebookIcon from "@mui/icons-material/Facebook"
+import YoutubeIcon from "@mui/icons-material/Youtube"
+import InstagramIcon from "@mui/icons-material/Instagram"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import FooterQr from '../assets/FooterQr.png'
 import { Link } from "react-router-dom";
@@ -19,26 +19,26 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between gap-10 py-12 border-y border-gray-700">
           <div className="flex flex-col gap-3">
             <h3 className="font-semibold">QweRty</h3>
-              <a href="#" target="_blank" className="!text-gray-400 hover:!text-white">QR Code Generator</a>
+              <a href="#" className="!text-gray-400 hover:!text-white">QR Code Generator</a>
               <Link to="/pricing" className="!text-gray-400 hover:!text-white">Plan and Pricing</Link>
           </div>
           <div className="flex flex-col gap-3">
             <h3 className="font-semibold">Company</h3>
-              <a href="#" target="_blank" className="!text-gray-400 hover:!text-white">Terms of Conditions</a>
-              <a href="#" target="_blank" className="!text-gray-400 hover:!text-white">Privacy Policy</a>
+              <a href="#" className="!text-gray-400 hover:!text-white">Terms of Conditions</a>
+              <a href="#" className="!text-gray-400 hover:!text-white">Privacy Policy</a>
           </div>
           <div className="flex flex-col gap-3">
             <h3 className="font-semibold">Help</h3>
-              <Link to="/contact" target="_blank" className="!text-gray-400 hover:!text-white">Contact us</Link>
-              <a href="#" target="_blank" className="!text-gray-400 hover:!text-white">FAQ</a>
+              <Link to="/contact" className="!text-gray-400 hover:!text-white">Contact us</Link>
+              <a href="#" className="!text-gray-400 hover:!text-white">FAQ</a>
           </div>
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm pt-8 text-gray-400">
           <p>2025 &copy; QR Code Generator</p>
           <div className="flex items-center gap-6">
-            <TwitterIcon className="cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
-            <FacebookIcon className="cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
+            <YoutubeIcon className="cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
+            <InstagramIcon className="cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
             <LinkedInIcon className="cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
           </div>
         </div>

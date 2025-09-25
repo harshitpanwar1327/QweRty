@@ -10,15 +10,15 @@ const API = axios.create({
 // Request interceptor to attach token
 API.interceptors.request.use(
   (config) => {
-      const token = sessionStorage.getItem('AuthToken');
+    const token = sessionStorage.getItem('AuthToken');
       
-      if (token) {
-          config.headers['Authorization'] = `Bearer ${token}`;
-      }
-      return config;
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
   },
   (error) => {
-      return Promise.reject(error);
+    return Promise.reject(error);
   }
 );
 
