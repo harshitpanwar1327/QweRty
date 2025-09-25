@@ -1,5 +1,10 @@
-import { useState, type ChangeEvent  } from 'react';
-import { NavLink } from 'react-router-dom'
+import { useState, type FormEvent, type ChangeEvent } from 'react'
+import { useNavigate, NavLink } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { auth } from '../../util/Firebase.ts';
+import { createUserWithEmailAndPassword } from "firebase/auth"
+import API from '../../util/Api.ts'
+import axios from "axios"
 import { HashLoader  } from "react-spinners"
 import GoogleIcon from '@mui/icons-material/Google'
 
@@ -7,6 +12,42 @@ const Register = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+
+  const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
+      const token = await userCredential.user.getIdToken();
+      sessionStorage.setItem('isAuthenticated', 'true');
+      sessionStorage.setItem('userId', uid);
+      sessionStorage.setItem('AuthToken', token);
+      await API.post('/authentication/register', {
+        email,
+        uid
+      });
+      setTimeout(() => {
+        setLoading(false);
+        toast.success("Register successful");
+        navigate("/hero");
+      }, 1000);
+    } catch (error) {
+      setLoading(false);
+      console.error('Signup error:', error);
+      if (error && typeof error === "object" && "code" in error) {
+        const firebaseError = error as { code: string; message: string };
+        toast.error(firebaseError.code);
+      } else if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || "Failed to register! Please try again.");
+      } else {
+        toast.error("Failed to register! Please check your details and try again.");
+      }
+    }
+  };
 
   return (
     <div className='flex flex-col lg:flex-row items-center justify-around p-3 w-full'>
@@ -22,7 +63,7 @@ const Register = () => {
           <p className="font-bold text-2xl text-black">QweRty</p>
         </div>
 
-      <form className = "flex flex-col justify-center gap-4">
+      <form className = "flex flex-col justify-center gap-4" onSubmit={handleRegister}>
         <div className='space-y-2 mb-2'>
           <h2 className="text-2xl font-bold">Create account!</h2>
           <p className='text-gray-600 text-sm'>It's free and only takes a few seconds.</p>

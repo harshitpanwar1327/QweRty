@@ -1,10 +1,34 @@
-import { useState, type ChangeEvent  } from 'react';
+import { useState, type FormEvent, type ChangeEvent } from 'react'
+import { toast } from 'react-toastify'
 import { NavLink } from 'react-router-dom'
+import { sendPasswordResetEmail } from 'firebase/auth'
+import { auth } from '../../util/Firebase'
 import { HashLoader  } from "react-spinners"
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      await sendPasswordResetEmail(auth, email);
+      toast.success('Password reset email sent.');
+      
+    } catch (error) {
+      setLoading(true);
+      console.error('Forgot password error:', error);
+      if (error && typeof error === "object" && "code" in error) {
+        const firebaseError = error as { code: string; message: string };
+        toast.error(firebaseError.code);
+      } else {
+        toast.error("Failed to change password! Please check your details and try again.");
+      }
+    } finally{
+      setLoading(false);
+    }
+  };
 
   return (
     <div className='flex flex-col lg:flex-row items-center justify-around p-3 w-full'>
@@ -20,7 +44,7 @@ const ForgotPassword = () => {
           <p className="font-bold text-2xl text-black">QweRty</p>
         </div>
 
-        <form className = "flex flex-col justify-center gap-4">
+        <form className = "flex flex-col justify-center gap-4" onSubmit={handleSubmit}>
           <div className='space-y-2 mb-2'>
             <h2 className="text-2xl font-bold">Recover Password</h2>
             <p className='text-gray-600 text-sm'>Enter the email with which you created your account and we will send you a code so you can recover your password</p>
