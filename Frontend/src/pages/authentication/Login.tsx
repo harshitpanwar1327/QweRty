@@ -25,7 +25,7 @@ const Login = () => {
       setTimeout(() => {
         setLoading(false);
         toast.success("Login successful");
-        navigate("/hero");
+        navigate("/new-qr");
       }, 1000);
     } catch (error) {
       setLoading(false);

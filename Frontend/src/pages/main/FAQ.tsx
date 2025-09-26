@@ -48,9 +48,9 @@ const faqs = [
 ];
 
 const FAQ = () => {
-  const [openIndex, setOpenIndex] = useState(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  const toggleFAQ = (index) => {
+  const toggleFAQ = (index: number | null) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
@@ -58,7 +58,7 @@ const FAQ = () => {
     <div className="flex flex-col w-screen h-screen overflow-y-auto">
       <Header />
 
-      <div className="py-15 px-4 md:px-12 lg:px-20 text-black flex flex-col gap-4">
+      <div className="grow py-4 md:py-8 lg:py-16 px-4 md:px-12 lg:px-20 flex flex-col gap-4">
         <p className="text-center text-gray-500">FAQ</p>
         <h2 className="text-3xl md:text-5xl font-semibold text-center mb-8">Everything you need to know</h2>
         <div className="flex flex-col gap-10">

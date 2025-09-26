@@ -13,6 +13,7 @@ import MyQRs from './pages/portal/MyQRs.js'
 import NewQR from './pages/portal/NewQR.js'
 import Plans from './pages/portal/Plans.js'
 import Stats from './pages/portal/Stats.js'
+import ProtectedRoutes from './components/ProtectedRoutes.js'
 
 function App() {
 
@@ -26,14 +27,17 @@ function App() {
         <Route path='/t&c' element={<TandC />}/>
         <Route path='/privacy-policy' element={<PrivacyPolicy />}/>
         <Route path='/faq' element={<FAQ />}/>
-        <Route path='/my-qr' element={<MyQRs />}/>
-        <Route path='/new-qr' element={<NewQR />}/>
-        <Route path='/plans' element={<Plans />}/>
-        <Route path='/stats' element={<Stats />}/>
 
         <Route path='/login' element={<Login />}/>
         <Route path='/register' element={<Register />}/>
         <Route path='/forgot-password' element={<ForgotPassword />}/>
+
+        <Route element={<ProtectedRoutes/>}>
+          <Route path='/my-qr' element={<MyQRs />}/>
+          <Route path='/new-qr' element={<NewQR />}/>
+          <Route path='/plans' element={<Plans />}/>
+          <Route path='/stats' element={<Stats />}/>
+        </Route>
 
         <Route path='*' element={<Navigate to='/' />}/>
       </Routes>

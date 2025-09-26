@@ -25,7 +25,7 @@ const Register = () => {
       setTimeout(() => {
         setLoading(false);
         toast.success("Register successful");
-        navigate("/hero");
+        navigate("/new-qr");
       }, 1000);
     } catch (error) {
       setLoading(false);

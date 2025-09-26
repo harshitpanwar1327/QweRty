@@ -19,8 +19,8 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between gap-10 py-12 border-y border-gray-700">
           <div className="flex flex-col gap-3">
             <h3 className="font-semibold">QweRty</h3>
-              <a href="#" className="!text-gray-400 hover:!text-white">QR Code Generator</a>
-              <Link to="/pricing" className="!text-gray-400 hover:!text-white">Plan and Pricing</Link>
+              <Link to="/new-qr" className="!text-gray-400 hover:!text-white">QR Generator</Link>
+              <Link to="/pricing" className="!text-gray-400 hover:!text-white">Plans and Pricings</Link>
           </div>
           <div className="flex flex-col gap-3">
             <h3 className="font-semibold">Company</h3>
