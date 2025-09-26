@@ -24,13 +24,13 @@ const Footer = () => {
           </div>
           <div className="flex flex-col gap-3">
             <h3 className="font-semibold">Company</h3>
-              <a href="#" className="!text-gray-400 hover:!text-white">Terms of Conditions</a>
-              <a href="#" className="!text-gray-400 hover:!text-white">Privacy Policy</a>
+              <Link to="/t&c" className="!text-gray-400 hover:!text-white">Terms and Conditions</Link>
+              <Link to="/privacy-policy" className="!text-gray-400 hover:!text-white">Privacy Policy</Link>
           </div>
           <div className="flex flex-col gap-3">
             <h3 className="font-semibold">Help</h3>
               <Link to="/contact" className="!text-gray-400 hover:!text-white">Contact us</Link>
-              <a href="#" className="!text-gray-400 hover:!text-white">FAQ</a>
+              <Link to="/faq" className="!text-gray-400 hover:!text-white">FAQ</Link>
           </div>
         </div>
 

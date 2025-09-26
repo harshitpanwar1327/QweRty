@@ -6,6 +6,13 @@ import Register from './pages/authentication/Register.js'
 import ForgotPassword from './pages/authentication/ForgotPassword.js'
 import Contact from './pages/main/Contact.js'
 import Pricing from './pages/main/Pricing.js'
+import PrivacyPolicy from './pages/main/PrivacyPolicy.js'
+import TandC from './pages/main/TandC.js'
+import FAQ from './pages/main/FAQ.js'
+import MyQRs from './pages/portal/MyQRs.js'
+import NewQR from './pages/portal/NewQR.js'
+import Plans from './pages/portal/Plans.js'
+import Stats from './pages/portal/Stats.js'
 
 function App() {
 
@@ -16,6 +23,13 @@ function App() {
         <Route path='/hero' element={<Hero />}/>
         <Route path='/contact' element={<Contact />}/>
         <Route path='/pricing' element={<Pricing />}/>
+        <Route path='/t&c' element={<TandC />}/>
+        <Route path='/privacy-policy' element={<PrivacyPolicy />}/>
+        <Route path='/faq' element={<FAQ />}/>
+        <Route path='/my-qr' element={<MyQRs />}/>
+        <Route path='/new-qr' element={<NewQR />}/>
+        <Route path='/plans' element={<Plans />}/>
+        <Route path='/stats' element={<Stats />}/>
 
         <Route path='/login' element={<Login />}/>
         <Route path='/register' element={<Register />}/>
