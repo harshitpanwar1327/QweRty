@@ -7,6 +7,7 @@ import { HashLoader  } from "react-spinners"
 import GoogleIcon from '@mui/icons-material/Google'
 
 const Register = () => {
+  const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -57,6 +58,10 @@ const Register = () => {
           <div className='flex flex-col gap-2'>
             <h2 className="text-2xl font-bold">Create account!</h2>
             <p className='text-gray-600 text-sm'>It's free and only takes a few seconds.</p>
+          </div>
+          <div className="flex flex-col gap-1">
+            <label htmlFor="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Enter your name" className="border border-gray-300 p-3 rounded-lg" value={name} onChange={(e: ChangeEvent<HTMLInputElement>)=>setName(e.target.value)} required />
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="email">Email</label>
