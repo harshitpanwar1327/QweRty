@@ -2,9 +2,10 @@ import { useState, type FormEvent, type ChangeEvent } from 'react'
 import { useNavigate, NavLink } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { auth } from '../../util/Firebase.ts';
-import { createUserWithEmailAndPassword } from "firebase/auth"
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo } from "firebase/auth"
 import { HashLoader  } from "react-spinners"
 import GoogleIcon from '@mui/icons-material/Google'
+import API from '../../util/API.ts'
 
 const Register = () => {
   const [name, setName] = useState<string>('');
@@ -23,6 +24,7 @@ const Register = () => {
       const token = await userCredential.user.getIdToken();
       sessionStorage.setItem('isAuthenticated', 'true');
       sessionStorage.setItem('AuthToken', token);
+      await API.post('/user/register', { name, email });
       setTimeout(() => {
         setLoading(false);
         toast.success("Register successful");
@@ -39,6 +41,37 @@ const Register = () => {
       }
     }
   };
+
+  const handleGoogle = async () => {
+    try {
+      setLoading(true);
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      const token = await userCredential.user.getIdToken();
+      sessionStorage.setItem('isAuthenticated', 'true');
+      sessionStorage.setItem('AuthToken', token);
+
+      const isNewUser = getAdditionalUserInfo(userCredential)?.isNewUser ?? false;
+      if(isNewUser) await API.post('/user/register', { 
+        name: userCredential.user.displayName, 
+        email: userCredential.user.email
+      });
+      setTimeout(() => {
+        setLoading(false);
+        toast.success(isNewUser ? "Register successful" : "Login successful");
+        navigate("/hero");
+      }, 1000);
+    } catch (error) {
+      setLoading(false);
+      console.error('Google login error:', error);
+      if (error && typeof error === "object" && "code" in error) {
+        const firebaseError = error as { code: string; message: string };
+        toast.error(firebaseError.code);
+      } else {
+        toast.error("Failed to login! Please try again.");
+      }
+    }
+  }
 
   return (
     <div className='flex flex-col lg:flex-row items-center justify-between p-3 w-full'>
@@ -78,7 +111,7 @@ const Register = () => {
 
         <span className="text-xs self-center font-semibold text-gray-500">OR</span>
 
-        <button className="p-2 border border-blue-500 bg-blue-500 text-white rounded-full cursor-pointer flex items-center justify-center gap-2 transition duration-300 hover:scale-102">
+        <button className="p-2 border border-blue-500 bg-blue-500 text-white rounded-full cursor-pointer flex items-center justify-center gap-2 transition duration-300 hover:scale-102" onClick={handleGoogle}>
           <GoogleIcon sx={{fontSize: '18px'}}/> <span className='hidden md:block'>Sign up with Google</span>
         </button>
       </div>

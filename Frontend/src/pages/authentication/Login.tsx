@@ -5,6 +5,7 @@ import { HashLoader  } from "react-spinners"
 import GoogleIcon from '@mui/icons-material/Google'
 import { auth } from '../../util/Firebase.ts'
 import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, getAdditionalUserInfo } from 'firebase/auth'
+import API from '../../util/API.ts'
 
 const Login = () => {
   const [email, setEmail] = useState<string>('');
@@ -49,7 +50,10 @@ const Login = () => {
       sessionStorage.setItem('AuthToken', token);
 
       const isNewUser = getAdditionalUserInfo(userCredential)?.isNewUser ?? false;
-
+      if(isNewUser) await API.post('/user/register', { 
+        name: userCredential.user.displayName, 
+        email: userCredential.user.email
+      });
       setTimeout(() => {
         setLoading(false);
         toast.success(isNewUser ? "Register successful" : "Login successful");

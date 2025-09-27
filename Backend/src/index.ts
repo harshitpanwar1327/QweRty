@@ -4,6 +4,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import { rateLimit } from 'express-rate-limit'
 import { checkConnection } from './config/Database.js'
+import { authMiddleware } from './middlewares/AuthMiddleware.js'
 import createAllTables from './utils/CreateTables.js'
 import UsersRoutes from './routes/UsersRoutes.js'
 import SubscriptionRoutes from './routes/SubscriptionRoutes.js'
@@ -24,6 +25,8 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.use('/api/user', UsersRoutes);
+
+app.use(authMiddleware);
 app.use('/api/subscription', SubscriptionRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {

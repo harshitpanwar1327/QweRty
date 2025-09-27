@@ -1,17 +1,14 @@
-export interface IUserData {
-    name?: string;
-    email?: string;
-    password_hash: string;
+interface UserData {
+    name: string;
+    email: string;
 }
 
 export class UsersModels {
-    name?: string;
-    email?: string;
-    password_hash: string;
+    name: string;
+    email: string;
 
-    constructor(userData: IUserData) {
+    constructor(userData: UserData) {
         this.name = userData.name;
         this.email = userData.email;
-        this.password_hash = userData.password_hash;
     }
 }
