@@ -1,7 +1,15 @@
+import NavigationBar from "../../components/NavigationBar"
+import Menubar from "../../components/Menubar"
 
 const Plans = () => {
   return (
-    <div>Plans</div>
+    <>
+    <NavigationBar />
+    <div className="flex flex-col w-screen h-screen overflow-y-auto">
+      <Menubar heading='Plans'/>
+
+    </div>
+    </>
   )
 }
 
