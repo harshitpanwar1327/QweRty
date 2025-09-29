@@ -3,7 +3,7 @@ import { QrCode, QrCode2, CreditCard, BarChart } from "@mui/icons-material";
 
 const NavigationBar = () => {
   return (
-    <div className="h-screen min-w-[260px] hidden lg:flex flex-col gap-8 p-4 shadow-lg">
+    <div className="h-screen min-w-[260px] hidden lg:flex flex-col gap-8 p-4 shadow-lg bg-white">
       <div className="flex items-center gap-2">
         <div className="px-2 py-1 bg-pink-500 text-white rounded-md text-lg font-bold">QR</div>
         <p className="font-bold text-2xl text-black">QweRty</p>
