@@ -24,6 +24,7 @@ const Register = () => {
       const token = await userCredential.user.getIdToken();
       sessionStorage.setItem('isAuthenticated', 'true');
       sessionStorage.setItem('AuthToken', token);
+      sessionStorage.setItem('email', email);
       await API.post('/user/register', { name, email });
       setTimeout(() => {
         setLoading(false);
@@ -48,8 +49,10 @@ const Register = () => {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       const token = await userCredential.user.getIdToken();
+      const email = userCredential.user.email ?? '';
       sessionStorage.setItem('isAuthenticated', 'true');
       sessionStorage.setItem('AuthToken', token);
+      sessionStorage.setItem('email', email);
 
       const isNewUser = getAdditionalUserInfo(userCredential)?.isNewUser ?? false;
       if(isNewUser) await API.post('/user/register', { 
@@ -59,7 +62,7 @@ const Register = () => {
       setTimeout(() => {
         setLoading(false);
         toast.success(isNewUser ? "Register successful" : "Login successful");
-        navigate("/hero");
+        navigate("/new-qr");
       }, 1000);
     } catch (error) {
       setLoading(false);

@@ -2,7 +2,7 @@ import website from '../assets/Location.png'
 
 const vCard = () => {
   return (
-    <div className="flex flex-col justify-center items-center pt-48 px-4">
+    <div className="flex flex-col justify-center items-center pt-48 pb-16 px-4">
       <div className='w-full h-[40vh] lg:h-[50vh] bg-gradient-to-b from-yellow-300 to-white rounded-t-lg flex justify-center'>
         <img src={website} alt="img" className="h-[60vh] lg:h-[80vh] relative bottom-25" />
       </div>
