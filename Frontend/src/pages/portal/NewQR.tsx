@@ -1,9 +1,21 @@
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
 import { Language, PictureAsPdf, AccountBox, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn } from "@mui/icons-material"
+import { Select, MenuItem } from "@mui/material"
+import SampleQr from '../../assets/SampleQR.png'
 
-const qrTypes = [
+interface QRType {
+  key: string,
+  icon: ReactNode,
+  label: string
+}
+
+interface NewQRProp {
+  qrType?: string
+}
+
+const qrTypes: QRType[] = [
   { key: "website", icon: <Language fontSize="medium" />, label: "Website" },
   { key: "text", icon: <TextFields fontSize="medium" />, label: "Text" },
   { key: "whatsapp", icon: <WhatsApp fontSize="medium" />, label: "WhatsApp" },
@@ -23,8 +35,8 @@ const qrTypes = [
 
 const tabsArray = ["Frame", "Shape", "Logo", "Level"];
 
-const NewQR = () => {
-  const [activeTab, setActiveTab] = useState<string>("website");
+const NewQR: React.FC<NewQRProp> = ({ qrType }) => {
+  const [activeTab, setActiveTab] = useState<string>(qrType || "website");
   const [designTab, setDesignTab] = useState<string>("Frame");
 
   return (
@@ -38,16 +50,29 @@ const NewQR = () => {
           <div className="w-2/3 flex flex-col gap-8 p-6">
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">1</span> Select the QR type</h3>
+              <Select value={activeTab} onChange={(e) => setActiveTab(e.target.value)} className="w-2/3">
+                {qrTypes.map((data, index) => (
+                  <MenuItem value={data.key} key={index}>
+                    <span className="flex items-center gap-2 text-pink-500">
+                      {data.icon}
+                      {data.label}
+                    </span>
+                  </MenuItem>
+                ))}
+              </Select>
             </div>
 
             <hr className="text-gray-300"/>
 
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">2</span> Complete the content</h3>
-              <div className="flex flex-col gap-1">
-                <label>Enter your Website</label>
-                <input type="text" placeholder="E.g. https://www.myweb.com/" className="w-2/3 p-2 border rounded"/>
-              </div>
+
+              {activeTab==='website' &&
+                <div className="flex flex-col gap-1">
+                  <label>Enter your Website</label>
+                  <input type="text" placeholder="E.g. https://www.myweb.com/" className="w-2/3 p-2 border border-gray-300 rounded"/>
+                </div>
+              }
             </div>
 
             <hr className="text-gray-300"/>
@@ -66,8 +91,8 @@ const NewQR = () => {
 
           <div className="w-1/3 rounded-md p-8 flex flex-col items-center gap-4 bg-gray-100">
             <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">4</span> Downlaod QR</h3>
-            <div className="w-[12.5rem] h-[12.5rem] flex items-center justify-center bg-white rounded-lg shadow-lg">QR Preview</div>
-            <button className="px-6 py-2 bg-white rounded-full hover:bg-gray-300">Download QR</button>
+            <img src={SampleQr} alt="w-full bg-white rounded-lg shadow-lg p-2" />
+            <button className="px-6 py-2 bg-white rounded-full hover:bg-gray-300">Generate QR</button>
           </div>
         </div>
       </div>
