@@ -16,7 +16,6 @@ import Stats from './pages/portal/Stats.js'
 import ProtectedRoutes from './components/ProtectedRoutes.js'
 
 function App() {
-
   return (
     <>
       <Routes>
