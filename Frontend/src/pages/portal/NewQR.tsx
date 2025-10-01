@@ -46,11 +46,11 @@ const NewQR: React.FC<NewQRProp> = ({ qrType }) => {
       <div className="grow flex flex-col gap-2 p-2 overflow-auto">
         <Menubar heading='New QR'/>
 
-        <div className="grow bg-white rounded-md overflow-y-auto flex flex-col lg:flex-row gap-8 p-2">
-          <div className="w-2/3 flex flex-col gap-8 p-6">
+        <div className="grow bg-white rounded-md overflow-y-auto flex flex-col md:flex-row gap-8 p-2">
+          <div className="w-full md:w-2/3 flex flex-col gap-8 p-6 md:overflow-y-auto">
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">1</span> Select the QR type</h3>
-              <Select value={activeTab} onChange={(e) => setActiveTab(e.target.value)} className="w-2/3">
+              <Select value={activeTab} onChange={(e) => setActiveTab(e.target.value)} className="w-full lg:w-2/3">
                 {qrTypes.map((data, index) => (
                   <MenuItem value={data.key} key={index}>
                     <span className="flex items-center gap-2 text-pink-500">
@@ -65,12 +65,19 @@ const NewQR: React.FC<NewQRProp> = ({ qrType }) => {
             <hr className="text-gray-300"/>
 
             <div className="flex flex-col gap-4">
-              <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">2</span> Complete the content</h3>
+              <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">2</span> Name your QR</h3>
+              <input type="text" placeholder="Enter your name" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"/>
+            </div>
+
+            <hr className="text-gray-300"/>
+
+            <div className="flex flex-col gap-4">
+              <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">3</span> Complete the content</h3>
 
               {activeTab==='website' &&
                 <div className="flex flex-col gap-1">
                   <label>Enter your Website</label>
-                  <input type="text" placeholder="E.g. https://www.myweb.com/" className="w-2/3 p-2 border border-gray-300 rounded"/>
+                  <input type="text" placeholder="E.g. https://www.myweb.com/" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"/>
                 </div>
               }
             </div>
@@ -78,7 +85,7 @@ const NewQR: React.FC<NewQRProp> = ({ qrType }) => {
             <hr className="text-gray-300"/>
 
             <div className="flex flex-col gap-4">
-              <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">3</span> Design your QR</h3>
+              <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">4</span> Design your QR</h3>
               <div className="flex gap-2">
                 {tabsArray.map((tab, index) => (
                   <button key={index} onClick={()=>setDesignTab(tab)} className={`py-3 px-4 text-sm rounded-md ${designTab === tab ? "text-pink-500 bg-pink-100" : "text-gray-600 hover:text-pink-500 hover:bg-pink-100"}`}>
@@ -89,10 +96,12 @@ const NewQR: React.FC<NewQRProp> = ({ qrType }) => {
             </div>
           </div>
 
-          <div className="w-1/3 rounded-md p-8 flex flex-col items-center gap-4 bg-gray-100">
-            <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">4</span> Downlaod QR</h3>
-            <img src={SampleQr} alt="w-full bg-white rounded-lg shadow-lg p-2" />
-            <button className="px-6 py-2 bg-white rounded-full hover:bg-gray-300">Generate QR</button>
+          <div>
+            <div className="w-full rounded-md p-8 flex flex-col items-center gap-4 bg-gray-100">
+              <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">5</span> Downlaod QR</h3>
+              <img src={SampleQr} alt="w-full bg-white rounded-lg shadow-lg p-2" />
+              <button className="px-6 py-2 bg-white rounded-full hover:bg-gray-300">Generate QR</button>
+            </div>
           </div>
         </div>
       </div>
