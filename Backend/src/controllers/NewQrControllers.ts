@@ -25,11 +25,11 @@ export const getNewQr = async (req: Request, res: Response) => {
 export const postNewQr = async(req: Request, res: Response)=>{
     const { user_id, name, qr_type, content, design, from_date , to_date, scan_limit, password, state } = req.body;
     
-    if(!user_id || !name || !qr_type || !content || password){
+    if(!user_id || !name || !qr_type || !content){
         return res.status(400).json({success: false, message: "All fields required!"});
     }
     
-    const newQrData = new NewQrModels({user_id, name, content, design, from_date, to_date, scan_limit, password, state});
+    const newQrData = new NewQrModels({user_id, name, qr_type, content, design, from_date, to_date, scan_limit, password, state});
     
     try {
         const response = await postNewQrLogic(newQrData);

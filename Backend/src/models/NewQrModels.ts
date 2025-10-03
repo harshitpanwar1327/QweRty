@@ -20,7 +20,7 @@ export class NewQrModels {
     from_date?: Date | string;
     to_date?: Date | string;
     scan_limit?: number;
-    password?: string;
+    password?: string | number;
     state?: string;
 
     constructor(userNewQr: INewQrData) {

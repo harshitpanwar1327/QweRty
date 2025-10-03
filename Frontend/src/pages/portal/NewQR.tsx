@@ -1,9 +1,10 @@
-import { useState, type ReactNode } from "react"
+import { useState, useEffect, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
 import { Language, PictureAsPdf, AccountBox, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn } from "@mui/icons-material"
 import { Select, MenuItem } from "@mui/material"
 import SampleQr from '../../assets/SampleQR.png'
+import API from "../../util/API"
 
 interface QRType {
   key: string,
@@ -38,6 +39,66 @@ const tabsArray = ["Frame", "Shape", "Logo", "Level"];
 const NewQR: React.FC<NewQRProp> = ({ qrType }) => {
   const [activeTab, setActiveTab] = useState<string>(qrType || "website");
   const [designTab, setDesignTab] = useState<string>("Frame");
+  const [qrData, setQrData] = useState<any[]>([]);
+  const [qrName, setQrName] = useState<string>("");
+  const [qrContent, setQrContent] = useState<string>("");
+
+  const fetchQr = async (id:number) => {
+    try {
+      const response = await API.get(`/new-qr/new-qr/${id}`);
+      setQrData(response.data.data);
+    } catch (error) {
+      console.log(error.response?.data?.message || error);
+    }
+  }
+
+  useEffect(()=>{
+    fetchQr(1);
+  }, [])
+
+  const handleGenerateQr = async () => {
+  if (!qrName || !qrContent) {
+    alert("Please fill all required fields");
+    return;
+  }
+
+  const userId = 1;
+
+  const qrTypeMap: Record<string, string> = {
+    website: "Website",
+    text: "Text",
+    whatsapp: "WhatsApp",
+    email: "Email",
+    wifi: "WiFi",
+    social: "Social",
+    apps: "Apps",
+    feedback: "Feedback",
+    pdf: "PDF",
+    images: "Images",
+    video: "Video",
+    mp3: "MP3",
+    location: "Location",
+    event: "Event",
+    vcard: "vCard"
+  };
+
+  const payload = {
+    user_id: userId,
+    qr_type: qrTypeMap[activeTab],
+    name: qrName,
+    content: qrContent
+  };
+
+  try {
+    const response = await API.post("/new-qr/new-qr", payload);
+    setQrData((prev) => [...prev, { qr_image: response.data.qr_image, name: qrName, qr_id: response.data.qr_code_id }]);
+    alert("QR generated successfully!");
+  } catch (error: any) {
+    console.error(error.response?.data || error);
+    alert("Failed to generate QR");
+  }
+};
+
 
   return (
     <div className="w-screen flex">
@@ -66,7 +127,7 @@ const NewQR: React.FC<NewQRProp> = ({ qrType }) => {
 
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">2</span> Name your QR</h3>
-              <input type="text" placeholder="Enter your name" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"/>
+              <input type="text" placeholder="Enter name" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={qrName}onChange={(e) => setQrName(e.target.value)}/>
             </div>
 
             <hr className="text-gray-300"/>
@@ -77,7 +138,7 @@ const NewQR: React.FC<NewQRProp> = ({ qrType }) => {
               {activeTab==='website' &&
                 <div className="flex flex-col gap-1">
                   <label>Enter your Website</label>
-                  <input type="text" placeholder="E.g. https://www.myweb.com/" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"/>
+                  <input type="text" placeholder="E.g. https://www.myweb.com/" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={qrContent} onChange={(e) => setQrContent(e.target.value)}/>
                 </div>
               }
             </div>
@@ -99,8 +160,10 @@ const NewQR: React.FC<NewQRProp> = ({ qrType }) => {
           <div>
             <div className="w-full rounded-md p-8 flex flex-col items-center gap-4 bg-gray-100">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">5</span> Downlaod QR</h3>
-              <img src={SampleQr} alt="w-full bg-white rounded-lg shadow-lg p-2" />
-              <button className="px-6 py-2 bg-white rounded-full hover:bg-gray-300">Generate QR</button>
+              {qrData.map((qr) => (
+              <img key={qr.qr_id} src={qr.qr_image || SampleQr} className="w-full bg-white rounded-lg shadow-lg p-2" alt={qr.name}/>
+              ))}
+              <button className="px-6 py-2 bg-white rounded-full hover:bg-gray-300" onClick={handleGenerateQr}>Generate QR</button>
             </div>
           </div>
         </div>

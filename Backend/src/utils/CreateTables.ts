@@ -29,7 +29,7 @@ const qr_codes = `CREATE TABLE IF NOT EXISTS qr_codes(
     from_date TIMESTAMP,
     to_date TIMESTAMP,
     scan_limit INT DEFAULT NULL,
-    password VARCHAR(255) NOT NULL,
+    password VARCHAR(255),
     state ENUM('active', 'paused', 'pending', 'finished', 'deleted'),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
