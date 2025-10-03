@@ -8,6 +8,7 @@ import { authMiddleware } from './middlewares/AuthMiddleware.js'
 import createAllTables from './utils/CreateTables.js'
 import UsersRoutes from './routes/UsersRoutes.js'
 import SubscriptionRoutes from './routes/SubscriptionRoutes.js'
+import NewQrRoutes from './routes/NewQrRoutes.js'
 
 dotenv.config();
 
@@ -26,8 +27,9 @@ app.use(limiter);
 
 app.use('/api/user', UsersRoutes);
 
-app.use(authMiddleware);
+// app.use(authMiddleware);
 app.use('/api/subscription', SubscriptionRoutes);
+app.use('/api/new-qr', NewQrRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
     res.status(404).send({message: "Route not exist!"});

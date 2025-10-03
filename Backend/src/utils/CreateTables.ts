@@ -19,6 +19,30 @@ const subscriptions = `CREATE TABLE IF NOT EXISTS subscriptions(
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );`;
 
+const qr_codes = `CREATE TABLE IF NOT EXISTS qr_codes(
+    qr_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    qr_type ENUM('Website', 'Text', 'WhatsApp', 'Email', 'WiFi') NOT NULL,
+    content JSON NOT NULL,
+    design JSON,
+    from_date TIMESTAMP,
+    to_date TIMESTAMP,
+    scan_limit INT DEFAULT NULL,
+    password VARCHAR(255) NOT NULL,
+    state ENUM('active', 'paused', 'pending', 'finished', 'deleted'),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);`;
+
+const qr_scans = `CREATE TABLE IF NOT EXISTS qr_scans(
+    scan_id INT AUTO_INCREMENT PRIMARY KEY,
+    qr_id INT NOT NULL,
+    scanned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (qr_id) REFERENCES qr_codes(qr_id) ON DELETE CASCADE
+);`;
+
 const createTable = async (tableName: string, query: string)=>{
     try {
         await pool.query(query);
@@ -32,6 +56,8 @@ const createAllTables = async () => {
     try {
         await createTable('Users', users);
         await createTable('Subscriptions', subscriptions);
+        await createTable('QR Codes', qr_codes);
+        await createTable('QR Scans', qr_scans);
     } catch (error) {
         console.log(error);
     }
