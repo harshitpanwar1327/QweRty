@@ -1,7 +1,12 @@
-import { motion } from 'motion/react'
-import { useState } from 'react';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
+import { motion } from 'framer-motion'
+import { useState } from 'react'
+import Header from '../../components/Header'
+import Footer from '../../components/Footer'
+import API from '../../util/API'
+import axios from 'axios'
+import { toast } from 'react-toastify'
+import { HashLoader  } from "react-spinners"
+import { useNavigate } from 'react-router-dom'
 
 const plans = [
   {
@@ -59,9 +64,50 @@ const plans = [
 
 const Pricing = () => {
   const [duration, setDuration] = useState("quarterly");
+  const uid = sessionStorage.getItem('userId');
+  const isAuthenticated = sessionStorage.getItem('isAuthenticated');
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+
+  const handleUpgrade = async (plan_name: string) => {
+    if(!isAuthenticated) {
+      toast.info("Please login to upgrade your subscription!");
+      setTimeout(() => {
+        navigate('/login');
+      }, 1000);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await API.post('/subscription', {
+        uid,
+        plan_name,
+        duration
+      });
+      toast.success("Subscription plan purchased successfully.");
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || error);
+      } else {
+        toast.error("Subscription plan purchase failed!");
+      }
+    }
+  }
   
   return (
     <div className="flex flex-col gap-4 w-screen h-screen overflow-y-auto">
+      {loading && (
+        <div className='fixed top-0 left-0 h-screen w-screen flex justify-center items-center backdrop-blur-md bg-black/25 z-100'>
+          <HashLoader color="#dc3753" />
+        </div>
+      )}
+
       <Header/>
 
       <div className='grow py-4 md:py-8 lg:py-16 px-4 md:px-12 lg:px-20 flex flex-col gap-8'>
@@ -81,7 +127,7 @@ const Pricing = () => {
               <p className="text-5xl font-semibold">{duration==='quarterly' ? plan.quarterlyPrice: plan.annuallyPrice}</p>
               <p className="text-sm text-gray-600">₹ {duration==='quarterly' ? plan.quarterlyMonthly: plan.annuallyMonthly} per month</p>
 
-              <button className={'my-4 p-2 rounded-lg font-semibold bg-gray-900 text-white hover:bg-[#f19509]'}> Upgrade </button>
+              <button className={'my-4 p-2 rounded-lg font-semibold bg-gray-900 text-white hover:bg-[#f19509]'} onClick={()=>handleUpgrade(plan.name)}> Upgrade </button>
 
               <p className='font-semibold'>Features</p>
               <ul className="space-y-2 text-sm text-gray-700">

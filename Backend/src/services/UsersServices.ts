@@ -6,6 +6,7 @@ import sendWelcomeMail from '../config/NodeMailer.js'
 dotenv.config();
 
 interface UserData {
+  uid: string;
   name: string;
   email: string;
 }
@@ -18,10 +19,18 @@ export const registerUserLogic = async (userData: UserData) => {
             return { success: false, message: "User already exists with provided email!" };
         }
 
-        const query = `INSERT INTO users(name, email) VALUES (?, ?);`;
-        const values = [userData.name, userData.email];
+        const query = `INSERT INTO users(user_id, name, email) VALUES (?, ?, ?);`;
+        const values = [userData.uid, userData.name, userData.email];
 
         await pool.query(query, values);
+
+        const today = new Date();
+        const expiry_date = new Date(today.getTime() + 90 * 24 * 60 * 60 * 1000);
+        
+        const subscriptionQuery = `INSERT INTO subscriptions (user_id, plan_name, duration, productId, purchase_date, expiry_date) VALUES (?, ?, ?, ?, ?, ?);`;
+        const subscriptionValues = [userData.uid, 'Free', 'quarterly', 'com.codeweave.freeQuarterly', today.toISOString().slice(0, 19).replace('T', ' '), expiry_date.toISOString().slice(0, 19).replace('T', ' ')];
+
+        await pool.query(subscriptionQuery, subscriptionValues);
 
         let mailResponse = await sendWelcomeMail(userData.name, userData.email);
 

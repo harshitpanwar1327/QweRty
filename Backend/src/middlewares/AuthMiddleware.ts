@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
-import admin from 'firebase-admin';
+import { admin } from '../config/FirebaseSDK.js';
 
 dotenv.config();
 

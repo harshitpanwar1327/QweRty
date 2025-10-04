@@ -21,11 +21,13 @@ const Register = () => {
     try {
       setLoading(true);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
       const token = await userCredential.user.getIdToken();
+      sessionStorage.setItem('userId', uid);
       sessionStorage.setItem('isAuthenticated', 'true');
       sessionStorage.setItem('AuthToken', token);
       sessionStorage.setItem('email', email);
-      await API.post('/user/register', { name, email });
+      await API.post('/user/register', { uid, name, email });
       setTimeout(() => {
         setLoading(false);
         toast.success("Register successful");
@@ -48,14 +50,17 @@ const Register = () => {
       setLoading(true);
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
+      const uid = userCredential.user.uid;
       const token = await userCredential.user.getIdToken();
       const email = userCredential.user.email ?? '';
+      sessionStorage.setItem('userId', uid);
       sessionStorage.setItem('isAuthenticated', 'true');
       sessionStorage.setItem('AuthToken', token);
       sessionStorage.setItem('email', email);
 
       const isNewUser = getAdditionalUserInfo(userCredential)?.isNewUser ?? false;
       if(isNewUser) await API.post('/user/register', { 
+        uid,
         name: userCredential.user.displayName, 
         email: userCredential.user.email
       });

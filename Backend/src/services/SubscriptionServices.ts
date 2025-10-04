@@ -1,16 +1,16 @@
-import { pool } from '../config/Database.js'
+import { RowDataPacket } from 'mysql2';
+import { pool } from '../config/Database.js';
+import { calculateAdjustedDays } from '../utils/Helper.js';
 
 interface SubscriptionData {
-    user_id?: number;
-    plan_name?: string;
-    purchase_date?: Date | string;
-    activation_date?: Date | string; 
-    expiry_date?: Date | string;
+    uid: number;
+    plan_name: string;
+    duration: string;
 }
 
-export const getSubscriptionsLogic = async (id: number) => {
+export const getSubscriptionsLogic = async (uid: number) => {
     try {
-        let [rows] = await pool.query(`SELECT * FROM subscriptions WHERE user_id=?;`, [id]);
+        let [rows] = await pool.query(`SELECT * FROM subscriptions WHERE user_id=?;`, [uid]);
 
         return {success: true, data: rows};
     } catch (error) {
@@ -19,46 +19,56 @@ export const getSubscriptionsLogic = async (id: number) => {
     }
 };
 
-export const postSubscriptionsLogic = async (subscriptionData: SubscriptionData) => {
-    try {
-        const query = `INSERT INTO subscriptions (user_id, plan_name, purchase_date, activation_date, expiry_date) VALUES (?, ?, ?, ?, ?);`;
-        const values = [subscriptionData.user_id, subscriptionData.plan_name, subscriptionData.purchase_date, subscriptionData.activation_date, subscriptionData.expiry_date];
-
-        await pool.query(query, values);
-        
-        return {success: true, message: "Subscription added successfully."};
-    } catch (error) {
-        console.log(error);
-        return {success: false, message: "Subscription not added!"};
+const SubscriptionPlans: Record<string, any> = {
+    Free: {
+        quarterly: { productId: "com.codeweave.freeQuarterly", days: 90 },
+        annually: { productId: "com.codeweave.freeQuarterly", days: 365 }
+    },
+    Pro: {
+        quarterly: { productId: "com.codeweave.proQuarterly", days: 90 },
+        annually: { productId: "com.codeweave.proQuarterly", days: 365 }
+    },
+    Business: {
+        quarterly: { productId: "com.codeweave.businessQuarterly", days: 90 },
+        annually: { productId: "com.codeweave.businessQuarterly", days: 365 }
     }
 };
 
-export const updateCancelSubscriptionsLogic = async (id: number) => {
+export const postSubscriptionLogic = async (subscriptionData: SubscriptionData) => {
     try {
-        const [rows]:any = await pool.query(`UPDATE subscriptions SET status='cancelled' WHERE subscription_id = ?;`, [id]);
+        let [subscriptions] = await pool.query<RowDataPacket[]>(`SELECT * FROM subscriptions WHERE user_id=?;`, [subscriptionData.uid]);
 
-        if (rows.affectedRows === 0) {
-            return { success: false, message: "Subscription not found." };
+        const today = new Date();
+        let adjustedDays = 0;
+
+        const activePlan = subscriptions.find((sub: any) => new Date(sub.expiry_date) > today);
+
+        if (activePlan) {
+            adjustedDays = calculateAdjustedDays(activePlan, SubscriptionPlans[subscriptionData.plan_name]?.[subscriptionData.duration]?.productId);
         }
 
-        return {success: true, message: "Subscription cancelled successfully."};
-    } catch (error) {
-        console.log(error);
-        return {success: false, message: "Subscription not cancelled!"};
-    }
-};
-
-export const updateRenewSubscriptionsLogic = async (id: number) => {
-    try {
-        const [rows]:any = await pool.query(`UPDATE subscriptions SET status='active' WHERE subscription_id = ?;`, [id]);
-
-        if (rows.affectedRows === 0) {
-            return { success: false, message: "Subscription not found." };
+        const selectedPlan = SubscriptionPlans[subscriptionData.plan_name]?.[subscriptionData.duration];
+        if (!selectedPlan) {
+            return { success: false, message: "Invalid plan or duration." };
         }
 
-        return {success: true, message: "Subscription renewed successfully"};
+        const expiryDate = new Date(today.getTime() + (selectedPlan.days + adjustedDays) * 24 * 60 * 60 * 1000);
+
+        const insertQuery = `INSERT INTO subscriptions (user_id, plan_name, duration, productId, purchase_date, expiry_date) VALUES (?, ?, ?, ?, ?, ?);`;
+        const insertValues = [
+            subscriptionData.uid,
+            subscriptionData.plan_name,
+            subscriptionData.duration,
+            selectedPlan.productId,
+            today.toISOString().slice(0, 19).replace('T', ' '),
+            expiryDate.toISOString().slice(0, 19).replace('T', ' ')
+        ];
+
+        await pool.query(insertQuery, insertValues);
+
+        return { success: true, message: "Subscription added successfully." };
     } catch (error) {
-        console.log(error);
-        return {success: false, message: "Subscription not renewed!"};
+        console.error(error);
+        return { success: false, message: "Subscription not added!" };
     }
 };

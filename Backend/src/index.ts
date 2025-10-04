@@ -27,8 +27,8 @@ app.use(limiter);
 
 app.use('/api/user', UsersRoutes);
 
-// app.use(authMiddleware);
-app.use('/api/subscription', SubscriptionRoutes);
+app.use(authMiddleware);
+app.use('/api', SubscriptionRoutes);
 app.use('/api/new-qr', NewQrRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {

@@ -3,18 +3,19 @@ import { registerUserLogic } from '../services/UsersServices.js'
 import { Request, Response } from "express";
 
 interface AuthenticationReqBody {
+    uid: string,
     name: string,
     email: string
 }
 
 export const registerUser = async (req: Request<{}, {}, AuthenticationReqBody>, res: Response) => {
-    const {name, email} = req.body;
+    const {uid, name, email} = req.body;
 
-    if(!email || !name) {
+    if(!uid || !email || !name) {
         return res.status(400).json({success: false, message: "Fill all the required fields!"});
     }
     
-    const userData = new UsersModels({name, email});
+    const userData = new UsersModels({uid, name, email});
 
     try {
         const response = await registerUserLogic(userData);
