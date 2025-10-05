@@ -58,7 +58,7 @@ const Header = () => {
         </div>
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 cursor-pointer" onClick={()=>navigate('/hero')}>
         <div className="px-2 py-1 bg-pink-500 text-white rounded-md text-lg font-bold">QR</div>
         <p className="font-bold text-2xl text-black">QweRty</p>
       </div>

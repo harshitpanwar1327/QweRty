@@ -1,38 +1,60 @@
-export interface INewQrData {
-    user_id?: number;
-    name?: string;
-    qr_type?: string;
-    content?: object | string;
-    design?: object | string;
-    from_date?: Date | string;
-    to_date?: Date | string;
-    scan_limit?: number;
-    password?: string | number;
-    state?: string;
+interface Whatsapp {
+  whatsappNumber?: string,
+  whatsappMessage?: string
+}
+
+interface Wifi {
+  ssid?: string,
+  password?: string,
+  encryption?: string
+}
+
+interface QrContent {
+  url?: string;
+  text?: string;
+  email?: string;
+  whatsapp?: Whatsapp;
+  wifi?: Wifi;
+  location?: string;
+  vCard?: string;
+}
+
+interface QrDesign {
+  borderColour?: string;
+  backgroundColour?: string;
+  logo?: string;
+}
+
+interface QrConfiguration {
+  from_date?: string;
+  to_date?: string;
+  scan_limit?: number;
+  password?: string;
+}
+
+interface NewQrData {
+  user_id: string;
+  name: string;
+  qr_type: string;
+  content: QrContent;
+  design: QrDesign;
+  configuration: QrConfiguration;
 }
 
 export class NewQrModels {
-    user_id?: number;
-    name?: string;
-    qr_type?: string;
-    content?: object | string;
-    design?: object | string;
-    from_date?: Date | string;
-    to_date?: Date | string;
-    scan_limit?: number;
-    password?: string | number;
-    state?: string;
+  user_id: string;
+  name: string;
+  qr_type: string;
+  content: QrContent;
+  design: QrDesign;
+  configuration: QrConfiguration;
 
-    constructor(userNewQr: INewQrData) {
-        this.user_id = userNewQr.user_id;
-        this.name = userNewQr.name;
-        this.qr_type = userNewQr.qr_type;
-        this.content = userNewQr.content;
-        this.design = userNewQr.design;
-        this.from_date = userNewQr.from_date;
-        this.to_date = userNewQr.to_date;
-        this.scan_limit = userNewQr.scan_limit;
-        this.password = userNewQr.password;
-        this.state = userNewQr.state;
-    }
+  constructor(data: NewQrData) {
+    this.user_id = data.user_id;
+    this.name = data.name;
+    this.qr_type = data.qr_type;
+    this.content = data.content;
+    this.design = data.design;
+    this.configuration = data.configuration;
+  }
 }

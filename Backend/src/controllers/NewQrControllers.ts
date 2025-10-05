@@ -1,16 +1,30 @@
 import { Request, Response } from "express";
-import { NewQrModels } from '../models/NewQrModels.js'
-import { getNewQrLogic, postNewQrLogic, updateNewQrLogic, deleteNewQrLogic } from '../services/NewQrServices.js'
+import { NewQrModels } from '../models/NewQrModels.js';
+import { getNewQrLogic, postNewQrLogic, updateNewQrLogic, deleteNewQrLogic } from '../services/NewQrServices.js';
 
-export const getNewQr = async (req: Request, res: Response) => {
-    const id = req.params.user_id;
+interface NewQrReqBody {
+    user_id: string; 
+    name: string;
+    qr_type: string;
+    content: object;
+    design: object;
+    configuration: object;
+}
 
-    if(!id){
+interface NewQrReqParams {
+    id?: string;
+    uid?: string;
+}
+
+export const getNewQr = async (req: Request<NewQrReqParams>, res: Response) => {
+    const { uid } = req.params;
+
+    if(!uid){
         return res.status(400).json({success: false, message: "User id not found!"});
     }
 
     try {
-        let response = await getNewQrLogic(id);
+        let response = await getNewQrLogic(uid);
         if(response.success){
             return res.status(200).json(response);
         }else{
@@ -22,14 +36,14 @@ export const getNewQr = async (req: Request, res: Response) => {
     }
 }
 
-export const postNewQr = async(req: Request, res: Response)=>{
-    const { user_id, name, qr_type, content, design, from_date , to_date, scan_limit, password, state } = req.body;
+export const postNewQr = async(req: Request<{}, {}, NewQrReqBody>, res: Response)=>{
+    const { user_id, name, qr_type, content, design, configuration } = req.body;
     
     if(!user_id || !name || !qr_type || !content){
-        return res.status(400).json({success: false, message: "All fields required!"});
+        return res.status(400).json({success: false, message: "Fill all the required fields!"});
     }
     
-    const newQrData = new NewQrModels({user_id, name, qr_type, content, design, from_date, to_date, scan_limit, password, state});
+    const newQrData = new NewQrModels({user_id, name, qr_type, content, design, configuration});
     
     try {
         const response = await postNewQrLogic(newQrData);
@@ -44,18 +58,18 @@ export const postNewQr = async(req: Request, res: Response)=>{
     }
 }
 
-export const updateNewQr = async(req: Request, res: Response)=>{
-    const id = req.params.id;
-    const {user_id, name, qr_type, content, design, from_date , to_date, scan_limit, password, state } = req.body;
+export const updateNewQr = async(req: Request<NewQrReqParams, {}, NewQrReqBody>, res: Response)=>{
+    const { id } = req.params;
+    const {user_id, name, qr_type, content, design, configuration } = req.body;
 
-    if(!id){
-        return res.status(400).json({success: false, message: "QR id not found!"});
+    if(!id || !user_id || !name || !qr_type || !content){
+        return res.status(400).json({success: false, message: "Fill all the required fields!"});
     }
 
-    const newQrData = new NewQrModels({user_id, name, qr_type, content, design, from_date , to_date, scan_limit, password, state });
+    const newQrData = new NewQrModels({user_id, name, qr_type, content, design, configuration});
     
     try {
-        let response = await updateNewQrLogic(id, newQrData);
+        let response = await updateNewQrLogic(Number(id), newQrData);
         if(response.success){
             return res.status(200).json(response);
         }else{
@@ -67,15 +81,15 @@ export const updateNewQr = async(req: Request, res: Response)=>{
     }
 }
 
-export const deleteNewQr = async(req: Request, res: Response)=>{
-    const {id} = req.params;    
+export const deleteNewQr = async(req: Request<NewQrReqParams>, res: Response)=>{
+    const { id } = req.params;    
 
     if(!id){
-        return res.status(400).json({success: false, message: "NewQr id not found!"});
+        return res.status(400).json({success: false, message: "Qr id not found!"});
     }
 
     try {
-        const response = await deleteNewQrLogic(id);
+        const response = await deleteNewQrLogic(Number(id));
         if(response.success){
             return res.status(200).json(response);
         }else{

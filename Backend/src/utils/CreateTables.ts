@@ -22,12 +22,12 @@ const subscriptions = `CREATE TABLE IF NOT EXISTS subscriptions(
 const qr_codes = `CREATE TABLE IF NOT EXISTS qr_codes(
     qr_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(50) NOT NULL,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) UNIQUE NOT NULL,
     qr_type ENUM('Website', 'Text', 'WhatsApp', 'Email', 'WiFi') NOT NULL,
     content JSON NOT NULL,
     design JSON,
     configuration JSON,
-    state ENUM('Active', 'Paused', 'Pending', 'Finished', 'Deleted'),
+    qr TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE

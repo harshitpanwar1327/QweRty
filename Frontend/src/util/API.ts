@@ -29,7 +29,7 @@ API.interceptors.response.use(
     const status = error.response?.status;
     const errorCode = error.response?.data?.code;
 
-    if (status === 401 && errorCode === 'TOKEN_EXPIRED' && !isAlertShown) {
+    if (status === 401 && errorCode === 'TOKEN_INVALID' && !isAlertShown) {
       isAlertShown = true;
 
       await Swal.fire({
@@ -40,7 +40,7 @@ API.interceptors.response.use(
       });
 
       sessionStorage.clear();
-      window.location.href = '/login';
+      window.location.href = '/#/login';
     }
 
     return Promise.reject(error);

@@ -7,7 +7,7 @@ const Event = () => {
         <img src={website} alt="img" className="h-[60vh] lg:h-[80vh] relative bottom-25" />
       </div>
 
-      <div className="w-full p-4 md:p-8 md:pl-24 bg-[#F7F7F7] rounded-b-lg z-1">
+      <div className="w-full p-4 md:p-8 bg-[#F7F7F7] rounded-b-lg z-1">
         <div className='w-full md:w-2/3 flex flex-col justify-center gap-3'>
           <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">Event</h2>
           <p className="text-gray-600 text-sm md:text-md lg:text-lg">Simplify event access. Scanning opens event details like date, time, location, and ticket links, helping attendees save or register easily.</p>

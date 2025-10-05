@@ -45,13 +45,15 @@ export const postSubscriptionLogic = async (subscriptionData: SubscriptionData) 
 
         if (activePlan) {
             adjustedDays = calculateAdjustedDays(activePlan, SubscriptionPlans[subscriptionData.plan_name]?.[subscriptionData.duration]?.productId);
+
+            await pool.query(`UPDATE subscriptions SET expiry_date = ? WHERE subscription_id = ?;`, [today.toISOString().slice(0, 19).replace('T', ' '), activePlan.subscription_id]);
         }
 
         const selectedPlan = SubscriptionPlans[subscriptionData.plan_name]?.[subscriptionData.duration];
         if (!selectedPlan) {
             return { success: false, message: "Invalid plan or duration." };
         }
-
+        
         const expiryDate = new Date(today.getTime() + (selectedPlan.days + adjustedDays) * 24 * 60 * 60 * 1000);
 
         const insertQuery = `INSERT INTO subscriptions (user_id, plan_name, duration, productId, purchase_date, expiry_date) VALUES (?, ?, ?, ?, ?, ?);`;

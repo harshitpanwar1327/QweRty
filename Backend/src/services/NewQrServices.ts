@@ -2,22 +2,9 @@ import { pool } from '../config/Database.js';
 import bcrypt from 'bcryptjs'
 import QRCode from "qrcode";
 
-interface NewQrData {
-    user_id?: number;
-    name?: string;
-    qr_type?: string;
-    content?: object | string;
-    design?: object | string;
-    from_date?: Date | string;
-    to_date?: Date | string;
-    scan_limit?: number;
-    password?: string | number;
-    state?: string;
-}
-
-export const getNewQrLogic = async (id: number) => {
+export const getNewQrLogic = async (uid: string) => {
     try {
-        const [rows] = await pool.query("SELECT * FROM qr_codes WHERE user_id = ?", [id]);
+        const [rows] = await pool.query("SELECT * FROM qr_codes WHERE user_id = ?", [uid]);
         const dataWithQr: any[] = [];
 
         for (let row of rows as any[]) {
@@ -64,28 +51,28 @@ export const getNewQrLogic = async (id: number) => {
     }
 };
 
-export const postNewQrLogic = async (newQrData: NewQrData) => {
+export const postNewQrLogic = async (newQrData: any) => {
     try {
-        const hashedPassword = newQrData.password
-            ? await bcrypt.hash(newQrData.password.toString(), 10)
-            : null;
-
         let qrPayload: string = "";
+
         switch (newQrData.qr_type) {
             case "website":
-                qrPayload = newQrData.content as string;
+                qrPayload = newQrData.content.url as string;
                 break;
             case "text":
-                qrPayload = newQrData.content as string;
+                qrPayload = newQrData.content.text as string;
                 break;
             case "whatsApp":
-                qrPayload = `https://wa.me/${newQrData.content}`;
+                const whatsapp = newQrData.content.whatsapp || {};
+                const phone = whatsapp.whatsappNumber?.replace(/\D/g, "");
+                const message = encodeURIComponent(whatsapp.whatsappMessage || "");
+                qrPayload = `https://wa.me/${phone}${message ? `?text=${message}` : ""}`;;
                 break;
             case "email":
-                qrPayload = `mailto:${newQrData.content}`;
+                qrPayload = `mailto:${newQrData.content.email}`;
                 break;
             case "wiFi":
-                const wifi = newQrData.content as any;
+                const wifi = newQrData.content.wiFi as any;
                 qrPayload = `WIFI:T:${wifi.encryption};S:${wifi.ssid};P:${wifi.password};;`;
                 break;
             default:
@@ -94,10 +81,7 @@ export const postNewQrLogic = async (newQrData: NewQrData) => {
 
         const qrImageBase64 = await QRCode.toDataURL(qrPayload);
 
-        const query = `
-          INSERT INTO qr_codes(user_id, name, qr_type, content, design, from_date, to_date, scan_limit, password, state) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-        `;
+        const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr) VALUES (?, ?, ?, ?, ?, ?, ?);`;
 
         const values = [
             newQrData.user_id,
@@ -105,24 +89,16 @@ export const postNewQrLogic = async (newQrData: NewQrData) => {
             newQrData.qr_type,
             JSON.stringify(newQrData.content),
             JSON.stringify(newQrData.design),
-            newQrData.from_date,
-            newQrData.to_date,
-            newQrData.scan_limit,
-            hashedPassword,
-            newQrData.state,
+            JSON.stringify(newQrData.configuration),
+            qrImageBase64
         ];
 
-        const [result] = await pool.query(query, values);
+        await pool.query(query, values);
 
-        return {
-            success: true,
-            message: "QR added successfully.",
-            qr_code_id: (result as any).insertId,
-            qr_image: qrImageBase64
-        };
+        return { success: true, message: "QR generated successfully.", qr_image: qrImageBase64 };
     } catch (error) {
         console.error(error);
-        return { success: false, message: "QR not added!" };
+        return { success: false, message: "Unable to generate QR!" };
     }
 };
 

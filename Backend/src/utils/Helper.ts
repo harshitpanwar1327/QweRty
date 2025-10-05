@@ -27,13 +27,25 @@ const SubscriptionProducts: Record<string, { amount: number; duration: number }>
 
 export const calculateAdjustedDays = (oldPlan: any, newPlanProductId: string): number => {
   const today = new Date();
-
   const oldExpiryDate = new Date(oldPlan.expiry_date);
-  const oldPlanPerDay = SubscriptionProducts[oldPlan.productId].amount/SubscriptionProducts[oldPlan.productId].duration;
-  const oldPlanRemainingDays = (oldExpiryDate.getTime() - today.getTime())/(1000 * 60 * 60 * 24);
-  const oldRemainingAmount = oldPlanRemainingDays * oldPlanPerDay;
-  
-  const newPlanPerDay = SubscriptionProducts[newPlanProductId].amount/SubscriptionProducts[newPlanProductId].duration;
 
-  return Math.ceil(oldRemainingAmount/newPlanPerDay);
+  if (oldExpiryDate <= today) return 0;
+
+  const oldProduct = SubscriptionProducts[oldPlan.productId];
+  const newProduct = SubscriptionProducts[newPlanProductId];
+
+  if (!oldProduct || !newProduct || !oldProduct.duration || !newProduct.duration) {
+    console.warn("Invalid product configuration for adjusted days.");
+    return 0;
+  }
+
+  const oldPlanRemainingDays = (oldExpiryDate.getTime() - today.getTime())/(1000 * 60 * 60 * 24);
+
+  const oldPlanPerDay = oldProduct.amount / oldProduct.duration;
+  const newPlanPerDay = newProduct.amount / newProduct.duration;
+
+  const oldRemainingAmount = oldPlanRemainingDays * oldPlanPerDay;
+  const adjustedDays = oldRemainingAmount / newPlanPerDay;
+
+  return Math.max(0, Math.ceil(adjustedDays));
 }

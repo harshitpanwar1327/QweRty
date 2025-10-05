@@ -1,12 +1,12 @@
-import { Language, PictureAsPdf, AccountBox, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn } from "@mui/icons-material"
+import { Language, PictureAsPdf, AccountBox, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge } from "@mui/icons-material"
 import Footer from "../../components/Footer.js"
 import Header from "../../components/Header.js"
 import Website from "../../section/Website.js"
 import Text from "../../section/Text.js"
 import Pdf from "../../section/Pdf.js"
 import Whatsapp from '../../section/Whatsapp.js'
-import Emails from '../../section/Email.js'
-import Wifis from '../../section/Wifi.js'
+import EmailSection from '../../section/Email.js'
+import WifiSection from '../../section/Wifi.js'
 import SocialMedia from "../../section/SocialMedia.js"
 import App from "../../section/Apps.js"
 import Feedbacks from "../../section/Feedback.js"
@@ -16,6 +16,7 @@ import Location from "../../section/Location.js"
 import MP3 from "../../section/MP3.js"
 import Video from "../../section/Video.js"
 import Images from "../../section/Image.js"
+import ContactPlus from "../../section/vCardPlus.js"
 
 const qrTypes = [
   { icon: <Language fontSize="large" />, label: "Website" },
@@ -23,6 +24,8 @@ const qrTypes = [
   { icon: <WhatsApp fontSize="large" />, label: "WhatsApp" },
   { icon: <Email fontSize="large" />, label: "Email" },
   { icon: <Wifi fontSize="large" />, label: "WiFi" },
+  { icon: <LocationOn fontSize="large" />, label: "Location" },
+  { icon: <AccountBox fontSize="large" />, label: "vCard" },
   { icon: <People fontSize="large" />, label: "Social Media" },
   { icon: <Apps fontSize="large" />, label: "Apps" },
   { icon: <Feedback fontSize="large" />, label: "Feedback" },
@@ -30,9 +33,8 @@ const qrTypes = [
   { icon: <Image fontSize="large" />, label: "Images" },
   { icon: <Videocam fontSize="large" />, label: "Video" },
   { icon: <QueueMusic fontSize="large" />, label: "MP3" },
-  { icon: <LocationOn fontSize="large" />, label: "Location" },
   { icon: <Event fontSize="large" />, label: "Event" },
-  { icon: <AccountBox fontSize="large" />, label: "vCard" },
+  { icon: <Badge fontSize="large" />, label: "vCard Plus" },
 ];
 
 const Hero = () => {
@@ -59,8 +61,10 @@ const Hero = () => {
       <Website />
       <Text />
       <Whatsapp />
-      <Emails />
-      <Wifis />
+      <EmailSection />
+      <WifiSection />
+      <Location />
+      <Contact />
       <SocialMedia />
       <App />
       <Feedbacks />
@@ -68,9 +72,8 @@ const Hero = () => {
       <Images />
       <Video />
       <MP3 />
-      <Location />
       <Events />
-      <Contact />
+      <ContactPlus />
 
       <Footer />
     </div>
