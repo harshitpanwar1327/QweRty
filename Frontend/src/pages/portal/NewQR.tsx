@@ -39,26 +39,41 @@ const qrTypes: QRTypeArray[] = [
   { key: "vcardplus", icon: <Badge fontSize="medium" />, label: "vCard Plus" },
 ];
 
-const tabsArray: string[] = ["Frame", "Shape", "Logo", "Level"];
+const locationTabsArray: string[] = ["Complete", "Coordinates"];
+
+const designTabsArray: string[] = ["Frame", "Shape", "Logo", "Level"];
 
 const NewQR: React.FC<NewQRProp> = ({ activeTab }) => {
-  const [designTab, setDesignTab] = useState<string>("Frame");
-  const [qrPreview, setQrPreview] = useState<string>("");
-  const [openDownloadModal, setOpenDownload] = useState<boolean>(false);
-
   const uid = sessionStorage.getItem('userId') || '';
 
   const [qrType, setQrType] = useState<string>(activeTab || "website");
   const [qrName, setQrName] = useState<string>('');
 
+  // 1. Website state
   const [websiteContent, setWebsiteContent] = useState<string>('');
+  // 2. Text state
   const [textContent, setTextContent] = useState<string>('');
+  // 3. Whatsapp state
   const [whatsappNumber, setWhatsappNumber] = useState<string>('');
   const [whatsappMessage, setWhatsappMessage] = useState<string>('');
+  // 4. Email state
   const [emailContent, setEmailContent] = useState<string>('');
+  // 5. Wifi state
   const [wifiSsid, setWifiSsid] = useState<string>('');
   const [wifiPassword, setWifiPassword] = useState<string>('');
   const [wifiEncryption, setWifiEncryption] = useState<string>('');
+  // 6. Location state
+  const [locationTab, setLocationTab] = useState<string>('Complete');
+  const [locationStreet, setLocationStreet] = useState<string>('');
+  const [locationArea, setLocationArea] = useState<string>('');
+  const [locationPostalCode, setLocationPostalCode] = useState<string>('');
+  const [locationCity, setLocationCity] = useState<string>('');
+  const [locationState, setLocationState] = useState<string>('');
+  const [locationCountry, setLocationCountry] = useState<string>('');
+  const [latitude, setLatitude] = useState<string>('');
+  const [longitude, setLongitude] = useState<string>('');
+
+  const [designTab, setDesignTab] = useState<string>('Frame');
 
   const [borderColour, setBorderColour] = useState<string>('');
   const [backgroundColour, setBackgroungColour] = useState<string>('');
@@ -68,6 +83,9 @@ const NewQR: React.FC<NewQRProp> = ({ activeTab }) => {
   const [toDate, setToDate] = useState<string>('');
   const [scanLimit, setScanLimit] = useState<number | null>(null);
   const [password, setPassword] = useState<string>('');
+
+  const [qrPreview, setQrPreview] = useState<string>("");
+  const [openDownloadModal, setOpenDownload] = useState<boolean>(false);
 
   const handleGenerateQr = async () => {
     try {
@@ -88,7 +106,21 @@ const NewQR: React.FC<NewQRProp> = ({ activeTab }) => {
             password: wifiPassword,
             encryption: wifiEncryption
           },
-          location: "",
+          location: {
+            mode: locationTab,
+            address: {
+              locationStreet,
+              locationArea,
+              locationPostalCode,
+              locationCity,
+              locationState,
+              locationCountry
+            },
+            coordinates: {
+              latitude,
+              longitude
+            }
+          },
           vCard: ""
         },
         design: {
@@ -125,7 +157,7 @@ const NewQR: React.FC<NewQRProp> = ({ activeTab }) => {
         <Menubar heading='New QR'/>
 
         <form className="grow bg-white rounded-md overflow-y-auto flex flex-col md:flex-row gap-8 p-2" onSubmit={handleGenerateQr}>
-          <div className="w-full md:w-2/3 flex flex-col gap-8 p-6 md:overflow-y-auto">
+          <div className="w-full md:w-2/3 flex flex-col gap-8 md:p-6 md:overflow-y-auto">
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">1</span> Select the QR type</h3>
               <Select value={qrType} onChange={(e) => setQrType(e.target.value)} className="w-full lg:w-2/3" required>
@@ -151,7 +183,7 @@ const NewQR: React.FC<NewQRProp> = ({ activeTab }) => {
 
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">3</span> Complete the content</h3>
-
+              {/* 1. Website Section */}
               {qrType==='website' &&
                 <div className="flex flex-col gap-1">
                   <label>Enter your Website</label>
@@ -159,6 +191,7 @@ const NewQR: React.FC<NewQRProp> = ({ activeTab }) => {
                 </div>
               }
 
+              {/* 2. Text Section */}
               {qrType==='text' &&
                 <div className="flex flex-col gap-1">
                   <label>Message</label>
@@ -169,6 +202,7 @@ const NewQR: React.FC<NewQRProp> = ({ activeTab }) => {
                 </div>
               }
 
+              {/* 3. Whatsapp Section */}
               {qrType==='whatsapp' &&
                 <div className="flex flex-col gap-1">
                   <label>Number</label>
@@ -181,6 +215,7 @@ const NewQR: React.FC<NewQRProp> = ({ activeTab }) => {
                 </div>
               }
 
+              {/* 4. Email Section */}
               {qrType==='email' &&
                 <div className="flex flex-col gap-1">
                   <label>Enter your Website</label>
@@ -188,6 +223,7 @@ const NewQR: React.FC<NewQRProp> = ({ activeTab }) => {
                 </div>
               }
 
+              {/* 5. Wifi Section */}
               {qrType==='wifi' &&
                 <div className="flex flex-col gap-1">
                   <label>Network name (SSID)</label>
@@ -204,13 +240,81 @@ const NewQR: React.FC<NewQRProp> = ({ activeTab }) => {
                 </div>
               }
 
+              {/* 6. Location Section */}
               {qrType==='location' &&
                 <div className="flex flex-col gap-1">
-                  <label>Enter your Website</label>
-                  <input type="text" placeholder="E.g. https://www.myweb.com/" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={websiteContent} onChange={(e) => setWebsiteContent(e.target.value)} required/>
+                  <div className="grid grid-cols-2 gap-2 mb-2 p-2 bg-gray-100 rounded-md">
+                    {locationTabsArray.map((tab, index)=>(
+                      <button type="button" key={index} onClick={()=>setLocationTab(tab)} className={`py-3 bg-white text-sm rounded-md border-2 ${locationTab === tab ? "text-pink-500 border-pink-500 font-bold" : "text-gray-500 border-gray-300 hover:border-pink-500"} transition duration-300`}>{tab}</button>
+                    ))}
+                  </div>
+                  {locationTab==='Complete' &&
+                    <>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="flex flex-col gap-1">
+                          <label>Street</label>
+                          <input type="text" placeholder="E.g. 403" className="md:w-2/3 p-2 border border-gray-300 rounded" value={locationStreet} onChange={(e) => setLocationStreet(e.target.value)} />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label>Area</label>
+                          <input type="text" placeholder="E.g. Sector-3" className="p-2 border border-gray-300 rounded" value={locationArea} onChange={(e) => setLocationArea(e.target.value)} required/>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label>Postal Code</label>
+                          <input type="text" placeholder="E.g. 122001" className="p-2 border border-gray-300 rounded" value={locationPostalCode} onChange={(e) => setLocationPostalCode(e.target.value)} required/>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-col gap-1">
+                          <label>City</label>
+                          <input type="text" placeholder="E.g. Gurugram" className="p-2 border border-gray-300 rounded" value={locationCity} onChange={(e) => setLocationCity(e.target.value)} required/>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label>State</label>
+                          <input type="text" placeholder="E.g. Haryana" className="p-2 border border-gray-300 rounded" value={locationState} onChange={(e) => setLocationState(e.target.value)} required/>
+                        </div>
+                      </div>
+
+                      <label>Country</label>
+                      <input type="text" placeholder="E.g. India" className="w-2/3 p-2 border border-gray-300 rounded" value={locationCountry} onChange={(e) => setLocationCountry(e.target.value)} required/>
+                    </>
+                  }
+
+                  {locationTab==='Coordinates' &&
+                    <>
+                      <label>Latitude</label>
+                      <input type="text" placeholder="E.g. 28.4595" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={latitude} onChange={(e) => setLatitude(e.target.value)} required/>
+                      <label>Longitude</label>
+                      <input type="text" placeholder="E.g. 77.0266" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={longitude} onChange={(e) => setLongitude(e.target.value)} required/>
+                    </>
+                  }
+                  
+                  {((locationTab === 'Coordinates' && latitude && longitude) ||
+                    (locationTab === 'Complete' && (locationStreet || locationCity))) && (
+                    <div className="mt-3">
+                      <label className="font-medium text-gray-700 mb-1">Preview Map</label>
+                      <iframe
+                        title="Location Preview"
+                        width="100%"
+                        height="250"
+                        loading="lazy"
+                        allowFullScreen
+                        className="rounded-xl border border-gray-200 shadow-sm"
+                        src={
+                          locationTab === 'Coordinates'
+                            ? `https://www.google.com/maps?q=${latitude},${longitude}&hl=es;z=14&output=embed`
+                            : `https://www.google.com/maps?q=${encodeURIComponent(
+                                `${locationStreet}, ${locationArea}, ${locationCity}, ${locationState}, ${locationCountry}`
+                              )}&hl=es;z=14&output=embed`
+                        }
+                      ></iframe>
+                    </div>
+                  )}
                 </div>
               }
 
+              {/* 7. vCard Section */}
               {qrType==='vcard' &&
                 <div className="flex flex-col gap-1">
                   <label>Enter your Website</label>
@@ -223,11 +327,9 @@ const NewQR: React.FC<NewQRProp> = ({ activeTab }) => {
 
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">4</span> Design your QR</h3>
-              <div className="flex gap-2">
-                {tabsArray.map((tab, index) => (
-                  <button type="button" key={index} onClick={()=>setDesignTab(tab)} className={`py-3 px-4 text-sm rounded-md ${designTab === tab ? "text-pink-500 bg-pink-100" : "text-gray-600 hover:text-pink-500 hover:bg-pink-100"}`}>
-                    {tab}
-                  </button>
+              <div className="grid grid-cols-4 gap-2">
+                {designTabsArray.map((tab, index) => (
+                  <button type="button" key={index} onClick={()=>setDesignTab(tab)} className={`py-3 text-sm rounded-md ${designTab === tab ? "text-pink-500 bg-pink-100" : "text-gray-600 hover:text-pink-500 hover:bg-pink-100"}`}>{tab}</button>
                 ))}
               </div>
             </div>

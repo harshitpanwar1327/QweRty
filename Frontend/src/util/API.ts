@@ -29,7 +29,7 @@ API.interceptors.response.use(
     const status = error.response?.status;
     const errorCode = error.response?.data?.code;
 
-    if (status === 401 && errorCode === 'TOKEN_INVALID' && !isAlertShown) {
+    if (status === 401 && errorCode === ('TOKEN_INVALID') && !isAlertShown) {
       isAlertShown = true;
 
       await Swal.fire({

@@ -23,7 +23,7 @@ const qr_codes = `CREATE TABLE IF NOT EXISTS qr_codes(
     qr_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(50) NOT NULL,
     name VARCHAR(100) UNIQUE NOT NULL,
-    qr_type ENUM('Website', 'Text', 'WhatsApp', 'Email', 'WiFi') NOT NULL,
+    qr_type ENUM('website', 'text', 'whatsApp', 'email', 'wiFi', 'location', 'vCard') NOT NULL,
     content JSON NOT NULL,
     design JSON,
     configuration JSON,

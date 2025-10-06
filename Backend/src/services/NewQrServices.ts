@@ -5,49 +5,11 @@ import QRCode from "qrcode";
 export const getNewQrLogic = async (uid: string) => {
     try {
         const [rows] = await pool.query("SELECT * FROM qr_codes WHERE user_id = ?", [uid]);
-        const dataWithQr: any[] = [];
 
-        for (let row of rows as any[]) {
-            if (typeof row.design === "string") {
-                row.design = JSON.parse(row.design);
-            }
-
-            if (typeof row.content === "string") {
-                try {
-                    row.content = JSON.parse(row.content);
-                } catch {
-                    // plain string like website URL is fine
-                }
-            }
-
-            let qrPayload = "";
-            switch (row.qr_type) {
-                case "Website":
-                case "Text":
-                    qrPayload = typeof row.content === "object" ? row.content.value || JSON.stringify(row.content) : row.content;
-                    break;
-                case "WhatsApp":
-                    qrPayload = `https://wa.me/${row.content.number || row.content}`;
-                    break;
-                case "Email":
-                    qrPayload = `mailto:${row.content.email || row.content}`;
-                    break;
-                case "WiFi":
-                    qrPayload = `WIFI:T:${row.content.encryption};S:${row.content.ssid};P:${row.content.password};;`;
-                    break;
-                default:
-                    qrPayload = typeof row.content === "object" ? JSON.stringify(row.content) : row.content;
-            }
-
-            row.qr_image = await QRCode.toDataURL(qrPayload);
-
-            dataWithQr.push(row);
-        }
-
-        return { success: true, data: dataWithQr };
+        return { success: true, data: rows };
     } catch (error) {
         console.error("Get QR by user error:", error);
-        return { success: false, message: "Failed to fetch QR codes" };
+        return { success: false, message: "Failed to fetch QR codes!" };
     }
 };
 
@@ -62,7 +24,7 @@ export const postNewQrLogic = async (newQrData: any) => {
             case "text":
                 qrPayload = newQrData.content.text as string;
                 break;
-            case "whatsApp":
+            case "whatsapp":
                 const whatsapp = newQrData.content.whatsapp || {};
                 const phone = whatsapp.whatsappNumber?.replace(/\D/g, "");
                 const message = encodeURIComponent(whatsapp.whatsappMessage || "");
@@ -75,8 +37,23 @@ export const postNewQrLogic = async (newQrData: any) => {
                 const wifi = newQrData.content.wiFi as any;
                 qrPayload = `WIFI:T:${wifi.encryption};S:${wifi.ssid};P:${wifi.password};;`;
                 break;
+            case "location":
+                const location = newQrData.content?.location || {};
+                switch (location.mode) {
+                    case "Complete":
+                        const address = location?.address || {};
+                        const fullAddress = `${address.locationStreet || ""}, ${address.locationArea || ""}, ${address.locationCity || ""}, ${address.locationState || ""}, ${address.locationCountry || ""}`;
+                        qrPayload = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+                        break;
+                    case "Coordinates":
+                        qrPayload = `https://www.google.com/maps?q=${location?.coordinates?.latitude},${location?.coordinates?.longitude}`;
+                        break;
+                    default:
+                        throw new Error("Invalid location mode");
+                }
+                break;
             default:
-                qrPayload = newQrData.content as string;
+                throw new Error("Invalid qr type");
         }
 
         const qrImageBase64 = await QRCode.toDataURL(qrPayload);
@@ -118,11 +95,11 @@ export const updateNewQrLogic = async (id: number, newQrData: NewQrData) => {
 
 export const deleteNewQrLogic = async (id: number) => {
     try {
-        await pool.query(`DELETE FROM qr_codes WHERE qr_id= ?`,[id]);
+        await pool.query(`DELETE FROM qr_codes WHERE qr_id= ?;`,[id]);
         
-        return {success: true, message: "QR deleted successfully"};
+        return {success: true, message: "QR deleted successfully."};
     } catch (error) {
         console.log(error);
-        return {success: false, message: "QR not deleted!"};
+        return {success: false, message: "Unable to delete QR!"};
     }
 };
