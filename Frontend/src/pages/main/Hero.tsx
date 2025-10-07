@@ -10,34 +10,46 @@ import WifiSection from '../../section/Wifi.js'
 import SocialMedia from "../../section/SocialMedia.js"
 import App from "../../section/Apps.js"
 import Feedbacks from "../../section/Feedback.js"
-import Contact from "../../section/vCard.js"
+import Contact from "../../section/VCard.js"
 import Events from "../../section/Event.js"
 import Location from "../../section/Location.js"
 import MP3 from "../../section/MP3.js"
 import Video from "../../section/Video.js"
 import Images from "../../section/Image.js"
-import ContactPlus from "../../section/vCardPlus.js"
+import ContactPlus from "../../section/VCardPlus.js"
+import { useNavigate } from 'react-router-dom'
+import type { AppDispatch } from '../../app/Store'
+import { useDispatch } from 'react-redux'
+import { activeTab } from '../../features/qrType/QrTypeSlice'
 
 const qrTypes = [
-  { icon: <Language fontSize="large" />, label: "Website" },
-  { icon: <TextFields fontSize="large" />, label: "Text" },
-  { icon: <WhatsApp fontSize="large" />, label: "WhatsApp" },
-  { icon: <Email fontSize="large" />, label: "Email" },
-  { icon: <Wifi fontSize="large" />, label: "WiFi" },
-  { icon: <LocationOn fontSize="large" />, label: "Location" },
-  { icon: <AccountBox fontSize="large" />, label: "vCard" },
-  { icon: <People fontSize="large" />, label: "Social Media" },
-  { icon: <Apps fontSize="large" />, label: "Apps" },
-  { icon: <Feedback fontSize="large" />, label: "Feedback" },
-  { icon: <PictureAsPdf fontSize="large" />, label: "PDF" },
-  { icon: <Image fontSize="large" />, label: "Images" },
-  { icon: <Videocam fontSize="large" />, label: "Video" },
-  { icon: <QueueMusic fontSize="large" />, label: "MP3" },
-  { icon: <Event fontSize="large" />, label: "Event" },
-  { icon: <Badge fontSize="large" />, label: "vCard Plus" },
+  { key: 'website', icon: <Language fontSize="large" />, label: "Website" },
+  { key: 'text', icon: <TextFields fontSize="large" />, label: "Text" },
+  { key: 'whatsapp', icon: <WhatsApp fontSize="large" />, label: "WhatsApp" },
+  { key: 'email', icon: <Email fontSize="large" />, label: "Email" },
+  { key: 'wifi', icon: <Wifi fontSize="large" />, label: "WiFi" },
+  { key: 'location', icon: <LocationOn fontSize="large" />, label: "Location" },
+  { key: 'vcard', icon: <AccountBox fontSize="large" />, label: "vCard" },
+  // { key: 'social', icon: <People fontSize="large" />, label: "Social Media" },
+  // { key: 'apps', icon: <Apps fontSize="large" />, label: "Apps" },
+  // { key: 'feedback', icon: <Feedback fontSize="large" />, label: "Feedback" },
+  // { key: 'pdf', icon: <PictureAsPdf fontSize="large" />, label: "PDF" },
+  // { key: 'images', icon: <Image fontSize="large" />, label: "Images" },
+  // { key: 'video', icon: <Videocam fontSize="large" />, label: "Video" },
+  // { key: 'mp3', icon: <QueueMusic fontSize="large" />, label: "MP3" },
+  // { key: 'event', icon: <Event fontSize="large" />, label: "Event" },
+  // { key: 'vcardplus', icon: <Badge fontSize="large" />, label: "vCard Plus" },
 ];
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const handleQrButton = (key: string) => {
+    dispatch(activeTab(key))
+    navigate('/new-qr');
+  }
+
   return (
     <div className="flex flex-col w-screen h-screen overflow-y-auto">
       <Header/>
@@ -50,7 +62,7 @@ const Hero = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
           {qrTypes.map((item, index) => (
-            <div key={index} className="border border-gray-300 rounded-xl flex flex-col items-center justify-center gap-2 p-4 shadow-sm hover:shadow-xl hover:scale-105 hover:border-pink-500 cursor-pointer transition duration-300">
+            <div key={index} className="border border-gray-300 rounded-xl flex flex-col items-center justify-center gap-2 p-4 shadow-sm hover:shadow-xl hover:scale-105 hover:border-pink-500 cursor-pointer transition duration-300" onClick={()=>handleQrButton(item.key)}>
               <div className="text-pink-500">{item.icon}</div>
               <p className="text-center text-gray-800">{item.label}</p>
             </div>
@@ -65,7 +77,7 @@ const Hero = () => {
       <WifiSection />
       <Location />
       <Contact />
-      <SocialMedia />
+      {/* <SocialMedia />
       <App />
       <Feedbacks />
       <Pdf />
@@ -73,7 +85,7 @@ const Hero = () => {
       <Video />
       <MP3 />
       <Events />
-      <ContactPlus />
+      <ContactPlus /> */}
 
       <Footer />
     </div>

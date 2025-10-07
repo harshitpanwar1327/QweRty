@@ -79,7 +79,7 @@ export const postNewQrLogic = async (newQrData: any) => {
     }
 };
 
-export const updateNewQrLogic = async (id: number, newQrData: NewQrData) => {
+export const updateNewQrLogic = async (id: number, newQrData: any) => {
     try {
         let query = `UPDATE qr_codes SET name=?,qr_type=?,content=?, design=?, from_date=?, to_date=?, scan_limit=?, password=?, state=? WHERE qr_id = ?;`;
         let values = [newQrData.name, newQrData.qr_type, newQrData.content, newQrData.design, newQrData.from_date, newQrData.to_date, newQrData.scan_limit, newQrData.password, newQrData.state, id];

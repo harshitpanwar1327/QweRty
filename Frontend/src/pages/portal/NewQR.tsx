@@ -9,10 +9,9 @@ import { toast } from "react-toastify"
 import axios from "axios"
 import { ArrowRight, Download } from "lucide-react"
 import { DownloadQR } from "../../modals/DownloadQR"
-
-interface NewQRProp {
-  activeTab?: string
-}
+import type { AppDispatch, RootState } from '../../app/Store.js'
+import { useSelector, useDispatch } from 'react-redux'
+import { activeTab } from "../../features/qrType/QrTypeSlice.js"
 
 interface QRTypeArray {
   key: string,
@@ -28,25 +27,27 @@ const qrTypes: QRTypeArray[] = [
   { key: "wifi", icon: <Wifi fontSize="medium" />, label: "WiFi" },
   { key: "location", icon: <LocationOn fontSize="medium" />, label: "Location" },
   { key: "vcard", icon: <AccountBox fontSize="medium" />, label: "vCard" },
-  { key: "social", icon: <People fontSize="medium" />, label: "Social Media" },
-  { key: "apps", icon: <Apps fontSize="medium" />, label: "Apps" },
-  { key: "feedback", icon: <Feedback fontSize="medium" />, label: "Feedback" },
-  { key: "pdf", icon: <PictureAsPdf fontSize="medium" />, label: "PDF" },
-  { key: "images", icon: <Image fontSize="medium" />, label: "Images" },
-  { key: "video", icon: <Videocam fontSize="medium" />, label: "Video" },
-  { key: "mp3", icon: <QueueMusic fontSize="medium" />, label: "MP3" },
-  { key: "event", icon: <Event fontSize="medium" />, label: "Event" },
-  { key: "vcardplus", icon: <Badge fontSize="medium" />, label: "vCard Plus" },
+  // { key: "social", icon: <People fontSize="medium" />, label: "Social Media" },
+  // { key: "apps", icon: <Apps fontSize="medium" />, label: "Apps" },
+  // { key: "feedback", icon: <Feedback fontSize="medium" />, label: "Feedback" },
+  // { key: "pdf", icon: <PictureAsPdf fontSize="medium" />, label: "PDF" },
+  // { key: "images", icon: <Image fontSize="medium" />, label: "Images" },
+  // { key: "video", icon: <Videocam fontSize="medium" />, label: "Video" },
+  // { key: "mp3", icon: <QueueMusic fontSize="medium" />, label: "MP3" },
+  // { key: "event", icon: <Event fontSize="medium" />, label: "Event" },
+  // { key: "vcardplus", icon: <Badge fontSize="medium" />, label: "vCard Plus" },
 ];
 
 const locationTabsArray: string[] = ["Complete", "Coordinates"];
 
 const designTabsArray: string[] = ["Frame", "Shape", "Logo", "Level"];
 
-const NewQR: React.FC<NewQRProp> = ({ activeTab }) => {
+const NewQR = () => {
   const uid = sessionStorage.getItem('userId') || '';
 
-  const [qrType, setQrType] = useState<string>(activeTab || "website");
+  const qrType = useSelector((state: RootState) => state.qrType.type);
+  const dispatch = useDispatch<AppDispatch>();
+
   const [qrName, setQrName] = useState<string>('');
 
   // 1. Website state
@@ -160,7 +161,7 @@ const NewQR: React.FC<NewQRProp> = ({ activeTab }) => {
           <div className="w-full md:w-2/3 flex flex-col gap-8 md:p-6 md:overflow-y-auto">
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">1</span> Select the QR type</h3>
-              <Select value={qrType} onChange={(e) => setQrType(e.target.value)} className="w-full lg:w-2/3" required>
+              <Select value={qrType} onChange={(e) => dispatch(activeTab(e.target.value))} className="w-full lg:w-2/3" required>
                 {qrTypes.map((data, index) => (
                   <MenuItem value={data.key} key={index}>
                     <span className="flex items-center gap-2 text-pink-500">

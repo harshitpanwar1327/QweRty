@@ -18,7 +18,7 @@ const plans = [
     features: [
       { text: "Generate up to 5 QR codes", included: true },
       { text: "Basic customization (color & shape)", included: true },
-      { text: "Access to Website, Text & WiFi QR types", included: true },
+      { text: "Access to 7 QR types", included: true },
       { text: "Download in PNG format only", included: true },
       { text: "No scan analytics", included: true },
       { text: "Limited storage for uploaded files (10MB)", included: true },

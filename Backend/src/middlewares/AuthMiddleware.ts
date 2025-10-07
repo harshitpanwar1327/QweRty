@@ -21,7 +21,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
   } catch (error: any) {
     console.error('Auth error:', error);
 
-    if (error.code === 'TokenExpiredError') {
+    if (error.code === 'auth/id-token-expired') {
       return res.status(401).json({ message: 'Token has expired!', code: 'TOKEN_EXPIRED' });
     }
 

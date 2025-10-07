@@ -1,6 +1,6 @@
 import website from '../assets/Location.png'
 
-const vCardPlus = () => {
+const VCardPlus = () => {
   return (
     <div className="flex flex-col justify-center items-center pt-48 pb-16 px-4">
       <div className='w-full h-[40vh] lg:h-[50vh] bg-gradient-to-b from-yellow-300 to-white rounded-t-lg flex justify-center'>
@@ -18,4 +18,4 @@ const vCardPlus = () => {
   )
 }
 
-export default vCardPlus
+export default VCardPlus
