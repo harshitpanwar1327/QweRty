@@ -1,17 +1,24 @@
 import { useState, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
-import { Language, PictureAsPdf, AccountBox, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge } from "@mui/icons-material"
+import { Language, PictureAsPdf, AccountBox, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge, Loop, PlayArrowRounded } from "@mui/icons-material"
 import { Select, MenuItem } from "@mui/material"
+import { ArrowRight, Download } from "lucide-react"
 import SampleQr from '../../assets/SampleQR.png'
 import API from "../../util/API"
-import { toast } from "react-toastify"
 import axios from "axios"
-import { ArrowRight, Download } from "lucide-react"
+import { toast } from "react-toastify"
 import { DownloadQR } from "../../modals/DownloadQR"
 import type { AppDispatch, RootState } from '../../app/Store.js'
 import { useSelector, useDispatch } from 'react-redux'
 import { activeTab } from "../../features/qrType/QrTypeSlice.js"
+import WebsiteLogic from "../../components/NewQr/WebsiteLogic.js"
+import TextLogic from "../../components/NewQr/TextLogic.js"
+import WhatsappLogic from "../../components/NewQr/WhatsappLogic.js"
+import EmailLogic from "../../components/NewQr/EmailLogic.js"
+import WifiLogic from "../../components/NewQr/WifiLogic.js"
+import LocationLogic from "../../components/NewQr/LocationLogic.js"
+import VCardLogic from "../../components/NewQr/VCardLogic.js"
 
 interface QRTypeArray {
   key: string,
@@ -38,9 +45,20 @@ const qrTypes: QRTypeArray[] = [
   // { key: "vcardplus", icon: <Badge fontSize="medium" />, label: "vCard Plus" },
 ];
 
-const locationTabsArray: string[] = ["Complete", "Coordinates"];
+const designTabsArray: string[] = ["Shape", "Level"];
 
-const designTabsArray: string[] = ["Frame", "Shape", "Logo", "Level"];
+interface levelObject {
+  key: string,
+  label: string,
+  percentage: number
+}
+
+const levelTabsArray: levelObject[] = [
+  { key: 'Q', label: 'Level Q', percentage: 25 },
+  { key: 'H', label: 'Level H', percentage: 30 },
+  { key: 'M', label: 'Level M', percentage: 15 },
+  { key: 'L', label: 'Level L', percentage: 7 }
+]
 
 const NewQR = () => {
   const uid = sessionStorage.getItem('userId') || '';
@@ -50,35 +68,10 @@ const NewQR = () => {
 
   const [qrName, setQrName] = useState<string>('');
 
-  // 1. Website state
-  const [websiteContent, setWebsiteContent] = useState<string>('');
-  // 2. Text state
-  const [textContent, setTextContent] = useState<string>('');
-  // 3. Whatsapp state
-  const [whatsappNumber, setWhatsappNumber] = useState<string>('');
-  const [whatsappMessage, setWhatsappMessage] = useState<string>('');
-  // 4. Email state
-  const [emailContent, setEmailContent] = useState<string>('');
-  // 5. Wifi state
-  const [wifiSsid, setWifiSsid] = useState<string>('');
-  const [wifiPassword, setWifiPassword] = useState<string>('');
-  const [wifiEncryption, setWifiEncryption] = useState<string>('');
-  // 6. Location state
-  const [locationTab, setLocationTab] = useState<string>('Complete');
-  const [locationStreet, setLocationStreet] = useState<string>('');
-  const [locationArea, setLocationArea] = useState<string>('');
-  const [locationPostalCode, setLocationPostalCode] = useState<string>('');
-  const [locationCity, setLocationCity] = useState<string>('');
-  const [locationState, setLocationState] = useState<string>('');
-  const [locationCountry, setLocationCountry] = useState<string>('');
-  const [latitude, setLatitude] = useState<string>('');
-  const [longitude, setLongitude] = useState<string>('');
-
-  const [designTab, setDesignTab] = useState<string>('Frame');
-
-  const [borderColour, setBorderColour] = useState<string>('');
-  const [backgroundColour, setBackgroungColour] = useState<string>('');
-  const [logo, setLogo] = useState<string>('');
+  const [designTab, setDesignTab] = useState<string>('Shape');
+  const [foregroundColor, setForegroundColor] = useState<string>('#000000');
+  const [backgroundColor, setBackgroundColor] = useState<string>('#ffffff');
+  const [errorCorrectionLevel, setErrorCorrectionLevel] = useState<string>('Q');
 
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
@@ -88,46 +81,21 @@ const NewQR = () => {
   const [qrPreview, setQrPreview] = useState<string>("");
   const [openDownloadModal, setOpenDownload] = useState<boolean>(false);
 
+  const [content, setContent] = useState({});
+
   const handleGenerateQr = async () => {
     try {
       const qrPayload = {
         user_id: uid,
         name: qrName,
         qr_type: qrType,
-        content: {
-          url: websiteContent,
-          text: textContent,
-          whatsapp: {
-            whatsappNumber,
-            whatsappMessage
-          },
-          email: emailContent,
-          wifi: {
-            ssid: wifiSsid,
-            password: wifiPassword,
-            encryption: wifiEncryption
-          },
-          location: {
-            mode: locationTab,
-            address: {
-              locationStreet,
-              locationArea,
-              locationPostalCode,
-              locationCity,
-              locationState,
-              locationCountry
-            },
-            coordinates: {
-              latitude,
-              longitude
-            }
-          },
-          vCard: ""
-        },
+        content,
         design: {
-          borderColour,
-          backgroundColour,
-          logo,
+          color: {
+            foregroundColor,
+            backgroundColor,
+          },
+          errorCorrectionLevel
         },
         configuration: {
           from_date: fromDate,
@@ -147,6 +115,32 @@ const NewQR = () => {
       } else {
         toast.error("QR generation failed!");
       }
+    }
+  };
+
+  const handleInvert = () => {
+    setBackgroundColor(foregroundColor);
+    setForegroundColor(backgroundColor);
+  }
+
+  const renderQRContent = () => {
+    switch (qrType) {
+      case "website":
+        return <WebsiteLogic setContent={setContent} />;
+      case "text":
+        return <TextLogic setContent={setContent} />;
+      case "whatsapp":
+        return <WhatsappLogic setContent={setContent} />;
+      case "email":
+        return <EmailLogic setContent={setContent} />;
+      case "wifi":
+        return <WifiLogic setContent={setContent} />;
+      case "location":
+        return <LocationLogic setContent={setContent} />;
+      case "vcard":
+        return <VCardLogic setContent={setContent} />;
+      default:
+        return null;
     }
   };
 
@@ -184,144 +178,7 @@ const NewQR = () => {
 
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">3</span> Complete the content</h3>
-              {/* 1. Website Section */}
-              {qrType==='website' &&
-                <div className="flex flex-col gap-1">
-                  <label>Enter your Website</label>
-                  <input type="text" placeholder="E.g. https://www.myweb.com/" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={websiteContent} onChange={(e) => setWebsiteContent(e.target.value)} required/>
-                </div>
-              }
-
-              {/* 2. Text Section */}
-              {qrType==='text' &&
-                <div className="flex flex-col gap-1">
-                  <label>Message</label>
-                  <textarea placeholder="Enter some text..." rows={5} className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={textContent} onChange={(e) => setTextContent(e.target.value)} maxLength={2000} required/>
-                  <div className={`text-sm ${textContent.length==2000? 'text-red-500' :'text-gray-500'}`}>
-                    {textContent.length}/2000 characters
-                  </div>
-                </div>
-              }
-
-              {/* 3. Whatsapp Section */}
-              {qrType==='whatsapp' &&
-                <div className="flex flex-col gap-1">
-                  <label>Number</label>
-                  <input type="text" placeholder="E.g. +919876543210" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} required/>
-                  <label>Message</label>
-                  <textarea placeholder="Enter a by default message..." rows={5} className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={whatsappMessage} onChange={(e) => setWhatsappMessage(e.target.value)} maxLength={200}/>
-                  <div className={`text-sm ${whatsappMessage.length==200? 'text-red-500' :'text-gray-500'}`}>
-                    {whatsappMessage.length}/200 characters
-                  </div>
-                </div>
-              }
-
-              {/* 4. Email Section */}
-              {qrType==='email' &&
-                <div className="flex flex-col gap-1">
-                  <label>Enter your Website</label>
-                  <input type="email" placeholder="E.g. myemail@gmail.com" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={emailContent} onChange={(e) => setEmailContent(e.target.value)} required/>
-                </div>
-              }
-
-              {/* 5. Wifi Section */}
-              {qrType==='wifi' &&
-                <div className="flex flex-col gap-1">
-                  <label>Network name (SSID)</label>
-                  <input type="text" placeholder="E.g. HomeWifi" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={wifiSsid} onChange={(e) => setWifiSsid(e.target.value)} required/>
-                  <label>Network password</label>
-                  <input type="text" placeholder="E.g. MyPassword" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={wifiPassword} onChange={(e) => setWifiPassword(e.target.value)}/>
-                  <label>Type of encryption</label>
-                  <select name="encryption" id="encryption" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={wifiEncryption} onChange={(e) => setWifiEncryption(e.target.value)} required>
-                    <option value="WEP">WEP</option>
-                    <option value="WPA">WPA</option>
-                    <option value="WPA2-EAP">WPA2-EAP</option>
-                    <option value="nopass">nopass</option>
-                  </select>
-                </div>
-              }
-
-              {/* 6. Location Section */}
-              {qrType==='location' &&
-                <div className="flex flex-col gap-1">
-                  <div className="grid grid-cols-2 gap-2 mb-2 p-2 bg-gray-100 rounded-md">
-                    {locationTabsArray.map((tab, index)=>(
-                      <button type="button" key={index} onClick={()=>setLocationTab(tab)} className={`py-3 bg-white text-sm rounded-md border-2 ${locationTab === tab ? "text-pink-500 border-pink-500 font-bold" : "text-gray-500 border-gray-300 hover:border-pink-500"} transition duration-300`}>{tab}</button>
-                    ))}
-                  </div>
-                  {locationTab==='Complete' &&
-                    <>
-                      <div className="grid grid-cols-3 gap-2">
-                        <div className="flex flex-col gap-1">
-                          <label>Street</label>
-                          <input type="text" placeholder="E.g. 403" className="md:w-2/3 p-2 border border-gray-300 rounded" value={locationStreet} onChange={(e) => setLocationStreet(e.target.value)} />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <label>Area</label>
-                          <input type="text" placeholder="E.g. Sector-3" className="p-2 border border-gray-300 rounded" value={locationArea} onChange={(e) => setLocationArea(e.target.value)} required/>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <label>Postal Code</label>
-                          <input type="text" placeholder="E.g. 122001" className="p-2 border border-gray-300 rounded" value={locationPostalCode} onChange={(e) => setLocationPostalCode(e.target.value)} required/>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="flex flex-col gap-1">
-                          <label>City</label>
-                          <input type="text" placeholder="E.g. Gurugram" className="p-2 border border-gray-300 rounded" value={locationCity} onChange={(e) => setLocationCity(e.target.value)} required/>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <label>State</label>
-                          <input type="text" placeholder="E.g. Haryana" className="p-2 border border-gray-300 rounded" value={locationState} onChange={(e) => setLocationState(e.target.value)} required/>
-                        </div>
-                      </div>
-
-                      <label>Country</label>
-                      <input type="text" placeholder="E.g. India" className="w-2/3 p-2 border border-gray-300 rounded" value={locationCountry} onChange={(e) => setLocationCountry(e.target.value)} required/>
-                    </>
-                  }
-
-                  {locationTab==='Coordinates' &&
-                    <>
-                      <label>Latitude</label>
-                      <input type="text" placeholder="E.g. 28.4595" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={latitude} onChange={(e) => setLatitude(e.target.value)} required/>
-                      <label>Longitude</label>
-                      <input type="text" placeholder="E.g. 77.0266" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={longitude} onChange={(e) => setLongitude(e.target.value)} required/>
-                    </>
-                  }
-                  
-                  {((locationTab === 'Coordinates' && latitude && longitude) ||
-                    (locationTab === 'Complete' && (locationStreet || locationCity))) && (
-                    <div className="mt-3">
-                      <label className="font-medium text-gray-700 mb-1">Preview Map</label>
-                      <iframe
-                        title="Location Preview"
-                        width="100%"
-                        height="250"
-                        loading="lazy"
-                        allowFullScreen
-                        className="rounded-xl border border-gray-200 shadow-sm"
-                        src={
-                          locationTab === 'Coordinates'
-                            ? `https://www.google.com/maps?q=${latitude},${longitude}&hl=es;z=14&output=embed`
-                            : `https://www.google.com/maps?q=${encodeURIComponent(
-                                `${locationStreet}, ${locationArea}, ${locationCity}, ${locationState}, ${locationCountry}`
-                              )}&hl=es;z=14&output=embed`
-                        }
-                      ></iframe>
-                    </div>
-                  )}
-                </div>
-              }
-
-              {/* 7. vCard Section */}
-              {qrType==='vcard' &&
-                <div className="flex flex-col gap-1">
-                  <label>Enter your Website</label>
-                  <input type="text" placeholder="E.g. https://www.myweb.com/" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={websiteContent} onChange={(e) => setWebsiteContent(e.target.value)} required/>
-                </div>
-              }
+              {renderQRContent()}
             </div>
 
             <hr className="text-gray-300"/>
@@ -330,9 +187,34 @@ const NewQR = () => {
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">4</span> Design your QR</h3>
               <div className="grid grid-cols-4 gap-2">
                 {designTabsArray.map((tab, index) => (
-                  <button type="button" key={index} onClick={()=>setDesignTab(tab)} className={`py-3 text-sm rounded-md ${designTab === tab ? "text-pink-500 bg-pink-100" : "text-gray-600 hover:text-pink-500 hover:bg-pink-100"}`}>{tab}</button>
+                  <button type="button" key={index} onClick={()=>setDesignTab(tab)} className={`py-3 text-sm rounded-md ${designTab === tab ? "text-pink-500 bg-pink-100" : "text-gray-600 hover:text-pink-500 hover:bg-pink-100"} transition duration-300`}>{tab}</button>
                 ))}
               </div>
+
+              {designTab==='Shape' &&
+                <div className="flex justify-between items-end bg-gray-100 p-4 rounded-md">
+                  <div className="flex gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-semibold">Foreground Color</label>
+                      <input type="color" name="foreground" id="foreground" value={foregroundColor} onChange={(e)=>setForegroundColor(e.target.value)} />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-semibold">Background Color</label>
+                      <input type="color" name="background" id="background" value={backgroundColor} onChange={(e)=>setBackgroundColor(e.target.value)} />
+                    </div>
+                  </div>
+
+                  <button type="button" className="text-sm font-semibold text-blue-500 hover:text-blue-600 border border-gray-300 px-2 rounded-full" onClick={handleInvert}><Loop sx={{fontSize: '14px'}} /> Invert</button>
+                </div>
+              }
+
+              {designTab==='Level' &&
+                <div className="flex flex-wrap gap-5 p-4 bg-gray-100 rounded-md">
+                  {levelTabsArray.map((level, index)=>(
+                    <p className={`text-sm font-semibold flex items-center gap-3 cursor-pointer ${errorCorrectionLevel===level.key? 'text-pink-500': ''} transition duration-300`} key={index} onClick={()=>setErrorCorrectionLevel(level.key)}>{level.label} <span className={`text-gray-500 border p-2 rounded-md ${errorCorrectionLevel===level.key? 'text-pink-500 border-pink-500': 'border-gray-200'} transition duration-300`}>{level.percentage}%</span></p>
+                  ))}
+                </div>
+              }
             </div>
 
             <hr className="text-gray-300"/>

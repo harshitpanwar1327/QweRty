@@ -1,5 +1,4 @@
 import { pool } from '../config/Database.js';
-import bcrypt from 'bcryptjs'
 import QRCode from "qrcode";
 
 export const getNewQrLogic = async (uid: string) => {
@@ -56,7 +55,15 @@ export const postNewQrLogic = async (newQrData: any) => {
                 throw new Error("Invalid qr type");
         }
 
-        const qrImageBase64 = await QRCode.toDataURL(qrPayload);
+        const qrOptions = {
+            errorCorrectionLevel: newQrData.design?.errorCorrectionLevel || 'Q',
+            color: {
+                dark: newQrData.design?.color?.foregroundColor || '#000000',
+                light: newQrData.design?.color?.backgroundColor || '#ffffff'
+            }
+        };
+
+        const qrImageBase64 = await QRCode.toDataURL(qrPayload, qrOptions);
 
         const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr) VALUES (?, ?, ?, ?, ?, ?, ?);`;
 
