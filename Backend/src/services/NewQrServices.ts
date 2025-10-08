@@ -26,6 +26,7 @@ export const postNewQrLogic = async (newQrData: any) => {
             case "whatsapp":
                 const phone = newQrData.content.whatsappNumber?.replace(/\D/g, "");
                 const message = encodeURIComponent(newQrData.content.whatsappMessage || "");
+                
                 qrPayload = `https://wa.me/${phone}${message ? `?text=${message}` : ""}`;;
                 break;
             case "email":
@@ -38,6 +39,7 @@ export const postNewQrLogic = async (newQrData: any) => {
                 switch (newQrData.content.locationTab) {
                     case "Complete":
                         const fullAddress = `${newQrData.content.locationStreet || ""}, ${newQrData.content.locationArea || ""}, ${newQrData.content.locationCity || ""}, ${newQrData.content.locationState || ""}, ${newQrData.content.locationCountry || ""}`;
+
                         qrPayload = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
                         break;
                     case "Coordinates":
@@ -46,6 +48,42 @@ export const postNewQrLogic = async (newQrData: any) => {
                     default:
                         throw new Error("Invalid location mode");
                 }
+                break;
+            case "vcard":
+                const contact = newQrData.content;
+
+                interface PhoneNumber {
+                    type: string;
+                    number: string;
+                }
+
+                const address = `${contact.locationStreet || ""};${contact.locationCity || ""};${contact.locationState || ""};${contact.locationPostalCode || ""};${contact.locationCountry || ""}`;
+
+                qrPayload = [
+                    "BEGIN:VCARD",
+                    "VERSION:3.0",
+                    `N:${contact.lastName || ""};${contact.firstName || ""};;;`,
+                    `FN:${contact.firstName || ""} ${contact.lastName || ""}`,
+                    contact.company ? `ORG:${contact.company}` : "",
+                    contact.title ? `TITLE:${contact.title}` : "",
+                    ...(Array.isArray(contact.phones)
+                    ? (contact.phones as PhoneNumber[])
+                        .filter((p: PhoneNumber) => p.number && p.type)
+                        .map((p: PhoneNumber) => `TEL;TYPE=${p.type.toUpperCase()}:${p.number}`)
+                    : []),
+                    contact.email ? `EMAIL;TYPE=WORK:${contact.email}` : "",
+                    contact.website ? `URL:${contact.website}` : "",
+                    (contact.locationStreet ||
+                    contact.locationCity ||
+                    contact.locationState ||
+                    contact.locationPostalCode ||
+                    contact.locationCountry)
+                        ? `ADR;TYPE=WORK:;;${address}`
+                        : "",
+                    "END:VCARD"
+                ]
+                .filter(Boolean)
+                .join("\n");
                 break;
             default:
                 throw new Error("Invalid qr type");

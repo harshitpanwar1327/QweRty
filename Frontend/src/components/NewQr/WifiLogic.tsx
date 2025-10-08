@@ -42,6 +42,7 @@ const WifiLogic: React.FC<WifiLogicProps> = ({ setContent }) => {
           className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"
           value={wifiPassword}
           onChange={(e) => setWifiPassword(e.target.value)}
+          required
         />
       </div>
 

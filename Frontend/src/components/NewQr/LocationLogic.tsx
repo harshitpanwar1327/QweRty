@@ -36,7 +36,7 @@ const LocationLogic: React.FC<LocationLogicProps> = ({ setContent }) => {
   }, [locationTab, locationStreet, locationArea, locationPostalCode, locationCity, locationState, locationCountry, latitude, longitude, setContent]);
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2">
       <div className="grid grid-cols-3 md:grid-cols-4 gap-2 mb-2">
         {locationTabs.map((tab) => (
           <button
@@ -63,7 +63,7 @@ const LocationLogic: React.FC<LocationLogicProps> = ({ setContent }) => {
             </div>
             <div className="flex flex-col gap-2">
               <label>Area</label>
-              <input type="text" placeholder="E.g. Sector-3" value={locationArea} onChange={(e) => setLocationArea(e.target.value)} className="p-2 border border-gray-300 rounded" />
+              <input type="text" placeholder="E.g. Sector-3" value={locationArea} onChange={(e) => setLocationArea(e.target.value)} className="p-2 border border-gray-300 rounded" required />
             </div>
             <div className="flex flex-col gap-2">
               <label>Postal Code</label>
@@ -73,16 +73,16 @@ const LocationLogic: React.FC<LocationLogicProps> = ({ setContent }) => {
           <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col gap-2">
               <label>City</label>
-              <input type="text" placeholder="E.g. Gurugram" value={locationCity} onChange={(e) => setLocationCity(e.target.value)} className="p-2 border border-gray-300 rounded" />
+              <input type="text" placeholder="E.g. Gurugram" value={locationCity} onChange={(e) => setLocationCity(e.target.value)} className="p-2 border border-gray-300 rounded" required/>
             </div>
             <div className="flex flex-col gap-2">
               <label>State</label>
-              <input type="text" placeholder="E.g. Haryana" value={locationState} onChange={(e) => setLocationState(e.target.value)} className="p-2 border border-gray-300 rounded" />
+              <input type="text" placeholder="E.g. Haryana" value={locationState} onChange={(e) => setLocationState(e.target.value)} className="p-2 border border-gray-300 rounded" required/>
             </div>
           </div>
           <div className="flex flex-col gap-2">
             <label>Country</label>
-            <input type="text" placeholder="E.g. India" value={locationCountry} onChange={(e) => setLocationCountry(e.target.value)} className="p-2 border border-gray-300 rounded" />
+            <input type="text" placeholder="E.g. India" value={locationCountry} onChange={(e) => setLocationCountry(e.target.value)} className="p-2 border border-gray-300 rounded" required/>
           </div>
         </div>
       )}
@@ -91,11 +91,11 @@ const LocationLogic: React.FC<LocationLogicProps> = ({ setContent }) => {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <label>Latitude</label>
-            <input type="text" placeholder="E.g. 28.4595" value={latitude} onChange={(e) => setLatitude(e.target.value)} className="p-2 border border-gray-300 rounded" />
+            <input type="text" placeholder="E.g. 28.4595" value={latitude} onChange={(e) => setLatitude(e.target.value)} className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" required/>
           </div>
           <div className="flex flex-col gap-2">
             <label>Longitude</label>
-            <input type="text" placeholder="E.g. 77.0266" value={longitude} onChange={(e) => setLongitude(e.target.value)} className="p-2 border border-gray-300 rounded" />
+            <input type="text" placeholder="E.g. 77.0266" value={longitude} onChange={(e) => setLongitude(e.target.value)} className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" required/>
           </div>
         </div>
       )}

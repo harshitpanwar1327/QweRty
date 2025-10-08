@@ -1,4 +1,3 @@
-import React from 'react'
 import { toast } from 'react-toastify'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import CropOriginalIcon from '@mui/icons-material/CropOriginal'
@@ -65,7 +64,7 @@ export const DownloadQR = ({ setOpenDownloadModal, qrPreview, qrName }) => {
       <div className="w-4/5 md:w-1/2 lg:w-1/3 bg-white rounded-xl shadow-md flex flex-col" onClick={(e)=>e.stopPropagation()}>
         <div className='p-4 flex justify-between items-center border-b border-gray-200'>
           <h4 className='text-lg font-semibold'>Save as...</h4>
-          <CloseRoundedIcon onClick={()=>setOpenDownloadModal(false)}/>
+          <CloseRoundedIcon className='cursor-pointer' onClick={()=>setOpenDownloadModal(false)}/>
         </div>
 
         <div className='flex flex-col gap-1 p-4'>
