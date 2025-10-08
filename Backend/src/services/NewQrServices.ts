@@ -18,34 +18,30 @@ export const postNewQrLogic = async (newQrData: any) => {
 
         switch (newQrData.qr_type) {
             case "website":
-                qrPayload = newQrData.content.url as string;
+                qrPayload = newQrData.content.websiteContent as string;
                 break;
             case "text":
-                qrPayload = newQrData.content.text as string;
+                qrPayload = newQrData.content.textContent as string;
                 break;
             case "whatsapp":
-                const whatsapp = newQrData.content.whatsapp || {};
-                const phone = whatsapp.whatsappNumber?.replace(/\D/g, "");
-                const message = encodeURIComponent(whatsapp.whatsappMessage || "");
+                const phone = newQrData.content.whatsappNumber?.replace(/\D/g, "");
+                const message = encodeURIComponent(newQrData.content.whatsappMessage || "");
                 qrPayload = `https://wa.me/${phone}${message ? `?text=${message}` : ""}`;;
                 break;
             case "email":
-                qrPayload = `mailto:${newQrData.content.email}`;
+                qrPayload = `mailto:${newQrData.content.emailContent}`;
                 break;
             case "wiFi":
-                const wifi = newQrData.content.wiFi as any;
-                qrPayload = `WIFI:T:${wifi.encryption};S:${wifi.ssid};P:${wifi.password};;`;
+                qrPayload = `WIFI:T:${newQrData.content.wifiEncryption};S:${newQrData.content.wifiSsid};P:${newQrData.content.wifiPassword};;`;
                 break;
             case "location":
-                const location = newQrData.content?.location || {};
-                switch (location.mode) {
+                switch (newQrData.content.locationTab) {
                     case "Complete":
-                        const address = location?.address || {};
-                        const fullAddress = `${address.locationStreet || ""}, ${address.locationArea || ""}, ${address.locationCity || ""}, ${address.locationState || ""}, ${address.locationCountry || ""}`;
+                        const fullAddress = `${newQrData.content.locationStreet || ""}, ${newQrData.content.locationArea || ""}, ${newQrData.content.locationCity || ""}, ${newQrData.content.locationState || ""}, ${newQrData.content.locationCountry || ""}`;
                         qrPayload = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
                         break;
                     case "Coordinates":
-                        qrPayload = `https://www.google.com/maps?q=${location?.coordinates?.latitude},${location?.coordinates?.longitude}`;
+                        qrPayload = `https://www.google.com/maps?q=${newQrData.content?.latitude},${newQrData.content?.longitude}`;
                         break;
                     default:
                         throw new Error("Invalid location mode");

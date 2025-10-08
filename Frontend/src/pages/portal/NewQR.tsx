@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react"
+import { useState, type FormEvent, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
 import { Language, PictureAsPdf, AccountBox, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge, Loop, PlayArrowRounded } from "@mui/icons-material"
@@ -83,7 +83,9 @@ const NewQR = () => {
 
   const [content, setContent] = useState({});
 
-  const handleGenerateQr = async () => {
+  const handleGenerateQr = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     try {
       const qrPayload = {
         user_id: uid,
