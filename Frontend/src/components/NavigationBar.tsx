@@ -14,7 +14,7 @@ const NavigationBar = () => {
           <li className="flex items-center gap-2"><QrCode2 /> New QR</li>
         </NavLink>
         <NavLink to="/my-qr" className={({ isActive }) =>`cursor-pointer w-full flex !text-gray-600 mx-auto p-3 rounded-lg transition duration-300 ease-in hover:scale-102 hover:!text-pink-500 ${isActive? "!text-pink-500 bg-pink-100" : ""}`}>
-          <li className="flex items-center gap-2"><QrCode /> My QR codes</li>
+          <li className="flex items-center gap-2"><QrCode /> My QR Codes</li>
         </NavLink>
         <NavLink to="/stats" className={({ isActive }) =>`cursor-pointer w-full flex !text-gray-600 mx-auto p-3 rounded-lg transition duration-300 ease-in hover:scale-102 hover:!text-pink-500 ${isActive? "!text-pink-500 bg-pink-100" : ""}`}>
           <li className="flex items-center gap-2"><BarChart /> Stats</li>
