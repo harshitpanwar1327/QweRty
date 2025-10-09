@@ -5,13 +5,13 @@ import API from '../../util/API'
 import axios from "axios"
 import { toast } from "react-toastify"
 import { FilterAlt, SortRounded, ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
-import Filter from "../../modals/Filter"
+import Filter from "../../modals/MyQrs/Filter"
 
 interface QRData {
   qr_id: number;
   user_id: number;
   name: string;
-  qr_type: 'website' | 'text' | 'whatsApp' | 'email' | 'wifi' | 'location' | 'vcard';
+  qr_type: 'website'|'text'|'whatsApp'|'email'|'wifi'|'location'|'vcard';
   content: object;
   design?: object;
   configuration?: object;

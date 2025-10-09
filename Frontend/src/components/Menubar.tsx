@@ -1,7 +1,6 @@
-import MenuIcon from '@mui/icons-material/Menu'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { QrCode, QrCode2, CreditCard, BarChart, AccountCircle, ArrowDropDown,Logout } from "@mui/icons-material"
+import { Menu, QrCode, QrCode2, CreditCard, BarChart, AccountCircle, KeyboardArrowDown, Logout } from "@mui/icons-material"
 import { motion, AnimatePresence } from 'framer-motion'
 import Swal from 'sweetalert2'
 import { auth } from '../util/Firebase.js'
@@ -18,6 +17,24 @@ const Menubar: React.FC<MenubarProps> = ({ heading }) => {
   const [profileDropdown, setProfileDropdown] = useState<boolean>(false);
 
   const navigate = useNavigate();
+  
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        profileRef.current && 
+        !profileRef.current.contains(event.target as Node)
+      ) {
+        setProfileDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = () => {
     Swal.fire({
@@ -54,22 +71,32 @@ const Menubar: React.FC<MenubarProps> = ({ heading }) => {
   return (
     <div className="w-full p-4 md:px-8 flex justify-between items-center gap-8 shadow-md bg-white rounded-md">
       <div className="flex items-center gap-2">
-        <MenuIcon className='lg:!hidden cursor-pointer' onClick={()=>setIsOpen(!isOpen)}/>
+        <Menu className='lg:!hidden cursor-pointer' onClick={()=>setIsOpen(!isOpen)}/>
         <h2 className="font-semibold text-xl">{heading}</h2>
       </div>
 
-      <div className="relative">
-        <div className="flex items-center gap-1 cursor-pointer" onClick={()=>setProfileDropdown(!profileDropdown)}>
+      <div className="relative" ref={profileRef}>
+        <div className="flex items-center gap-1 cursor-pointer group" onClick={()=>setProfileDropdown(!profileDropdown)}>
           <AccountCircle sx={{ fontSize: '32px' }} />
-          <ArrowDropDown sx={{ fontSize: '24px', color: '#ec4899' }} />
+          <KeyboardArrowDown sx={{ fontSize: '24px', color: '#ec4899' }} className='group-hover:bg-pink-100 rounded' />
         </div>
 
-        {profileDropdown && (
-          <div className="absolute bg-white right-0 border border-gray-200 shadow-lg rounded-lg transition-all duration-200 z-10">
-            <div className="px-4 py-3 border-b border-gray-100 text-sm text-gray-700 font-medium">{email}</div>
-            <button className="w-full py-2 gap-2 hover:bg-gray-100 flex justify-center text-red-500" onClick={handleLogout}><Logout sx={{ fontSize: 20 }} /><p className='font-semibold text-sm'>Logout</p></button>
-          </div>
-        )}
+        <AnimatePresence>
+          {profileDropdown && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="absolute bg-white right-0 border border-gray-200 shadow-lg rounded-lg z-10 flex flex-col items-center gap-2 p-2"
+            >
+              <p className="p-3 border-b border-gray-100 text-sm text-gray-700 font-medium">{email}</p>
+              <button className="py-2 px-3 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-red-500 text-sm font-semibold" onClick={handleLogout}>
+                <Logout sx={{ fontSize: '18px' }} /> Logout
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <AnimatePresence>
