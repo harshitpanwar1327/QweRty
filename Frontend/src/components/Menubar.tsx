@@ -1,9 +1,11 @@
-import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
-import { QrCode, QrCode2, CreditCard, BarChart } from "@mui/icons-material"
+import { NavLink, useNavigate } from 'react-router-dom'
+import { QrCode, QrCode2, CreditCard, BarChart, AccountCircle, ArrowDropDown,Logout } from "@mui/icons-material"
 import { motion, AnimatePresence } from 'framer-motion'
+import Swal from 'sweetalert2'
+import { auth } from '../util/Firebase.js'
+import { signOut } from 'firebase/auth'
 
 interface MenubarProps {
   heading: string;
@@ -13,6 +15,41 @@ const Menubar: React.FC<MenubarProps> = ({ heading }) => {
   const email = sessionStorage.getItem('email');
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [profileDropdown, setProfileDropdown] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    Swal.fire({
+      title: "Are you sure you want to logout?",
+      text: "You will need to log in again to access your account.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, logout!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await signOut(auth);
+          sessionStorage.clear();
+          navigate("/hero");
+          Swal.fire({
+            title: "Logged out!",
+            text: "You have been successfully logged out.",
+            icon: "success",
+          });
+        } catch (error) {
+          console.error("Logout error:", error);
+          Swal.fire({
+            title: "Error",
+            text: "Something went wrong while logging out.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  }
 
   return (
     <div className="w-full p-4 md:px-8 flex justify-between items-center gap-8 shadow-md bg-white rounded-md">
@@ -21,9 +58,18 @@ const Menubar: React.FC<MenubarProps> = ({ heading }) => {
         <h2 className="font-semibold text-xl">{heading}</h2>
       </div>
 
-      <div className="flex items-center gap-2">
-        <h3 className="text-sm hidden md:block">{email}</h3>
-        <AccountCircleIcon sx={{fontSize: '32px'}}/>
+      <div className="relative">
+        <div className="flex items-center gap-1 cursor-pointer" onClick={()=>setProfileDropdown(!profileDropdown)}>
+          <AccountCircle sx={{ fontSize: '32px' }} />
+          <ArrowDropDown sx={{ fontSize: '24px', color: '#ec4899' }} />
+        </div>
+
+        {profileDropdown && (
+          <div className="absolute bg-white right-0 border border-gray-200 shadow-lg rounded-lg transition-all duration-200 z-10">
+            <div className="px-4 py-3 border-b border-gray-100 text-sm text-gray-700 font-medium">{email}</div>
+            <button className="w-full py-2 gap-2 hover:bg-gray-100 flex justify-center text-red-500" onClick={handleLogout}><Logout sx={{ fontSize: 20 }} /><p className='font-semibold text-sm'>Logout</p></button>
+          </div>
+        )}
       </div>
 
       <AnimatePresence>

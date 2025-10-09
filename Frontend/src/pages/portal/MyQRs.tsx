@@ -5,6 +5,7 @@ import API from '../../util/API'
 import axios from "axios"
 import { toast } from "react-toastify"
 import { FilterAlt, SortRounded, ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
+import Filter from "../../modals/Filter"
 
 interface QRData {
   qr_id: number;
@@ -22,7 +23,9 @@ interface QRData {
 
 const MyQRs = () => {
   const [qrData, setQrData] = useState<QRData[]>([]);
-  const [search, setSearch] = useState<string>('');
+  // const [search, setSearch] = useState<string>('');
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
 
   const uid = sessionStorage.getItem("userId");
 
@@ -53,9 +56,36 @@ const MyQRs = () => {
         <Menubar heading='My QR Codes'/>
 
         <div className="grow bg-white rounded-md flex flex-col gap-4 p-2 overflow-y-auto">
-          <div className="flex gap-4 self-end">
-            <button className="py-1 px-3 flex items-center gap-2 text-gray-500 border border-gray-200 rounded"><FilterAlt sx={{fontSize: '18px'}} /> Filter</button>
-            <button className="py-1 px-3 flex items-center gap-2 text-gray-500 border border-gray-200 rounded"><SortRounded sx={{fontSize: '18px'}} /> Sort by: Name</button>
+          <div className="flex gap-4 self-end relative">
+            <button className="py-1 px-3 flex items-center gap-2 text-gray-500 border border-gray-200 rounded" onClick={()=>setOpenFilterModal(true)}><FilterAlt sx={{fontSize: '18px'}} />Filter</button>
+
+            <div className="relative">
+              <button className="py-1 px-3 flex items-center gap-2 text-gray-500 border border-gray-200 rounded" onClick={()=>setShowDropdown(!showDropdown)}>
+                <SortRounded sx={{ fontSize: '18px' }} />Sort by: Name
+              </button>
+
+              {showDropdown && (
+                <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-md z-10"
+                >
+                  <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-600" onClick={()=>{setShowDropdown(false);
+                    toast.info("Sorted by Most recent");}}>
+                    Most Recent
+                  </p>
+                  <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-600" onClick={()=>{setShowDropdown(false);
+                    toast.info("Sorted by Name");}}>
+                    Name
+                  </p>
+                  <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-600" onClick={()=>{setShowDropdown(false);
+                    toast.info("Sorted by Most scanned");}}>
+                    Most scanned
+                  </p>
+                  <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-600" onClick={()=>{setShowDropdown(false);
+                    toast.info("Sorted by Last modified");}}>
+                    Last Modified``
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="border border-gray-200 p-2 rounded flex flex-col gap-2 overflow-y-auto">
@@ -113,6 +143,7 @@ const MyQRs = () => {
           </div>
         </div>
       </div>
+      {openFilterModal && <Filter setOpenFilterModal={setOpenFilterModal}/>}
     </div>
   )
 }
