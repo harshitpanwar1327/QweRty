@@ -3,13 +3,14 @@ import Menubar from "../../components/Menubar"
 
 const Plans = () => {
   return (
-    <>
-    <NavigationBar />
-    <div className="flex flex-col w-screen h-screen overflow-y-auto">
-      <Menubar heading='Plans'/>
+    <div className="w-screen flex">
+      <NavigationBar />
+      
+      <div className="grow flex flex-col gap-2 p-2 overflow-auto">
+        <Menubar heading='Plans'/>
 
+      </div>
     </div>
-    </>
   )
 }
 
