@@ -73,7 +73,7 @@ const MyQRs = () => {
   const fetchQr = async () => {
     try {
       setLoading(true);
-      const response = await API.get(`/new-qr/${uid}`);
+      const response = await API.get(`/qr-codes/${uid}`);
       setQrData(response.data.data);
       setLoading(false);
     } catch (error) {

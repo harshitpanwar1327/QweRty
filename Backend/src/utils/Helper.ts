@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const SubscriptionProducts: Record<string, { amount: number; duration: number }> = {
   'com.codeweave.freeQuarterly' : {
     amount: 0,
@@ -49,3 +51,19 @@ export const calculateAdjustedDays = (oldPlan: any, newPlanProductId: string): n
 
   return Math.max(0, Math.ceil(adjustedDays));
 }
+
+export const getLocationFromIP = async (ip: string | null) => {
+  if (!ip) return { country: null, city: null };
+  
+  try {
+    if (!ip || ip === "127.0.0.1" || ip === "::1") {
+      return { country: "Localhost", city: "Development" };
+    }
+    
+    const { data } = await axios.get(`https://ipapi.co/${ip}/json/`);
+    return { country: data.country_name, city: data.city };
+  } catch {
+    console.warn("IP geolocation lookup failed");
+    return { country: null, city: null };
+  }
+};

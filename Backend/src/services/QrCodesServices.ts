@@ -12,82 +12,132 @@ export const getNewQrLogic = async (uid: string) => {
     }
 };
 
+// export const postNewQrLogic = async (newQrData: any) => {
+//     try {
+//         let qrPayload: string = "";
+
+//         switch (newQrData.qr_type) {
+//             case "website":
+//                 qrPayload = newQrData.content.websiteContent as string;
+//                 break;
+//             case "text":
+//                 qrPayload = newQrData.content.textContent as string;
+//                 break;
+//             case "whatsapp":
+//                 const phone = newQrData.content.whatsappNumber?.replace(/\D/g, "");
+//                 const message = encodeURIComponent(newQrData.content.whatsappMessage || "");
+                
+//                 qrPayload = `https://wa.me/${phone}${message ? `?text=${message}` : ""}`;;
+//                 break;
+//             case "email":
+//                 qrPayload = `mailto:${newQrData.content.emailContent}`;
+//                 break;
+//             case "wiFi":
+//                 qrPayload = `WIFI:T:${newQrData.content.wifiEncryption};S:${newQrData.content.wifiSsid};P:${newQrData.content.wifiPassword};;`;
+//                 break;
+//             case "location":
+//                 switch (newQrData.content.locationTab) {
+//                     case "Complete":
+//                         const fullAddress = `${newQrData.content.locationStreet || ""}, ${newQrData.content.locationArea || ""}, ${newQrData.content.locationCity || ""}, ${newQrData.content.locationState || ""}, ${newQrData.content.locationCountry || ""}`;
+
+//                         qrPayload = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+//                         break;
+//                     case "Coordinates":
+//                         qrPayload = `https://www.google.com/maps?q=${newQrData.content?.latitude},${newQrData.content?.longitude}`;
+//                         break;
+//                     default:
+//                         throw new Error("Invalid location mode");
+//                 }
+//                 break;
+//             case "vcard":
+//                 const contact = newQrData.content;
+
+//                 interface PhoneNumber {
+//                     type: string;
+//                     number: string;
+//                 }
+
+//                 const address = `${contact.locationStreet || ""};${contact.locationCity || ""};${contact.locationState || ""};${contact.locationPostalCode || ""};${contact.locationCountry || ""}`;
+
+//                 qrPayload = [
+//                     "BEGIN:VCARD",
+//                     "VERSION:3.0",
+//                     `N:${contact.lastName || ""};${contact.firstName || ""};;;`,
+//                     `FN:${contact.firstName || ""} ${contact.lastName || ""}`,
+//                     contact.company ? `ORG:${contact.company}` : "",
+//                     contact.title ? `TITLE:${contact.title}` : "",
+//                     ...(Array.isArray(contact.phones)
+//                     ? (contact.phones as PhoneNumber[])
+//                         .filter((p: PhoneNumber) => p.number && p.type)
+//                         .map((p: PhoneNumber) => `TEL;TYPE=${p.type.toUpperCase()}:${p.number}`)
+//                     : []),
+//                     contact.email ? `EMAIL;TYPE=WORK:${contact.email}` : "",
+//                     contact.website ? `URL:${contact.website}` : "",
+//                     (contact.locationStreet ||
+//                     contact.locationCity ||
+//                     contact.locationState ||
+//                     contact.locationPostalCode ||
+//                     contact.locationCountry)
+//                         ? `ADR;TYPE=WORK:;;${address}`
+//                         : "",
+//                     "END:VCARD"
+//                 ]
+//                 .filter(Boolean)
+//                 .join("\n");
+//                 break;
+//             default:
+//                 throw new Error("Invalid qr type");
+//         }
+
+//         const qrOptions = {
+//             errorCorrectionLevel: newQrData.design?.errorCorrectionLevel || 'Q',
+//             color: {
+//                 dark: newQrData.design?.color?.foregroundColor || '#000000',
+//                 light: newQrData.design?.color?.backgroundColor || '#ffffff'
+//             }
+//         };
+
+//         const qrImageBase64 = await QRCode.toDataURL(qrPayload, qrOptions);
+
+//         const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr) VALUES (?, ?, ?, ?, ?, ?, ?);`;
+
+//         const values = [
+//             newQrData.user_id,
+//             newQrData.name,
+//             newQrData.qr_type,
+//             JSON.stringify(newQrData.content),
+//             JSON.stringify(newQrData.design),
+//             JSON.stringify(newQrData.configuration),
+//             qrImageBase64
+//         ];
+
+//         await pool.query(query, values);
+
+//         return { success: true, message: "QR generated successfully.", qr_image: qrImageBase64 };
+//     } catch (error) {
+//         console.error(error);
+//         return { success: false, message: "Unable to generate QR!" };
+//     }
+// };
+
 export const postNewQrLogic = async (newQrData: any) => {
     try {
-        let qrPayload: string = "";
+        const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr) VALUES (?, ?, ?, ?, ?, ?, '');`;
 
-        switch (newQrData.qr_type) {
-            case "website":
-                qrPayload = newQrData.content.websiteContent as string;
-                break;
-            case "text":
-                qrPayload = newQrData.content.textContent as string;
-                break;
-            case "whatsapp":
-                const phone = newQrData.content.whatsappNumber?.replace(/\D/g, "");
-                const message = encodeURIComponent(newQrData.content.whatsappMessage || "");
-                
-                qrPayload = `https://wa.me/${phone}${message ? `?text=${message}` : ""}`;;
-                break;
-            case "email":
-                qrPayload = `mailto:${newQrData.content.emailContent}`;
-                break;
-            case "wiFi":
-                qrPayload = `WIFI:T:${newQrData.content.wifiEncryption};S:${newQrData.content.wifiSsid};P:${newQrData.content.wifiPassword};;`;
-                break;
-            case "location":
-                switch (newQrData.content.locationTab) {
-                    case "Complete":
-                        const fullAddress = `${newQrData.content.locationStreet || ""}, ${newQrData.content.locationArea || ""}, ${newQrData.content.locationCity || ""}, ${newQrData.content.locationState || ""}, ${newQrData.content.locationCountry || ""}`;
+        const values = [
+            newQrData.user_id,
+            newQrData.name,
+            newQrData.qr_type,
+            JSON.stringify(newQrData.content),
+            JSON.stringify(newQrData.design),
+            JSON.stringify(newQrData.configuration),
+        ];
 
-                        qrPayload = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
-                        break;
-                    case "Coordinates":
-                        qrPayload = `https://www.google.com/maps?q=${newQrData.content?.latitude},${newQrData.content?.longitude}`;
-                        break;
-                    default:
-                        throw new Error("Invalid location mode");
-                }
-                break;
-            case "vcard":
-                const contact = newQrData.content;
+        const [result]: any = await pool.query(query, values);
+        const qr_id = result.insertId;
 
-                interface PhoneNumber {
-                    type: string;
-                    number: string;
-                }
-
-                const address = `${contact.locationStreet || ""};${contact.locationCity || ""};${contact.locationState || ""};${contact.locationPostalCode || ""};${contact.locationCountry || ""}`;
-
-                qrPayload = [
-                    "BEGIN:VCARD",
-                    "VERSION:3.0",
-                    `N:${contact.lastName || ""};${contact.firstName || ""};;;`,
-                    `FN:${contact.firstName || ""} ${contact.lastName || ""}`,
-                    contact.company ? `ORG:${contact.company}` : "",
-                    contact.title ? `TITLE:${contact.title}` : "",
-                    ...(Array.isArray(contact.phones)
-                    ? (contact.phones as PhoneNumber[])
-                        .filter((p: PhoneNumber) => p.number && p.type)
-                        .map((p: PhoneNumber) => `TEL;TYPE=${p.type.toUpperCase()}:${p.number}`)
-                    : []),
-                    contact.email ? `EMAIL;TYPE=WORK:${contact.email}` : "",
-                    contact.website ? `URL:${contact.website}` : "",
-                    (contact.locationStreet ||
-                    contact.locationCity ||
-                    contact.locationState ||
-                    contact.locationPostalCode ||
-                    contact.locationCountry)
-                        ? `ADR;TYPE=WORK:;;${address}`
-                        : "",
-                    "END:VCARD"
-                ]
-                .filter(Boolean)
-                .join("\n");
-                break;
-            default:
-                throw new Error("Invalid qr type");
-        }
+        const redirectBaseUrl = process.env.BASE_URL;
+        const trackingUrl = `${redirectBaseUrl}/track/${qr_id}`;
 
         const qrOptions = {
             errorCorrectionLevel: newQrData.design?.errorCorrectionLevel || 'Q',
@@ -97,21 +147,9 @@ export const postNewQrLogic = async (newQrData: any) => {
             }
         };
 
-        const qrImageBase64 = await QRCode.toDataURL(qrPayload, qrOptions);
+        const qrImageBase64 = await QRCode.toDataURL(trackingUrl, qrOptions);
 
-        const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr) VALUES (?, ?, ?, ?, ?, ?, ?);`;
-
-        const values = [
-            newQrData.user_id,
-            newQrData.name,
-            newQrData.qr_type,
-            JSON.stringify(newQrData.content),
-            JSON.stringify(newQrData.design),
-            JSON.stringify(newQrData.configuration),
-            qrImageBase64
-        ];
-
-        await pool.query(query, values);
+        await pool.query(`UPDATE qr_codes SET qr = ? WHERE qr_id = ?`, [qrImageBase64, qr_id]);
 
         return { success: true, message: "QR generated successfully.", qr_image: qrImageBase64 };
     } catch (error) {

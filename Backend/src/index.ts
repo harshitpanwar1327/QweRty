@@ -8,7 +8,8 @@ import { authMiddleware } from './middlewares/AuthMiddleware.js'
 import createAllTables from './utils/CreateTables.js'
 import UsersRoutes from './routes/UsersRoutes.js'
 import SubscriptionRoutes from './routes/SubscriptionRoutes.js'
-import NewQrRoutes from './routes/QrCodesRoutes.js'
+import QrCodesRoutes from './routes/QrCodesRoutes.js'
+import QrAnalyticsRoutes from './routes/QrAnalyticsRoutes.js'
 
 dotenv.config();
 
@@ -27,10 +28,11 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.use('/api/user', UsersRoutes);
+app.use('/api', QrAnalyticsRoutes);
 
 app.use(authMiddleware);
 app.use('/api', SubscriptionRoutes);
-app.use('/api', NewQrRoutes);
+app.use('/api', QrCodesRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
     res.status(404).send({message: "Route not exist!"});
