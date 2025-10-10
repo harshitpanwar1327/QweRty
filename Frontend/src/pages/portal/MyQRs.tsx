@@ -30,6 +30,8 @@ const MyQRs = () => {
   const [sortBy, setSortBy] = useState<string>('Most Recent');
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  const [selectAll, setSelectAll] = useState<boolean>(false);
 
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -39,6 +41,21 @@ const MyQRs = () => {
   const uid = sessionStorage.getItem("userId");
 
   const sortByRef = useRef<HTMLDivElement>(null);
+
+  const handleRowSelect = (id: number) => {
+    setSelectedRows((prev) =>
+      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if(selectAll){
+      setSelectedRows([]);
+    }else{
+      setSelectedRows(qrData.map((data)=>data.qr_id));
+    }
+    setSelectAll(!selectAll);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -57,7 +74,6 @@ const MyQRs = () => {
     try {
       setLoading(true);
       const response = await API.get(`/new-qr/${uid}`);
-      console.log(response.data);
       setQrData(response.data.data);
       setLoading(false);
     } catch (error) {
@@ -175,7 +191,7 @@ const MyQRs = () => {
               <table className="w-full text-left p-3">
                 <thead className="bg-gray-100 text-gray-500 text-sm">
                   <tr>
-                    <th className="p-3 w-[5rem]"><input type="checkbox" /></th>
+                    <th className="p-3 w-[5rem]"><input type="checkbox" checked={selectAll} onChange={handleSelectAll}/></th>
                     <th className="p-3 font-medium">Name</th>
                     <th className="p-3 font-medium">QR Type</th>
                     <th className="p-3 font-medium">Created</th>
@@ -188,7 +204,7 @@ const MyQRs = () => {
                 <tbody>
                   {qrData.map((data,index)=>(
                     <tr key={index}>
-                      <td className="p-3 w-[5rem]"><input type="checkbox" /></td>
+                      <td className="p-3 w-[5rem]"><input type="checkbox" checked={selectedRows.includes(data.qr_id)} onChange={()=>handleRowSelect(data.qr_id)}/></td>
                       <td className="p-3">{data.name}</td>
                       <td className="p-3">{data.qr_type}</td>
                       <td className="p-3">{new Date(data.created_at).toLocaleString()}</td>
