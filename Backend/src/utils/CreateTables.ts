@@ -28,6 +28,8 @@ const qr_codes = `CREATE TABLE IF NOT EXISTS qr_codes(
     design JSON,
     configuration JSON,
     qr TEXT NOT NULL,
+    state ENUM('Active', 'Paused', 'Finished') DEFAULT 'Active',
+    total_scans INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
@@ -37,6 +39,10 @@ const qr_analytics = `CREATE TABLE IF NOT EXISTS qr_analytics(
     analytics_id INT AUTO_INCREMENT PRIMARY KEY,
     qr_id INT NOT NULL,
     scanned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ip_address VARCHAR(45) DEFAULT NULL,
+    country VARCHAR(100) DEFAULT NULL,
+    city VARCHAR(100) DEFAULT NULL,
+    device_type VARCHAR(50) DEFAULT NULL,
     FOREIGN KEY (qr_id) REFERENCES qr_codes(qr_id) ON DELETE CASCADE
 );`;
 

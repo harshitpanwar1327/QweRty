@@ -1,5 +1,5 @@
 import express from 'express';
-import { getNewQr, postNewQr, updateNewQr, deleteNewQr } from '../controllers/NewQrControllers.js';
+import { getNewQr, postNewQr, updateNewQr, deleteNewQr } from '../controllers/QrCodesControllers.js';
 
 let router = express.Router();
 

@@ -65,7 +65,7 @@ const Header = () => {
 
       <div className='hidden lg:flex items-center gap-4'>
         <NavLink to={'/new-qr'} className='!text-black'>QR Generator</NavLink>
-        <NavLink to={'/pricing'} className='!text-black'>Plans and Pricings</NavLink>
+        {/* <NavLink to={'/pricing'} className='!text-black'>Plans and Pricings</NavLink> */}
         <NavLink to={'/contact'} className='!text-black'>Contact</NavLink>
         <NavLink to={'/faq'} className='!text-black'>FAQ</NavLink>
       </div>
@@ -99,7 +99,7 @@ const Header = () => {
             </div>
 
             <NavLink to={'/new-qr'} className='!text-black'>QR Generator</NavLink>
-            <NavLink to={'/pricing'} className='!text-black'>Plans and Pricings</NavLink>
+            {/* <NavLink to={'/pricing'} className='!text-black'>Plans and Pricings</NavLink> */}
             <NavLink to={'/contact'} className='!text-black'>Contact</NavLink>
             <NavLink to={'/faq'} className='!text-black'>FAQ</NavLink>
             

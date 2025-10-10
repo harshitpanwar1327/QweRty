@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react"
+import { useState, useRef, useEffect } from 'react'
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
 import API from '../../util/API'
 import axios from "axios"
-import { toast } from "react-toastify"
-import { FilterAlt, SortRounded, ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
+import { FilterAlt, SortRounded } from '@mui/icons-material'
 import Filter from "../../modals/MyQrs/Filter"
+import TablePagination from '@mui/material/TablePagination'
+import { HashLoader  } from "react-spinners"
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface QRData {
   qr_id: number;
@@ -19,27 +21,52 @@ interface QRData {
   created_at: string;
   updated_at: string;
   state: string;
+  total_scans: number;
 }
 
 const MyQRs = () => {
   const [qrData, setQrData] = useState<QRData[]>([]);
-  // const [search, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('Most Recent');
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
 
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+
+  const [loading, setLoading] = useState<boolean>(false);
+
   const uid = sessionStorage.getItem("userId");
+
+  const sortByRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sortByRef.current && !sortByRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchQr = async () => {
     try {
+      setLoading(true);
       const response = await API.get(`/new-qr/${uid}`);
       console.log(response.data);
       setQrData(response.data.data);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log(error);
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || error);
+        console.log(error.response?.data?.message || error);
       } else {
-        toast.error("QR generation failed!");
+        console.log("QR generation failed!");
       }
     }
   }
@@ -48,8 +75,28 @@ const MyQRs = () => {
     fetchQr();
   }, []);
 
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number,
+  ) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   return (
     <div className="w-screen flex">
+      {loading && (
+        <div className='fixed top-0 left-0 h-screen w-screen flex justify-center items-center backdrop-blur-md bg-black/25 z-100'>
+          <HashLoader color="#dc3753" />
+        </div>
+      )}
+
       <NavigationBar />
       
       <div className="grow flex flex-col gap-2 p-2 overflow-auto">
@@ -59,56 +106,69 @@ const MyQRs = () => {
           <div className="flex gap-4 self-end relative">
             <button className="py-1 px-3 flex items-center gap-2 text-gray-500 border border-gray-200 rounded" onClick={()=>setOpenFilterModal(true)}><FilterAlt sx={{fontSize: '18px'}} />Filter</button>
 
-            <div className="relative">
+            <div className="relative" ref={sortByRef}>
               <button className="py-1 px-3 flex items-center gap-2 text-gray-500 border border-gray-200 rounded" onClick={()=>setShowDropdown(!showDropdown)}>
-                <SortRounded sx={{ fontSize: '18px' }} />Sort by: Name
+                <SortRounded sx={{ fontSize: '18px' }} />Sort by: {sortBy}
               </button>
 
-              {showDropdown && (
-                <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-md z-10"
-                >
-                  <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-600" onClick={()=>{setShowDropdown(false);
-                    toast.info("Sorted by Most recent");}}>
-                    Most Recent
-                  </p>
-                  <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-600" onClick={()=>{setShowDropdown(false);
-                    toast.info("Sorted by Name");}}>
-                    Name
-                  </p>
-                  <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-600" onClick={()=>{setShowDropdown(false);
-                    toast.info("Sorted by Most scanned");}}>
-                    Most scanned
-                  </p>
-                  <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-600" onClick={()=>{setShowDropdown(false);
-                    toast.info("Sorted by Last modified");}}>
-                    Last Modified``
-                  </p>
-                </div>
-              )}
+              <AnimatePresence>
+                {showDropdown && (
+                  <motion.div className="absolute bg-white right-0 mt-2 border border-gray-200 shadow-lg rounded-lg z-10"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500"
+                    onClick={()=>{
+                      setShowDropdown(false);
+                      setSortBy('Most Recent');
+                    }}>
+                      Most Recent
+                    </p>
+                    <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500"
+                    onClick={()=>{
+                      setShowDropdown(false);
+                      setSortBy('Name');
+                    }}>
+                      Name
+                    </p>
+                    <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500"
+                    onClick={()=>{
+                      setShowDropdown(false);
+                      setSortBy('Most Scanned');
+                    }}>
+                      Most Scanned
+                    </p>
+                    <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500"
+                    onClick={()=>{
+                      setShowDropdown(false);
+                      setSortBy('Last Modified');
+                    }}>
+                      Last Modified
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
           <div className="border border-gray-200 p-2 rounded flex flex-col gap-2 overflow-y-auto">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2 border border-gray-200 rounded-md px-3 py-1 w-full md:w-1/3">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-2">
+              <div className="flex items-center gap-2 border border-gray-200 rounded-md px-3 py-2 w-full md:w-1/3">
                 <span className="text-gray-500">🔍</span>
-                <input type="text" placeholder="Search..." className="w-full outline-none text-gray-700"/>
+                <input type="text" placeholder="Search..." value={search} onChange={(e)=>setSearch(e.target.value)} className="w-full outline-none text-gray-700"/>
               </div>
 
-              <div className="flex items-center gap-4 text-gray-500 text-xs font-bold">
-                <p>1 of 1</p>
-                <div>
-                  <ChevronLeftRounded />
-                  <ChevronRightRounded />
-                </div>
-                <select name="dataLimit" id="dataLimit" className="border border-gray-200 rounded-md px-3 py-1">
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-              </div>
+              <TablePagination
+                className="rounded-md"
+                component="div"
+                count={100}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
             </div>
 
             <div className="grow overflow-y-auto">
@@ -133,8 +193,8 @@ const MyQRs = () => {
                       <td className="p-3">{data.qr_type}</td>
                       <td className="p-3">{new Date(data.created_at).toLocaleString()}</td>
                       <td className="p-3">{new Date(data.updated_at).toLocaleString()}</td>
-                      <td className="p-3">State</td>
-                      <td className="p-3">0</td>
+                      <td className="p-3">{data.state}</td>
+                      <td className="p-3">{data.total_scans}</td>
                     </tr>
                   ))}
                 </tbody>

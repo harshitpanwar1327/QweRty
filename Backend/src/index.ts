@@ -8,7 +8,7 @@ import { authMiddleware } from './middlewares/AuthMiddleware.js'
 import createAllTables from './utils/CreateTables.js'
 import UsersRoutes from './routes/UsersRoutes.js'
 import SubscriptionRoutes from './routes/SubscriptionRoutes.js'
-import NewQrRoutes from './routes/NewQrRoutes.js'
+import NewQrRoutes from './routes/QrCodesRoutes.js'
 
 dotenv.config();
 

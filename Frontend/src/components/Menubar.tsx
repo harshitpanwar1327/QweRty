@@ -88,7 +88,7 @@ const Menubar: React.FC<MenubarProps> = ({ heading }) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="absolute bg-white right-0 border border-gray-200 shadow-lg rounded-lg z-10 flex flex-col items-center gap-2 p-2"
+              className="absolute bg-white right-0 mt-2 border border-gray-200 shadow-lg rounded-lg z-10 flex flex-col items-center gap-2 p-2"
             >
               <p className="p-3 border-b border-gray-100 text-sm text-gray-700 font-medium">{email}</p>
               <button className="py-2 px-3 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-red-500 text-sm font-semibold" onClick={handleLogout}>
@@ -136,10 +136,10 @@ const Menubar: React.FC<MenubarProps> = ({ heading }) => {
                   `cursor-pointer w-full flex !text-gray-600 mx-auto p-3 rounded-lg transition duration-300 ease-in hover:!text-pink-500 ${isActive ? "!text-pink-500 bg-pink-100" : ""}`}>
                   <li className="flex items-center gap-2"><BarChart /> Stats</li>
                 </NavLink>
-                <NavLink to="/plans" className={({ isActive }) =>
+                {/* <NavLink to="/plans" className={({ isActive }) =>
                   `cursor-pointer w-full flex !text-gray-600 mx-auto p-3 rounded-lg transition duration-300 ease-in hover:!text-pink-500 ${isActive ? "!text-pink-500 bg-pink-100" : ""}`}>
                   <li className="flex items-center gap-2"><CreditCard /> Plans and Pricings</li>
-                </NavLink>
+                </NavLink> */}
               </ul>
             </motion.div>
           </>

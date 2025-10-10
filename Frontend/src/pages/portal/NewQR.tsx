@@ -8,6 +8,7 @@ import SampleQr from '../../assets/SampleQR.png'
 import API from "../../util/API"
 import axios from "axios"
 import { toast } from "react-toastify"
+import { HashLoader  } from "react-spinners"
 import { DownloadQR } from "../../modals/DownloadQR"
 import type { AppDispatch, RootState } from '../../app/Store.js'
 import { useSelector, useDispatch } from 'react-redux'
@@ -83,10 +84,13 @@ const NewQR = () => {
 
   const [content, setContent] = useState({});
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const handleGenerateQr = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
+      setLoading(true);
       const qrPayload = {
         user_id: uid,
         name: qrName,
@@ -110,7 +114,9 @@ const NewQR = () => {
       const response = await API.post("/new-qr", qrPayload);
       setQrPreview(response.data.qr_image);
       toast.success("QR generated successfully!");
+      setLoading(false);
     } catch (error: unknown) {
+      setLoading(false);
       console.log(error);
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || error);
@@ -148,6 +154,12 @@ const NewQR = () => {
 
   return (
     <div className="w-screen flex">
+      {loading && (
+        <div className='fixed top-0 left-0 h-screen w-screen flex justify-center items-center backdrop-blur-md bg-black/25 z-100'>
+          <HashLoader color="#dc3753" />
+        </div>
+      )}
+
       <NavigationBar />
 
       <div className="grow flex flex-col gap-2 p-2 overflow-auto">

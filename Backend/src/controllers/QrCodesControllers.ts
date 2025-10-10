@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { NewQrModels } from '../models/NewQrModels.js';
-import { getNewQrLogic, postNewQrLogic, updateNewQrLogic, deleteNewQrLogic } from '../services/NewQrServices.js';
+import { NewQrModels } from '../models/QrCodesModels.js';
+import { getNewQrLogic, postNewQrLogic, updateNewQrLogic, deleteNewQrLogic } from '../services/QrCodesServices.js';
 
 interface NewQrReqBody {
     user_id: string; 
