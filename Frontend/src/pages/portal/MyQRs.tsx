@@ -8,12 +8,13 @@ import Filter from "../../modals/MyQrs/Filter"
 import TablePagination from '@mui/material/TablePagination'
 import { HashLoader  } from "react-spinners"
 import { motion, AnimatePresence } from 'framer-motion'
+import { Language, PictureAsPdf, AccountBox, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge, Loop, PlayArrowRounded, MoreVert } from "@mui/icons-material"
 
 interface QRData {
   qr_id: number;
   user_id: number;
   name: string;
-  qr_type: 'website'|'text'|'whatsApp'|'email'|'wifi'|'location'|'vcard';
+  qr_type: 'website'|'text'|'whatsapp'|'email'|'wifi'|'location'|'vcard';
   content: object;
   design?: object;
   configuration?: object;
@@ -24,14 +25,34 @@ interface QRData {
   total_scans: number;
 }
 
+const qrTypes = {
+  website: { icon: <Language sx={{fontSize: '16px'}} />, label: "Website" },
+  text: { icon: <TextFields sx={{fontSize: '16px'}} />, label: "Text" },
+  whatsapp: { icon: <WhatsApp sx={{fontSize: '16px'}} />, label: "WhatsApp" },
+  email: { icon: <Email sx={{fontSize: '16px'}} />, label: "Email" },
+  wifi: { icon: <Wifi sx={{fontSize: '16px'}} />, label: "WiFi" },
+  location: { icon: <LocationOn sx={{fontSize: '16px'}} />, label: "Location" },
+  vcard: { icon: <AccountBox sx={{fontSize: '16px'}} />, label: "vCard" },
+  // social: { icon: <People sx={{fontSize: '16px'}} />, label: "Social Media" },
+  // apps: { icon: <Apps sx={{fontSize: '16px'}} />, label: "Apps" },
+  // feedback: { icon: <Feedback sx={{fontSize: '16px'}} />, label: "Feedback" },
+  // pdf: { icon: <PictureAsPdf sx={{fontSize: '16px'}} />, label: "PDF" },
+  // images: { icon: <Image sx={{fontSize: '16px'}} />, label: "Images" },
+  // video: { icon: <Videocam sx={{fontSize: '16px'}} />, label: "Video" },
+  // mp3: { icon: <QueueMusic sx={{fontSize: '16px'}} />, label: "MP3" },
+  // event: { icon: <Event sx={{fontSize: '16px'}} />, label: "Event" },
+  // vcardplus: { icon: <Badge sx={{fontSize: '16px'}} />, label: "vCard Plus" },
+};
+
 const MyQRs = () => {
   const [qrData, setQrData] = useState<QRData[]>([]);
   const [search, setSearch] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('Most Recent');
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
+
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
-  const [selectAll, setSelectAll] = useState<boolean>(false);
+  const [selectAllRows, setSelectAllRows] = useState<boolean>(false);
 
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -41,21 +62,6 @@ const MyQRs = () => {
   const uid = sessionStorage.getItem("userId");
 
   const sortByRef = useRef<HTMLDivElement>(null);
-
-  const handleRowSelect = (id: number) => {
-    setSelectedRows((prev) =>
-      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
-    );
-  };
-
-  const handleSelectAll = () => {
-    if(selectAll){
-      setSelectedRows([]);
-    }else{
-      setSelectedRows(qrData.map((data)=>data.qr_id));
-    }
-    setSelectAll(!selectAll);
-  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -103,6 +109,21 @@ const MyQRs = () => {
   ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  const handleRowSelect = (id: number) => {
+    setSelectedRows((prev) =>
+      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if(selectAllRows){
+      setSelectedRows([]);
+    }else{
+      setSelectedRows(qrData.map((data)=>data.qr_id));
+    }
+    setSelectAllRows(!selectAllRows);
   };
 
   return (
@@ -191,26 +212,52 @@ const MyQRs = () => {
               <table className="w-full text-left p-3">
                 <thead className="bg-gray-100 text-gray-500 text-sm">
                   <tr>
-                    <th className="p-3 w-[5rem]"><input type="checkbox" checked={selectAll} onChange={handleSelectAll}/></th>
-                    <th className="p-3 font-medium">Name</th>
-                    <th className="p-3 font-medium">QR Type</th>
-                    <th className="p-3 font-medium">Created</th>
-                    <th className="p-3 font-medium">Edited</th>
-                    <th className="p-3 font-medium">State</th>
-                    <th className="p-3 font-medium">Scans</th>
-                    <th className="p-3 w-10"></th>
+                    <th className='p-3'><input type="checkbox" checked={selectAllRows} onChange={handleSelectAll}/></th>
+                    <th></th>
+                    <th className="p-3">Name</th>
+                    <th className="p-3">QR Type</th>
+                    <th className="p-3">Created</th>
+                    <th className="p-3">Edited</th>
+                    <th className="p-3">State</th>
+                    <th className="p-3">Scans</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   {qrData.map((data,index)=>(
                     <tr key={index}>
-                      <td className="p-3 w-[5rem]"><input type="checkbox" checked={selectedRows.includes(data.qr_id)} onChange={()=>handleRowSelect(data.qr_id)}/></td>
+                      <td className="p-3">
+                        <input type="checkbox" checked={selectedRows.includes(data.qr_id)} onChange={()=>handleRowSelect(data.qr_id)}/>
+                      </td>
+                      <td className='p-3 pr-0'>
+                        <img src={data.qr} alt="Qr" width={50} className='cursor-pointer border border-gray-200 rounded'/>
+                      </td>
                       <td className="p-3">{data.name}</td>
-                      <td className="p-3">{data.qr_type}</td>
-                      <td className="p-3">{new Date(data.created_at).toLocaleString()}</td>
-                      <td className="p-3">{new Date(data.updated_at).toLocaleString()}</td>
-                      <td className="p-3">{data.state}</td>
-                      <td className="p-3">{data.total_scans}</td>
+                      <td className="p-3">
+                        <div className='flex justify-center items-center gap-1 py-1 px-2 bg-pink-100 text-pink-500 rounded'>
+                          {qrTypes[data.qr_type]?.icon}
+                          <p className='text-sm font-semibold'>{qrTypes[data.qr_type].label}</p>
+                        </div>
+                      </td>
+                      <td className="p-3 text-sm text-gray-500">
+                        {new Date(data.created_at).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </td>
+                      <td className="p-3 text-sm text-gray-500">
+                        {new Date(data.updated_at).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </td>
+                      <td className="p-3">
+                        <p className={`text-sm font-semibold text-white px-2 py-1 rounded flex justify-center items-center ${data.state==='Active'? 'bg-[#46CB48]': data.state==='Pause'? 'bg-blue-500': 'bg-[#FE8E3E]'}`}>{data.state}</p>
+                      </td>
+                      <td className="p-3 font-semibold">{data.total_scans}</td>
+                      <td className='p-3'><MoreVert className='cursor-pointer'/></td>
                     </tr>
                   ))}
                 </tbody>

@@ -23,7 +23,7 @@ const qr_codes = `CREATE TABLE IF NOT EXISTS qr_codes(
     qr_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(50) NOT NULL,
     name VARCHAR(100) UNIQUE NOT NULL,
-    qr_type ENUM('website', 'text', 'whatsApp', 'email', 'wiFi', 'location', 'vCard') NOT NULL,
+    qr_type ENUM('website', 'text', 'whatsapp', 'email', 'wiFi', 'location', 'vCard') NOT NULL,
     content JSON NOT NULL,
     design JSON,
     configuration JSON,
@@ -31,7 +31,7 @@ const qr_codes = `CREATE TABLE IF NOT EXISTS qr_codes(
     state ENUM('Active', 'Paused', 'Finished') DEFAULT 'Active',
     total_scans INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );`;
 

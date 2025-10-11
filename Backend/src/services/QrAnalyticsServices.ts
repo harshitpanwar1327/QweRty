@@ -1,15 +1,49 @@
 import { pool } from "../config/Database.js";
 import { getLocationFromIP } from "../utils/Helper.js";
 
-export const postAnalyticsLogic = async (id: number, clientIp: string | null, deviceType: string) => {
+export const scanAnalyticsLogic = async (id: number, clientIp: string | null, deviceType: string) => {
     try {
         const [rows]: any = await pool.query(`SELECT * FROM qr_codes WHERE qr_id = ?;`, [id]);
-        if(rows.length === 0) {
+        if(!rows || rows.length === 0) {
             return { success: false, message: "QR not found!" };
         }
 
         const qrData = rows[0];
+
+        if(qrData.state==='Pause') {
+            return { success: false, message: 'QR code is paused by the owner!', isPaused: true }
+        }
+        
         const content = typeof qrData.content === "string" ? JSON.parse(qrData.content) : qrData.content;
+        const configuration = typeof qrData.configuration === "string" ? JSON.parse(qrData.configuration) : qrData.configuration;
+
+        const now = new Date();
+        if(configuration?.from_date && configuration?.to_date) {
+            const startDate = new Date(configuration.from_date);
+            const endDate = new Date(configuration.to_date);
+
+            if(now < startDate || now > endDate) {
+                await pool.query(`UPDATE qr_codes SET state = 'Finished' WHERE qr_id = ?;`, [id]);
+
+                return { success: false, message: 'QR code is not active at this time!', inActive: true }
+            }
+        }
+
+        if(configuration?.scan_limit) {
+            const [analyticsData]: any = await pool.query(`SELECT COUNT(*) AS scans FROM qr_analytics WHERE qr_id = ?`, [id]);
+
+            const alreadyScans = analyticsData[0].scans;
+            if(alreadyScans >= configuration.scan_limit) {
+                await pool.query(`UPDATE qr_codes SET state = 'Finished' WHERE qr_id = ?;`, [id]);
+
+                return { success: false, message: 'QR code scan limit reached!', limitReached: true }
+            }
+        }
+
+        if (configuration?.password && configuration.password !== "") {
+            return { success: true, requiresPassword: true, qrId: id };
+        }
+
         const { country, city } = await getLocationFromIP(clientIp);
 
         await pool.query(`INSERT INTO qr_analytics (qr_id, ip_address, country, city, device_type) VALUES (?, ?, ?, ?, ?);`, [id, clientIp, country, city, deviceType]);
@@ -19,80 +53,184 @@ export const postAnalyticsLogic = async (id: number, clientIp: string | null, de
         let redirectURL = "#";
 
         switch (qrData.qr_type) {
-        case "website":
-            redirectURL = content.websiteContent;
-            break;
+            case "website":
+                redirectURL = content.websiteContent;
+                break;
 
-        case "text":
-            redirectURL = `data:text/plain,${encodeURIComponent(content.textContent)}`;
-            break;
+            case "text":
+                redirectURL = `data:text/plain,${encodeURIComponent(content.textContent)}`;
+                break;
 
-        case "whatsApp":
-            const phone = content.whatsappNumber?.replace(/\D/g, "");
-            const message = encodeURIComponent(content.whatsappMessage || "");
-            redirectURL = `https://wa.me/${phone}${message ? `?text=${message}` : ""}`;
-            break;
+            case "whatsapp":
+                const phone = content.whatsappNumber?.replace(/\D/g, "");
+                const message = encodeURIComponent(content.whatsappMessage || "");
+                redirectURL = `https://wa.me/${phone}${message ? `?text=${message}` : ""}`;
+                break;
 
-        case "email":
-            redirectURL = `mailto:${content.emailContent}`;
-            break;
+            case "email":
+                redirectURL = `mailto:${content.emailContent}`;
+                break;
 
-        case "wiFi":
-            redirectURL = `WIFI:T:${content.wifiEncryption};S:${content.wifiSsid};P:${content.wifiPassword};;`;
-            break;
+            case "wifi":
+                redirectURL = `WIFI:T:${content.wifiEncryption};S:${content.wifiSsid};P:${content.wifiPassword};;`;
+                break;
 
-        case "location":
-            if (content.locationTab === "Coordinates") {
-                redirectURL = `https://www.google.com/maps?q=${content.latitude},${content.longitude}`;
-            } else {
-                const fullAddress = `${content.locationStreet || ""}, ${content.locationArea || ""}, ${content.locationCity || ""}, ${content.locationState || ""}, ${content.locationCountry || ""}`;
-                redirectURL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
-            }
-            break;
+            case "location":
+                if (content.locationTab === "Coordinates") {
+                    redirectURL = `https://www.google.com/maps?q=${content.latitude},${content.longitude}`;
+                } else {
+                    const fullAddress = `${content.locationStreet || ""}, ${content.locationArea || ""}, ${content.locationCity || ""}, ${content.locationState || ""}, ${content.locationCountry || ""}`;
+                    redirectURL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+                }
+                break;
 
-        case "vCard":
-            const contact = content;
+            case "vCard":
+                const contact = content;
 
-            interface PhoneNumber {
-                type: string,
-                number: string
-            }
+                interface PhoneNumber {
+                    type: string,
+                    number: string
+                }
 
-            const address = `${contact.locationStreet || ""};${contact.locationCity || ""};${contact.locationState || ""};${contact.locationPostalCode || ""};${contact.locationCountry || ""}`;
+                const address = `${contact.locationStreet || ""};${contact.locationCity || ""};${contact.locationState || ""};${contact.locationPostalCode || ""};${contact.locationCountry || ""}`;
 
-            const vcard = [
-                "BEGIN:VCARD",
-                "VERSION:3.0",
-                `N:${contact.lastName || ""};${contact.firstName || ""};;;`,
-                `FN:${contact.firstName || ""} ${contact.lastName || ""}`,
-                contact.company ? `ORG:${contact.company}` : "",
-                contact.title ? `TITLE:${contact.title}` : "",
-                ...(Array.isArray(contact.phones)
-                    ? contact.phones
-                        .filter((p: PhoneNumber) => p.number && p.type)
-                        .map((p: PhoneNumber) => `TEL;TYPE=${p.type.toUpperCase()}:${p.number}`)
-                    : []),
-                contact.email ? `EMAIL;TYPE=WORK:${contact.email}` : "",
-                contact.website ? `URL:${contact.website}` : "",
-                (contact.locationStreet || contact.locationCity || contact.locationState || contact.locationPostalCode || contact.locationCountry)
-                    ? `ADR;TYPE=WORK:;;${address}`
-                    : "",
-                "END:VCARD",
-            ]
-                .filter(Boolean)
-                .join("\n");
+                const vcard = [
+                    "BEGIN:VCARD",
+                    "VERSION:3.0",
+                    `N:${contact.lastName || ""};${contact.firstName || ""};;;`,
+                    `FN:${contact.firstName || ""} ${contact.lastName || ""}`,
+                    contact.company ? `ORG:${contact.company}` : "",
+                    contact.title ? `TITLE:${contact.title}` : "",
+                    ...(Array.isArray(contact.phones)
+                        ? contact.phones
+                            .filter((p: PhoneNumber) => p.number && p.type)
+                            .map((p: PhoneNumber) => `TEL;TYPE=${p.type.toUpperCase()}:${p.number}`)
+                        : []),
+                    contact.email ? `EMAIL;TYPE=WORK:${contact.email}` : "",
+                    contact.website ? `URL:${contact.website}` : "",
+                    (contact.locationStreet || contact.locationCity || contact.locationState || contact.locationPostalCode || contact.locationCountry)
+                        ? `ADR;TYPE=WORK:;;${address}`
+                        : "",
+                    "END:VCARD",
+                ]
+                    .filter(Boolean)
+                    .join("\n");
 
-            return { success: true, vcard, filename: contact.firstName || "contact" };
-
-        default:
-            redirectURL = "#";
+                return { success: true, vcard, filename: contact.firstName || "contact" };
+            
+            default:
+                throw new Error("Invalid QR type");
         }
-
-        console.log("Redirecting to:", redirectURL);
 
         return { success: true, redirectURL };
     } catch (error) {
         console.error(error);
         return { success: false, message: "Failed to save QR analytics!" };
+    }
+}
+
+export const verifyPasswordLogic = async (id: number, password: string, clientIp: string | null, deviceType: string) => {
+    try {
+        const [rows]: any = await pool.query(`SELECT * FROM qr_codes WHERE qr_id = ?`, [id]);
+        if(!rows || rows.length === 0) {
+            return { success: false, message: "QR not found!" };
+        }
+
+        const qrData = rows[0];
+
+        const configuration = typeof qrData.configuration === "string" ? JSON.parse(qrData.configuration) : qrData.configuration;
+
+        if (!configuration?.password) {
+            return { success: false, message: "This QR code does not require a password." }
+        }
+
+        if (configuration.password !== password) {
+            return { success: false, message: "Incorrect password. Please try again." }
+        }
+        
+        const content = typeof qrData.content === "string" ? JSON.parse(qrData.content) : qrData.content;
+
+        const { country, city } = await getLocationFromIP(clientIp);
+
+        await pool.query(`INSERT INTO qr_analytics (qr_id, ip_address, country, city, device_type) VALUES (?, ?, ?, ?, ?);`, [id, clientIp, country, city, deviceType]);
+
+        await pool.query(`UPDATE qr_codes SET total_scans = total_scans + 1 WHERE qr_id = ?`, [id]);
+
+        let redirectURL = "#";
+
+        switch (qrData.qr_type) {
+            case "website":
+                redirectURL = content.websiteContent;
+                break;
+
+            case "text":
+                redirectURL = `data:text/plain,${encodeURIComponent(content.textContent)}`;
+                break;
+
+            case "whatsapp":
+                const phone = content.whatsappNumber?.replace(/\D/g, "");
+                const message = encodeURIComponent(content.whatsappMessage || "");
+                redirectURL = `https://wa.me/${phone}${message ? `?text=${message}` : ""}`;
+                break;
+
+            case "email":
+                redirectURL = `mailto:${content.emailContent}`;
+                break;
+
+            case "wifi":
+                redirectURL = `WIFI:T:${content.wifiEncryption};S:${content.wifiSsid};P:${content.wifiPassword};;`;
+                break;
+
+            case "location":
+                if (content.locationTab === "Coordinates") {
+                    redirectURL = `https://www.google.com/maps?q=${content.latitude},${content.longitude}`;
+                } else {
+                    const fullAddress = `${content.locationStreet || ""}, ${content.locationArea || ""}, ${content.locationCity || ""}, ${content.locationState || ""}, ${content.locationCountry || ""}`;
+                    redirectURL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+                }
+                break;
+
+            case "vCard":
+                const contact = content;
+
+                interface PhoneNumber {
+                    type: string,
+                    number: string
+                }
+
+                const address = `${contact.locationStreet || ""};${contact.locationCity || ""};${contact.locationState || ""};${contact.locationPostalCode || ""};${contact.locationCountry || ""}`;
+
+                const vcard = [
+                    "BEGIN:VCARD",
+                    "VERSION:3.0",
+                    `N:${contact.lastName || ""};${contact.firstName || ""};;;`,
+                    `FN:${contact.firstName || ""} ${contact.lastName || ""}`,
+                    contact.company ? `ORG:${contact.company}` : "",
+                    contact.title ? `TITLE:${contact.title}` : "",
+                    ...(Array.isArray(contact.phones)
+                        ? contact.phones
+                            .filter((p: PhoneNumber) => p.number && p.type)
+                            .map((p: PhoneNumber) => `TEL;TYPE=${p.type.toUpperCase()}:${p.number}`)
+                        : []),
+                    contact.email ? `EMAIL;TYPE=WORK:${contact.email}` : "",
+                    contact.website ? `URL:${contact.website}` : "",
+                    (contact.locationStreet || contact.locationCity || contact.locationState || contact.locationPostalCode || contact.locationCountry)
+                        ? `ADR;TYPE=WORK:;;${address}`
+                        : "",
+                    "END:VCARD",
+                ]
+                    .filter(Boolean)
+                    .join("\n");
+
+                return { success: true, vcard, filename: contact.firstName || "contact" };
+            
+            default:
+                throw new Error("Invalid QR type");
+        }
+
+        return { success: true, redirectURL };
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: "Failed to verify password!" };
     }
 }

@@ -1,8 +1,9 @@
 import express from 'express'
-import { postAnalytics } from '../controllers/QrAnalyticsControllers.js'
+import { scanAnalytics, verifyPassword } from '../controllers/QrAnalyticsControllers.js'
 
 const router = express.Router();
 
-router.use('/track/:id', postAnalytics);
+router.use('/track/:id', scanAnalytics);
+router.post('/verify/:id', verifyPassword);
 
 export default router;

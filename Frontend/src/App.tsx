@@ -14,6 +14,10 @@ import NewQR from './pages/portal/NewQR.js'
 import Plans from './pages/portal/Plans.js'
 import Stats from './pages/portal/Stats.js'
 import ProtectedRoutes from './components/ProtectedRoutes.js'
+import ConfigPauseQR from './pages/qr/ConfigPauseQR.js'
+import ConfigTimeSchedule from './pages/qr/ConfigTimeSchedule.js'
+import ConfigScanLimit from './pages/qr/ConfigScanLimit.js'
+import ConfigPassword from './pages/qr/ConfigPassword.js'
 
 function App() {
   return (
@@ -30,6 +34,11 @@ function App() {
         <Route path='/login' element={<Login />}/>
         <Route path='/register' element={<Register />}/>
         <Route path='/forgot-password' element={<ForgotPassword />}/>
+
+        <Route path='/config/pauseQR' element={<ConfigPauseQR />}/>
+        <Route path='/config/timeSchedule' element={<ConfigTimeSchedule />}/>
+        <Route path='/config/scanLimit' element={<ConfigScanLimit />}/>
+        <Route path='/config/password/:id' element={<ConfigPassword />}/>
 
         <Route element={<ProtectedRoutes/>}>
           <Route path='/my-qr' element={<MyQRs />}/>

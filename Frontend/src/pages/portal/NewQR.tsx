@@ -94,6 +94,11 @@ const NewQR = () => {
   const handleGenerateQr = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if(password!==confirmPassword) {
+      toast.error('Password and confirm password not match!');
+      return;
+    }
+
     try {
       setLoading(true);
       const qrPayload = {
@@ -118,7 +123,7 @@ const NewQR = () => {
 
       const response = await API.post("/qr-codes", qrPayload);
       setQrPreview(response.data.qr_image);
-      toast.success("QR generated successfully!");
+      toast.success("QR generated successfully.");
       setLoading(false);
     } catch (error: unknown) {
       setLoading(false);
