@@ -37,7 +37,7 @@ const WifiLogic: React.FC<WifiLogicProps> = ({ setContent }) => {
       <div className="flex flex-col gap-2">
         <label>Network password</label>
         <input
-          type="text"
+          type="password"
           placeholder="E.g. MyPassword"
           className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"
           value={wifiPassword}

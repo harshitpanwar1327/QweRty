@@ -3,9 +3,9 @@ import { getNewQr, postNewQr, updateNewQr, deleteNewQr } from '../controllers/Qr
 
 let router = express.Router();
 
-router.get('/qr-codes/:uid', getNewQr);
-router.post('/qr-codes', postNewQr);
-router.put('/qr-codes/:id', updateNewQr);
-router.delete('/qr-codes/:id', deleteNewQr);
+router.post('/get-qr', getNewQr);
+router.post('/qr', postNewQr);
+router.put('/qr/:id', updateNewQr);
+router.delete('/qr/:id', deleteNewQr);
 
 export default router;

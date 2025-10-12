@@ -8,7 +8,7 @@ import Filter from "../../modals/MyQrs/Filter"
 import TablePagination from '@mui/material/TablePagination'
 import { HashLoader  } from "react-spinners"
 import { motion, AnimatePresence } from 'framer-motion'
-import { Language, PictureAsPdf, AccountBox, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge, Loop, PlayArrowRounded, MoreVert } from "@mui/icons-material"
+import { Language, PictureAsPdf, AccountBox, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge, Loop, PlayArrowRounded, MoreVert, DownloadRounded, EditRounded, DeleteRounded } from "@mui/icons-material"
 
 interface QRData {
   qr_id: number;
@@ -24,6 +24,14 @@ interface QRData {
   state: string;
   total_scans: number;
 }
+
+const sortByOptions = ['Most Recent', 'Name', 'Most Scanned', 'Last Modified'];
+
+const myQrOptions = [
+  { icon: <DownloadRounded sx={{fontSize: '16px'}} />, label: "Download" },
+  { icon: <EditRounded sx={{fontSize: '16px'}} />, label: "Edit" },
+  { icon: <DeleteRounded sx={{fontSize: '16px'}} />, label: "Delete" }
+]
 
 const qrTypes = {
   website: { icon: <Language sx={{fontSize: '16px'}} />, label: "Website" },
@@ -44,29 +52,44 @@ const qrTypes = {
   // vcardplus: { icon: <Badge sx={{fontSize: '16px'}} />, label: "vCard Plus" },
 };
 
+interface FilterData {
+  activeStatus: string[],
+  selectedType: string[]
+}
+
 const MyQRs = () => {
   const [qrData, setQrData] = useState<QRData[]>([]);
   const [search, setSearch] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('Most Recent');
+  const [filterData, setFilterData] = useState<FilterData>({
+    activeStatus: [],
+    selectedType: []
+  });
+
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
+  const [activeOptionRow, setActiveOptionRow] = useState<number | null>(null);
 
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [selectAllRows, setSelectAllRows] = useState<boolean>(false);
 
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [totalData, setTotalData] = useState<number>(1);
 
   const [loading, setLoading] = useState<boolean>(false);
 
   const uid = sessionStorage.getItem("userId");
 
   const sortByRef = useRef<HTMLDivElement>(null);
+  const activeOptionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (sortByRef.current && !sortByRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
+      } else if (activeOptionRef.current && !activeOptionRef.current.contains(event.target as Node)) {
+        setActiveOptionRow(null);
       }
     };
 
@@ -79,8 +102,16 @@ const MyQRs = () => {
   const fetchQr = async () => {
     try {
       setLoading(true);
-      const response = await API.get(`/qr-codes/${uid}`);
+      const response = await API.post(`/get-qr`, {
+        search,
+        sortBy,
+        filterData,
+        uid,
+        page,
+        rowsPerPage
+      });
       setQrData(response.data.data);
+      setTotalData(response.data.total);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -95,18 +126,13 @@ const MyQRs = () => {
 
   useEffect(()=>{
     fetchQr();
-  }, []);
+  }, [search, sortBy, filterData, page, rowsPerPage]);
 
-  const handleChangePage = (
-    event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
-  ) => {
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -156,34 +182,15 @@ const MyQRs = () => {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500"
-                    onClick={()=>{
-                      setShowDropdown(false);
-                      setSortBy('Most Recent');
-                    }}>
-                      Most Recent
-                    </p>
-                    <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500"
-                    onClick={()=>{
-                      setShowDropdown(false);
-                      setSortBy('Name');
-                    }}>
-                      Name
-                    </p>
-                    <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500"
-                    onClick={()=>{
-                      setShowDropdown(false);
-                      setSortBy('Most Scanned');
-                    }}>
-                      Most Scanned
-                    </p>
-                    <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500"
-                    onClick={()=>{
-                      setShowDropdown(false);
-                      setSortBy('Last Modified');
-                    }}>
-                      Last Modified
-                    </p>
+                    {sortByOptions.map((option, index) => (
+                      <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500" key={index}
+                      onClick={()=>{
+                        setShowDropdown(false);
+                        setSortBy(option);
+                      }}>
+                        {option}
+                      </p>
+                    ))}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -200,7 +207,7 @@ const MyQRs = () => {
               <TablePagination
                 className="rounded-md"
                 component="div"
-                count={100}
+                count={totalData}
                 page={page}
                 onPageChange={handleChangePage}
                 rowsPerPage={rowsPerPage}
@@ -224,8 +231,8 @@ const MyQRs = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {qrData.map((data,index)=>(
-                    <tr key={index}>
+                  {qrData.map((data)=>(
+                    <tr key={data.qr_id}>
                       <td className="p-3">
                         <input type="checkbox" checked={selectedRows.includes(data.qr_id)} onChange={()=>handleRowSelect(data.qr_id)}/>
                       </td>
@@ -236,7 +243,7 @@ const MyQRs = () => {
                       <td className="p-3">
                         <div className='flex justify-center items-center gap-1 py-1 px-2 bg-pink-100 text-pink-500 rounded'>
                           {qrTypes[data.qr_type]?.icon}
-                          <p className='text-sm font-semibold'>{qrTypes[data.qr_type].label}</p>
+                          <p className='text-sm font-semibold'>{qrTypes[data.qr_type]?.label}</p>
                         </div>
                       </td>
                       <td className="p-3 text-sm text-gray-500">
@@ -257,7 +264,32 @@ const MyQRs = () => {
                         <p className={`text-sm font-semibold text-white px-2 py-1 rounded flex justify-center items-center ${data.state==='Active'? 'bg-[#46CB48]': data.state==='Pause'? 'bg-blue-500': 'bg-[#FE8E3E]'}`}>{data.state}</p>
                       </td>
                       <td className="p-3 font-semibold">{data.total_scans}</td>
-                      <td className='p-3'><MoreVert className='cursor-pointer'/></td>
+                      <td className='p-3'>
+                        <div className='relative' ref={activeOptionRef}>
+                          <MoreVert className='cursor-pointer' onClick={()=>setActiveOptionRow(activeOptionRow===data.qr_id ? null: data.qr_id)}/>
+                          
+                          <AnimatePresence>
+                            {activeOptionRow===data.qr_id && (
+                              <motion.div className="absolute right-6 top-0 bg-white border border-gray-200 shadow-lg rounded-lg z-10"
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.3 }}
+                              >
+                                {myQrOptions.map((option, index) => (
+                                  <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500 flex items-center gap-2" key={index}
+                                  onClick={()=>{
+                                    setActiveOptionRow(null);
+                                  }}>
+                                    {option.icon}
+                                    <p>{option.label}</p>
+                                  </p>
+                                ))}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -266,7 +298,7 @@ const MyQRs = () => {
           </div>
         </div>
       </div>
-      {openFilterModal && <Filter setOpenFilterModal={setOpenFilterModal}/>}
+      {openFilterModal && <Filter setOpenFilterModal={setOpenFilterModal} setFilterData={setFilterData}/>}
     </div>
   )
 }

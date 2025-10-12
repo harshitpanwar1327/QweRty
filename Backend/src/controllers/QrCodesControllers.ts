@@ -16,15 +16,21 @@ interface NewQrReqParams {
     uid?: string;
 }
 
-export const getNewQr = async (req: Request<NewQrReqParams>, res: Response) => {
-    const { uid } = req.params;
+export const getNewQr = async (req: Request, res: Response) => {
+    const search = req.body.search || '';
+    const sortBy = req.body.sortBy || '';
+    const filterData = req.body.filterData || {activeStatus: [], selectedTypes: []};
+    const uid = req.body.uid;
+    const page = parseInt(req.body.page) || 0;
+    const limit = parseInt(req.body.rowsPerPage) || 10;
+    const offset = page * limit;
 
     if(!uid){
         return res.status(400).json({success: false, message: "User id not found!"});
     }
 
     try {
-        let response = await getNewQrLogic(uid);
+        let response = await getNewQrLogic(search, sortBy, filterData, uid, limit, offset);
         if(response.success){
             return res.status(200).json(response);
         }else{

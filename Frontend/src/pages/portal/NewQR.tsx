@@ -121,7 +121,7 @@ const NewQR = () => {
         }
       };
 
-      const response = await API.post("/qr-codes", qrPayload);
+      const response = await API.post("/qr", qrPayload);
       setQrPreview(response.data.qr_image);
       toast.success("QR generated successfully.");
       setLoading(false);

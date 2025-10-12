@@ -1,11 +1,55 @@
 import { pool } from '../config/Database.js';
 import QRCode from "qrcode";
 
-export const getNewQrLogic = async (uid: string) => {
-    try {
-        const [rows] = await pool.query("SELECT * FROM qr_codes WHERE user_id = ?", [uid]);
+interface FilterData {
+    activeStatus: string[],
+    selectedTypes: string[]
+}
 
-        return { success: true, data: rows };
+export const getNewQrLogic = async (search: string, sortBy: string, filterData: FilterData , uid: string, limit: number, offset: number) => {
+    try {
+        const searchQuery = `%${search}%`;
+
+        let query = `SELECT * FROM qr_codes WHERE user_id = ? AND name LIKE ?`;
+        let params: any[] = [uid, searchQuery];
+
+        if(filterData.activeStatus?.length > 0) {
+            const placeholder = filterData.activeStatus.map(()=>'?').join(',');
+            query += ` AND state IN (${placeholder})`;
+            params.push(...filterData.activeStatus);
+        }
+
+        if(filterData.selectedTypes?.length > 0) {
+            const placeholder = filterData.selectedTypes.map(()=>'?').join(',');
+            query += ` AND qr_type IN (${placeholder})`;
+            params.push(...filterData.selectedTypes);
+        }
+
+        switch (sortBy) {
+            case "Most Recent":
+                query += " ORDER BY created_at DESC";
+                break;
+            case "Name":
+                query += " ORDER BY name ASC";
+                break;
+            case "Most Scanned":
+                query += " ORDER BY total_scans DESC";
+                break;
+            case "Last Modified":
+                query += " ORDER BY updated_at DESC";
+                break;
+            default:
+                query += " ORDER BY created_at DESC";
+                break;
+        }
+
+        query += ` LIMIT ? OFFSET ?`;
+        params.push(limit, offset);
+
+        const [rows] = await pool.query(query, params);
+        const [countRows]: any[] = await pool.query(`SELECT COUNT(*) AS total FROM qr_codes WHERE user_id = ?`, [uid]);
+
+        return { success: true, data: rows, total: countRows[0].total };
     } catch (error) {
         console.error("Get QR by user error:", error);
         return { success: false, message: "Failed to fetch QR codes!" };
@@ -14,23 +58,6 @@ export const getNewQrLogic = async (uid: string) => {
 
 export const postNewQrLogic = async (newQrData: any) => {
     try {
-        const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr) VALUES (?, ?, ?, ?, ?, ?, '');`;
-
-        const values = [
-            newQrData.user_id,
-            newQrData.name,
-            newQrData.qr_type,
-            JSON.stringify(newQrData.content),
-            JSON.stringify(newQrData.design),
-            JSON.stringify(newQrData.configuration),
-        ];
-
-        const [result]: any = await pool.query(query, values);
-        const qr_id = result.insertId;
-
-        const redirectBaseUrl = process.env.BASE_URL;
-        const trackingUrl = `${redirectBaseUrl}/track/${qr_id}`;
-
         let actualPayload = "";
         switch (newQrData.qr_type) {
             case "website":
@@ -51,7 +78,7 @@ export const postNewQrLogic = async (newQrData: any) => {
                 actualPayload = `mailto:${newQrData.content.emailContent}`;
                 break;
 
-            case "wiFi":
+            case "wifi":
                 actualPayload = `WIFI:T:${newQrData.content.wifiEncryption};S:${newQrData.content.wifiSsid};P:${newQrData.content.wifiPassword};;`;
                 break;
 
@@ -93,6 +120,23 @@ export const postNewQrLogic = async (newQrData: any) => {
             default:
                 throw new Error("Invalid QR type");
         }
+        
+        const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr) VALUES (?, ?, ?, ?, ?, ?, '');`;
+
+        const values = [
+            newQrData.user_id,
+            newQrData.name,
+            newQrData.qr_type,
+            JSON.stringify(newQrData.content),
+            JSON.stringify(newQrData.design),
+            JSON.stringify(newQrData.configuration),
+        ];
+
+        const [result]: any = await pool.query(query, values);
+        const qr_id = result.insertId;
+
+        const redirectBaseUrl = process.env.BASE_URL;
+        const trackingUrl = `${redirectBaseUrl}/track/${qr_id}`;
 
         const qrOptions = {
             errorCorrectionLevel: newQrData.design?.errorCorrectionLevel || 'Q',
