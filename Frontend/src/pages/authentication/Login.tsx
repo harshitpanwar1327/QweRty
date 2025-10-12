@@ -6,6 +6,7 @@ import GoogleIcon from '@mui/icons-material/Google'
 import { auth } from '../../util/Firebase.ts'
 import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, getAdditionalUserInfo } from 'firebase/auth'
 import API from '../../util/API.ts'
+import LoginImage from '../../assets/LoginImage.jpg'
 
 const Login = () => {
   const [email, setEmail] = useState<string>('');
@@ -81,14 +82,14 @@ const Login = () => {
   }
 
   return (
-    <div className='flex flex-col lg:flex-row items-center justify-between gap-16 p-3 w-screen'>
+    <div className='flex flex-col lg:flex-row items-center justify-between p-3 w-screen'>
       {loading && (
         <div className='fixed top-0 left-0 h-screen w-screen flex justify-center items-center backdrop-blur-md bg-black/25 z-100'>
           <HashLoader color="#dc3753" />
         </div>
       )}
       
-      <div className='flex flex-col justify-center gap-4 w-full h-full lg:w-1/2 p-8 md:p-16'>
+      <div className='flex flex-col justify-center gap-4 w-full h-full lg:w-2/5 p-8 md:p-16'>
         <div className="flex items-center gap-2 items-start">
           <div className="px-2 py-1 bg-pink-500 text-white rounded-md text-lg font-bold">QR</div>
           <p className="font-bold text-2xl text-black">QweRty</p>
@@ -120,9 +121,7 @@ const Login = () => {
         </button>
       </div>
 
-      <div className='hidden lg:block lg:w-1/2 h-full rounded-r-lg rounded-l-4xl bg-pink-300 flex flex-center items-center'>
-        <img src="" alt="Login Image"/>
-      </div>
+      <img src={LoginImage} alt="Login Image" className='hidden lg:block lg:w-3/5 h-full rounded-r-lg rounded-l-4xl flex flex-center items-center' />
     </div>
   )
 }

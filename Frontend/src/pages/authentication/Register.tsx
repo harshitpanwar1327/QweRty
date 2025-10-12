@@ -6,6 +6,7 @@ import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, ge
 import { HashLoader  } from "react-spinners"
 import GoogleIcon from '@mui/icons-material/Google'
 import API from '../../util/API.ts'
+import SignupImage from '../../assets/SignupImage1.jpg'
 
 const Register = () => {
   const [name, setName] = useState<string>('');
@@ -89,7 +90,7 @@ const Register = () => {
         </div>
       )}
       
-      <div className='flex flex-col justify-center gap-4 text-black w-full h-full lg:w-1/2 p-8 md:p-16'>
+      <div className='flex flex-col justify-center gap-4 text-black w-full h-full lg:w-2/5 p-8 md:p-16'>
         <div className="flex items-center gap-2 items-start">
           <div className="px-2 py-1 bg-pink-500 text-white rounded-md text-lg font-bold">QR</div>
           <p className="font-bold text-2xl text-black">QweRty</p>
@@ -124,9 +125,7 @@ const Register = () => {
         </button>
       </div>
 
-      <div className='hidden lg:block lg:w-1/2 h-full rounded-r-lg rounded-l-4xl bg-pink-300 flex flex-center items-center'>
-        <img src="" alt="Login Image"/>
-      </div>
+      <img src={SignupImage} alt="Signup Image" className='hidden lg:block lg:w-3/5 h-full rounded-r-lg rounded-l-4xl flex flex-center items-center' />
     </div>
   )
 }

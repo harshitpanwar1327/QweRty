@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom'
 import { sendPasswordResetEmail } from 'firebase/auth'
 import { auth } from '../../util/Firebase'
 import { HashLoader  } from "react-spinners"
+import ForgotImage from '../../assets/ForgotImage.jpg'
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState<string>('');
@@ -38,7 +39,7 @@ const ForgotPassword = () => {
         </div>
       )}
       
-      <div className='flex flex-col justify-center gap-4 text-black w-full h-full lg:w-1/2 p-8 md:p-16'>
+      <div className='flex flex-col justify-center gap-4 text-black w-full h-full lg:w-2/5 p-8 md:p-16'>
         <div className="flex items-center gap-2">
           <div className="px-2 py-1 bg-pink-500 text-white rounded-md text-lg font-bold">QR</div>
           <p className="font-bold text-2xl text-black">QweRty</p>
@@ -59,9 +60,7 @@ const ForgotPassword = () => {
         <span className="text-xs font-semibold text-gray-500">Don&apos;t have an account? <NavLink to="/register" className="text-blue-500 hover:text-blue-700 font-bold">Create an account</NavLink></span>
       </div>
 
-      <div className='hidden lg:block lg:w-1/2 h-full rounded-r-lg rounded-l-4xl bg-pink-300 flex flex-center items-center'>
-        <img src="" alt="Login Image"/>
-      </div>
+      <img src={ForgotImage} alt="Forgot Image" className='hidden lg:block lg:w-3/5 h-full rounded-r-lg rounded-l-4xl flex flex-center items-center' />
     </div>
   )
 }
