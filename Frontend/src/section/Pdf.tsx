@@ -1,4 +1,4 @@
-import website from '../assets/Location.png'
+import website from '../assets/hero/Location.png'
 
 const Pdf = () => {
   return (

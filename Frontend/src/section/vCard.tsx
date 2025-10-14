@@ -1,4 +1,4 @@
-import website from '../assets/Location.png'
+import website from '../assets/hero/vCard.png'
 import { useNavigate } from 'react-router-dom'
 import type { AppDispatch } from '../app/Store'
 import { useDispatch } from 'react-redux'

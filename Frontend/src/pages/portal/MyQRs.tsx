@@ -8,6 +8,7 @@ import Filter from "../../modals/MyQrs/Filter"
 import TablePagination from '@mui/material/TablePagination'
 import { HashLoader  } from "react-spinners"
 import { motion, AnimatePresence } from 'framer-motion'
+import Qr from '../../modals/MyQrs/Qr'
 import { Language, PictureAsPdf, AccountBox, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge, Loop, PlayArrowRounded, MoreVert, DownloadRounded, EditRounded, DeleteRounded } from "@mui/icons-material"
 
 interface QRData {
@@ -68,6 +69,8 @@ const MyQRs = () => {
 
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
+  const [openQrModal, setOpenQrModal] = useState<boolean>(false);
+  const [selectedQr, setselectedQr] = useState<QRData[]>([]);
   const [activeOptionRow, setActiveOptionRow] = useState<number | null>(null);
 
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
@@ -151,6 +154,16 @@ const MyQRs = () => {
     }
     setSelectAllRows(!selectAllRows);
   };
+
+  const handleQr = (data)=>{
+    setOpenQrModal(true);
+    setselectedQr(data);
+  }
+
+  const handleSelectedRows = ()=>{
+    setSelectedRows([]);
+    setSelectAllRows(false);
+  }
 
   return (
     <div className="w-screen flex">
@@ -236,7 +249,7 @@ const MyQRs = () => {
                       <td className="p-3">
                         <input type="checkbox" checked={selectedRows.includes(data.qr_id)} onChange={()=>handleRowSelect(data.qr_id)}/>
                       </td>
-                      <td className='p-3 pr-0'>
+                      <td className='p-3 pr-0' onClick={()=>handleQr(data)}>
                         <img src={data.qr} alt="Qr" width={50} className='cursor-pointer border border-gray-200 rounded'/>
                       </td>
                       <td className="p-3">{data.name}</td>
@@ -296,9 +309,24 @@ const MyQRs = () => {
               </table>
             </div>
           </div>
+          {selectedRows.length > 0 && (
+            <div className="fixed bottom-0 left-0 w-full bg-white shadow-md flex justify-between items-center px-6 py-3 border-t border-gray-200">
+              <button className="text-gray-600 border border-gray-200 px-4 py-1 rounded-md hover:bg-gray-100 transition" onClick={() => handleSelectedRows()}>Cancel</button>
+
+              <div className="flex items-center gap-3">
+                <button className="text-white bg-red-500 px-4 py-1 rounded-md hover:bg-red-600 transition">Delete</button>
+                <button className="text-blue-500 border border-blue-400 px-4 py-1 rounded-md hover:bg-blue-50 transition">Pause</button>
+                <button className="text-white bg-blue-500 px-4 py-1 rounded-md hover:bg-blue-600 transition">Download</button>
+              </div>
+              <div className="flex items-center gap-2 text-gray-500">
+                <p className="text-sm">{selectedRows.length} Selected</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       {openFilterModal && <Filter setOpenFilterModal={setOpenFilterModal} setFilterData={setFilterData}/>}
+      {openQrModal && <Qr setOpenQrModal={setOpenQrModal} selectedQr={selectedQr}/>}
     </div>
   )
 }
