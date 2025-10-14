@@ -1,5 +1,16 @@
 import { useState } from "react"
 import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, Close, DeleteRounded } from "@mui/icons-material"
+import { motion } from 'framer-motion'
+
+interface FilterData {
+  activeStatus: string[],
+  selectedType: string[]
+}
+
+interface FilterProp {
+  setOpenFilterModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setFilterData: React.Dispatch<React.SetStateAction<FilterData>>;
+}
 
 const qrStatus = ["Active", "Paused", "Finished"];
 
@@ -13,9 +24,9 @@ const qrTypes = [
   { key: 'vcard', name: "vCard", icon: <AccountBox fontSize="small" /> },
 ];
 
-const Filter = ({ setOpenFilterModal, setFilterData }) => {
+const Filter: React.FC<FilterProp> = ({ setOpenFilterModal, setFilterData }) => {
   const [activeStatus, setActiveStatus] = useState<string[]>([]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedType, setSelectedTypes] = useState<string[]>([]);
 
   const toggleStatus = (status: string) => {
     setActiveStatus((prev) => prev.includes(status)? prev.filter((s) => s !== status) : [...prev, status])
@@ -33,14 +44,19 @@ const Filter = ({ setOpenFilterModal, setFilterData }) => {
   const handleResult = () => {
     setFilterData({
       activeStatus: [...activeStatus],
-      selectedTypes: [...selectedTypes]
+      selectedType: [...selectedType]
     })
     setOpenFilterModal(false);
   }
 
   return (
     <div className='fixed top-0 left-0 w-screen h-screen p-4 flex justify-end items-center bg-[#0000005a] z-10' onClick={()=>setOpenFilterModal(false)}>
-      <div className="w-full md:w-1/2 lg:w-1/3 bg-white rounded-md shadow-md p-4 flex flex-col gap-4" onClick={(e)=>e.stopPropagation()}>
+      <motion.div className="w-full md:w-1/2 lg:w-1/3 bg-white rounded-md shadow-md p-4 flex flex-col gap-4" onClick={(e)=>e.stopPropagation()}
+        initial={{opacity: 0, x: '100%'}}
+        animate={{opacity: 1, x: 0}}
+        exit={{opacity: 0, x: '100%'}}
+        transition={{duration: 0.3}}
+      >
         <div className="flex justify-between items-center">
           <h2 className="font-semibold text-xl">Filter results</h2>
           <div className="flex justify-center items-center p-1 hover:bg-gray-100 rounded-full text-gray-500 cursor-pointer">
@@ -64,7 +80,7 @@ const Filter = ({ setOpenFilterModal, setFilterData }) => {
         <h3 className='text-black font-semibold'>QR code type</h3>
         <div className="flex flex-wrap gap-2">
           {qrTypes.map((type, index) => (
-            <button key={index} onClick={()=>toggleType(type.key)} className={`flex items-center gap-2 py-2 px-3 text-sm rounded-md border transition-all duration-300 ${selectedTypes.includes(type.key)? "bg-pink-50 border-pink-500 text-pink-600": "border-gray-200 text-gray-600 hover:bg-gray-100"}`}>
+            <button key={index} onClick={()=>toggleType(type.key)} className={`flex items-center gap-2 py-2 px-3 text-sm rounded-md border transition-all duration-300 ${selectedType.includes(type.key)? "bg-pink-50 border-pink-500 text-pink-600": "border-gray-200 text-gray-600 hover:bg-gray-100"}`}>
               {type.icon}
               <span>{type.name}</span>
             </button>
@@ -77,7 +93,7 @@ const Filter = ({ setOpenFilterModal, setFilterData }) => {
           <button className="flex items-center gap-1 font-semibold text-blue-500 hover:text-blue-600  transition duration-300" onClick={handleClearFilter}><DeleteRounded /> Clear filters</button>
           <button className="bg-blue-500 hover:bg-blue-600 transition duration-300 py-2 px-3 text-white font-semibold rounded-full" onClick={handleResult}>See results</button>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

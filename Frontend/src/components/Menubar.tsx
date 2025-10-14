@@ -76,10 +76,10 @@ const Menubar: React.FC<MenubarProps> = ({ heading }) => {
       </div>
 
       <div className="relative" ref={profileRef}>
-        <div className="flex items-center gap-1 cursor-pointer group" onClick={()=>setProfileDropdown(!profileDropdown)}>
+        <button className="flex items-center gap-1 cursor-pointer group" onClick={()=>setProfileDropdown(!profileDropdown)}>
           <AccountCircle sx={{ fontSize: '32px' }} />
           <KeyboardArrowDown sx={{ fontSize: '24px', color: '#ec4899' }} className='group-hover:bg-pink-100 rounded' />
-        </div>
+        </button>
 
         <AnimatePresence>
           {profileDropdown && (

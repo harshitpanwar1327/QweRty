@@ -6,7 +6,7 @@ import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, ge
 import { HashLoader  } from "react-spinners"
 import GoogleIcon from '@mui/icons-material/Google'
 import API from '../../util/API.ts'
-import SignupImage from '../../assets/SignupImage1.jpg'
+import SignupImage from '../../assets/SignupImage.jpg'
 
 const Register = () => {
   const [name, setName] = useState<string>('');

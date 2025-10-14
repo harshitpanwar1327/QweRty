@@ -3,7 +3,13 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import CropOriginalIcon from '@mui/icons-material/CropOriginal'
 import FilterCenterFocusIcon from '@mui/icons-material/FilterCenterFocus'
 
-export const DownloadQR = ({ setOpenDownloadModal, qrPreview, qrName }) => {
+interface DownloadQRProp {
+  setOpenDownloadModal: React.Dispatch<React.SetStateAction<boolean>>;
+  qrPreview: string,
+  qrName: string
+}
+
+const DownloadQR: React.FC<DownloadQRProp> = ({ setOpenDownloadModal, qrPreview, qrName }) => {
   const handleDownloadQr = async (downloadFormat: string) => {
     try {
       const img = new window.Image();
@@ -96,3 +102,5 @@ export const DownloadQR = ({ setOpenDownloadModal, qrPreview, qrName }) => {
     </div>
   )
 }
+
+export default DownloadQR

@@ -9,7 +9,7 @@ import API from "../../util/API"
 import axios from "axios"
 import { toast } from "react-toastify"
 import { HashLoader  } from "react-spinners"
-import { DownloadQR } from "../../modals/DownloadQR"
+import DownloadQR from "../../modals/DownloadQR"
 import type { AppDispatch, RootState } from '../../app/Store.js'
 import { useSelector, useDispatch } from 'react-redux'
 import { activeTab } from "../../features/qrType/QrTypeSlice.js"

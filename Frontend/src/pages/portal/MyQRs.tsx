@@ -3,13 +3,15 @@ import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
 import API from '../../util/API'
 import axios from "axios"
-import { FilterAlt, SortRounded } from '@mui/icons-material'
 import Filter from "../../modals/MyQrs/Filter"
 import TablePagination from '@mui/material/TablePagination'
 import { HashLoader  } from "react-spinners"
 import { motion, AnimatePresence } from 'framer-motion'
-import Qr from '../../modals/MyQrs/Qr'
-import { Language, PictureAsPdf, AccountBox, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge, Loop, PlayArrowRounded, MoreVert, DownloadRounded, EditRounded, DeleteRounded } from "@mui/icons-material"
+import ViewQr from '../../modals/MyQrs/ViewQr'
+import { Language, AccountBox, PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge, Loop, PlayArrowRounded, MoreVert, DownloadRounded, EditRounded, DeleteRounded, FilterAlt, SortRounded } from "@mui/icons-material"
+import { toast } from 'react-toastify'
+import Swal from 'sweetalert2'
+import DownloadQR from '../../modals/DownloadQR'
 
 interface QRData {
   qr_id: number;
@@ -69,10 +71,24 @@ const MyQRs = () => {
 
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
-  const [openQrModal, setOpenQrModal] = useState<boolean>(false);
-  const [selectedQr, setselectedQr] = useState<QRData[]>([]);
-  const [activeOptionRow, setActiveOptionRow] = useState<number | null>(null);
+  const [openViewQrModal, setOpenViewQrModal] = useState<boolean>(false);
+  const [openDownloadModal, setOpenDownloadModal] = useState<boolean>(false);
+  const [selectedQr, setselectedQr] = useState<QRData>({
+    qr_id: 0,
+    user_id: 0,
+    name: '',
+    qr_type: 'website',
+    content: {},
+    design: {},
+    configuration: {},
+    qr: '',
+    created_at: '',
+    updated_at: '',
+    state: '',
+    total_scans: 0,
+  });
 
+  const [activeOptionRow, setActiveOptionRow] = useState<number | null>(null);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [selectAllRows, setSelectAllRows] = useState<boolean>(false);
 
@@ -91,7 +107,8 @@ const MyQRs = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (sortByRef.current && !sortByRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
-      } else if (activeOptionRef.current && !activeOptionRef.current.contains(event.target as Node)) {
+      } 
+      if (activeOptionRef.current && !activeOptionRef.current.contains(event.target as Node)) {
         setActiveOptionRow(null);
       }
     };
@@ -155,14 +172,86 @@ const MyQRs = () => {
     setSelectAllRows(!selectAllRows);
   };
 
-  const handleQr = (data)=>{
-    setOpenQrModal(true);
-    setselectedQr(data);
-  }
-
   const handleSelectedRows = ()=>{
     setSelectedRows([]);
     setSelectAllRows(false);
+  }
+
+  const handleOption = (index: number, data: QRData) => {
+    setActiveOptionRow(null);
+
+    if(index===0) {
+      handleDownloadSingle(data);
+    } else if(index===1) {
+      handleEdit();
+    } else if(index===2) {
+      handleDeleteSingle(data.qr_id);
+    } else {
+      console.log('Invalid index.');
+    }
+  }
+
+  const handleDownloadSingle = (data: QRData) => {
+    setOpenDownloadModal(true);
+    setselectedQr(data);
+  }
+
+  const handleEdit = () => {
+
+  }
+
+  const handleDeleteSingle = async (id: number) => {
+    try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      });
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Deleting...",
+          text: "Please wait",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+        await API.delete(`/qr/${id}`);
+        fetchQr();
+        Swal.fire({
+          title: "Deleted!",
+          text: "QR has been deleted.",
+          icon: "success"
+        });
+      }
+    } catch (error: unknown) {
+      console.log(error);
+      if (axios.isAxiosError(error)) {
+        Swal.fire({
+          title: "Error!",
+          text: error.response?.data?.message || "QR not deleted!",
+          icon: "error",
+        });
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: "Unexpected error occurred!",
+          icon: "error",
+        });
+      }
+    }
+  };
+
+  const handleQr = (data: QRData)=>{
+    setOpenViewQrModal(true);
+    setselectedQr(data);
   }
 
   return (
@@ -290,12 +379,9 @@ const MyQRs = () => {
                                 transition={{ duration: 0.3 }}
                               >
                                 {myQrOptions.map((option, index) => (
-                                  <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500 flex items-center gap-2" key={index}
-                                  onClick={()=>{
-                                    setActiveOptionRow(null);
-                                  }}>
+                                  <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500 flex items-center gap-2" key={index} onClick={()=>handleOption(index, data)}>
                                     {option.icon}
-                                    <p>{option.label}</p>
+                                    <span>{option.label}</span>
                                   </p>
                                 ))}
                               </motion.div>
@@ -325,8 +411,13 @@ const MyQRs = () => {
           )}
         </div>
       </div>
-      {openFilterModal && <Filter setOpenFilterModal={setOpenFilterModal} setFilterData={setFilterData}/>}
-      {openQrModal && <Qr setOpenQrModal={setOpenQrModal} selectedQr={selectedQr}/>}
+      <AnimatePresence>
+        {openFilterModal && <Filter setOpenFilterModal={setOpenFilterModal} setFilterData={setFilterData}/>}
+      </AnimatePresence>
+      <AnimatePresence>
+        {openViewQrModal && <ViewQr setOpenViewQrModal={setOpenViewQrModal} selectedQr={selectedQr}/>}
+      </AnimatePresence>
+      {openDownloadModal && <DownloadQR setOpenDownloadModal={setOpenDownloadModal} qrPreview={selectedQr.qr} qrName={selectedQr.name} />}
     </div>
   )
 }
