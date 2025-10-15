@@ -8,10 +8,11 @@ import TablePagination from '@mui/material/TablePagination'
 import { HashLoader  } from "react-spinners"
 import { motion, AnimatePresence } from 'framer-motion'
 import ViewQr from '../../modals/MyQrs/ViewQr'
-import { Language, AccountBox, PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge, Loop, PlayArrowRounded, MoreVert, DownloadRounded, EditRounded, DeleteRounded, FilterAlt, SortRounded } from "@mui/icons-material"
+import { Language, AccountBox, PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge, Loop, PlayArrowRounded, MoreVert, DownloadRounded, EditRounded, DeleteRounded, FilterAlt, SortRounded, Delete, PauseCircleOutline } from "@mui/icons-material"
 import { toast } from 'react-toastify'
 import Swal from 'sweetalert2'
 import DownloadQR from '../../modals/DownloadQR'
+import { data } from 'react-router-dom'
 
 interface QRData {
   qr_id: number;
@@ -177,21 +178,26 @@ const MyQRs = () => {
     setSelectAllRows(false);
   }
 
+  const handleQr = (data: QRData)=>{
+    setOpenViewQrModal(true);
+    setselectedQr(data);
+  }
+
   const handleOption = (index: number, data: QRData) => {
     setActiveOptionRow(null);
 
     if(index===0) {
-      handleDownloadSingle(data);
+      handleDownload(data);
     } else if(index===1) {
       handleEdit();
     } else if(index===2) {
-      handleDeleteSingle(data.qr_id);
+      handleDelete([data.qr_id]);
     } else {
       console.log('Invalid index.');
     }
   }
 
-  const handleDownloadSingle = (data: QRData) => {
+  const handleDownload = (data: QRData) => {
     setOpenDownloadModal(true);
     setselectedQr(data);
   }
@@ -200,7 +206,7 @@ const MyQRs = () => {
 
   }
 
-  const handleDeleteSingle = async (id: number) => {
+  const handleDelete = async (ids: number[]) => {
     try {
       const result = await Swal.fire({
         title: "Are you sure?",
@@ -223,8 +229,12 @@ const MyQRs = () => {
             Swal.showLoading();
           }
         });
-        await API.delete(`/qr/${id}`);
+        setLoading(true);
+        await API.delete(`/qr`, {
+          data: { ids }
+        });
         fetchQr();
+        setLoading(false);
         Swal.fire({
           title: "Deleted!",
           text: "QR has been deleted.",
@@ -232,6 +242,7 @@ const MyQRs = () => {
         });
       }
     } catch (error: unknown) {
+      setLoading(false);
       console.log(error);
       if (axios.isAxiosError(error)) {
         Swal.fire({
@@ -249,9 +260,23 @@ const MyQRs = () => {
     }
   };
 
-  const handleQr = (data: QRData)=>{
-    setOpenViewQrModal(true);
-    setselectedQr(data);
+  const handleStatus = async (ids: number[]) => {
+    try {
+      setLoading(true);
+      await API.put('/qr-status', {
+        data: { ids }
+      });
+      fetchQr();
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || "QR not deleted!");
+      } else {
+        toast.error("Unexpected error occurred!");
+      }
+    }
   }
 
   return (
@@ -395,22 +420,24 @@ const MyQRs = () => {
               </table>
             </div>
           </div>
-          {selectedRows.length > 0 && (
-            <div className="fixed bottom-0 left-0 w-full bg-white shadow-md flex justify-between items-center px-6 py-3 border-t border-gray-200">
-              <button className="text-gray-600 border border-gray-200 px-4 py-1 rounded-md hover:bg-gray-100 transition" onClick={() => handleSelectedRows()}>Cancel</button>
-
-              <div className="flex items-center gap-3">
-                <button className="text-white bg-red-500 px-4 py-1 rounded-md hover:bg-red-600 transition">Delete</button>
-                <button className="text-blue-500 border border-blue-400 px-4 py-1 rounded-md hover:bg-blue-50 transition">Pause</button>
-                <button className="text-white bg-blue-500 px-4 py-1 rounded-md hover:bg-blue-600 transition">Download</button>
-              </div>
-              <div className="flex items-center gap-2 text-gray-500">
-                <p className="text-sm">{selectedRows.length} Selected</p>
-              </div>
-            </div>
-          )}
         </div>
+
+        {selectedRows.length > 0 && (
+          <div className="w-full bg-white rounded-b-md flex justify-between items-center p-2 border-t border-gray-200">
+            <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500" onClick={() => handleSelectedRows()}>Cancel</button>
+
+            <div className="flex items-center gap-4">
+              <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500 flex items-center gap-2 border border-gray-200" onClick={()=>handleDelete(selectedRows)}><Delete /> Delete</button>
+              <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500 flex items-center gap-2 border border-gray-200" onClick={()=>handleStatus(selectedRows)}><PauseCircleOutline /> Pause</button>
+            </div>
+
+            <div className="flex items-center gap-2 text-gray-500">
+              <p className="text-sm"><strong>{selectedRows.length}</strong> Selected</p>
+            </div>
+          </div>
+        )}
       </div>
+
       <AnimatePresence>
         {openFilterModal && <Filter setOpenFilterModal={setOpenFilterModal} setFilterData={setFilterData}/>}
       </AnimatePresence>

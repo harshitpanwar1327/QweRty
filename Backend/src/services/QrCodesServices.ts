@@ -6,7 +6,7 @@ interface FilterData {
     selectedTypes: string[]
 }
 
-export const getNewQrLogic = async (search: string, sortBy: string, filterData: FilterData , uid: string, limit: number, offset: number) => {
+export const getQrLogic = async (search: string, sortBy: string, filterData: FilterData , uid: string, limit: number, offset: number) => {
     try {
         const searchQuery = `%${search}%`;
 
@@ -56,7 +56,7 @@ export const getNewQrLogic = async (search: string, sortBy: string, filterData: 
     }
 };
 
-export const postNewQrLogic = async (newQrData: any) => {
+export const postQrLogic = async (newQrData: any) => {
     try {
         let actualPayload = "";
         switch (newQrData.qr_type) {
@@ -157,7 +157,7 @@ export const postNewQrLogic = async (newQrData: any) => {
     }
 };
 
-export const updateNewQrLogic = async (id: number, newQrData: any) => {
+export const updateQrLogic = async (id: number, newQrData: any) => {
     try {
         let query = `UPDATE qr_codes SET name=?,qr_type=?,content=?, design=?, from_date=?, to_date=?, scan_limit=?, password=?, state=? WHERE qr_id = ?;`;
         let values = [newQrData.name, newQrData.qr_type, newQrData.content, newQrData.design, newQrData.from_date, newQrData.to_date, newQrData.scan_limit, newQrData.password, newQrData.state, id];
@@ -171,13 +171,29 @@ export const updateNewQrLogic = async (id: number, newQrData: any) => {
     }
 };
 
-export const deleteNewQrLogic = async (id: number) => {
+export const updateStatusLogic = async (ids: number[]) => {
     try {
-        await pool.query(`DELETE FROM qr_codes WHERE qr_id= ?;`,[id]);
-        
-        return {success: true, message: "QR deleted successfully."};
+        const placeholders = ids.map(() => '?').join(',');
+
+        await pool.query(`UPDATE qr_codes SET status = ?`);
+
+        return {success: true, message: "QR(s) updated successfully."};
     } catch (error) {
         console.log(error);
-        return {success: false, message: "Unable to delete QR!"};
+        return {success: false, message: "Unable to update QR(s)!"};
+    }
+}
+
+export const deleteQrLogic = async (ids: number[]) => {
+    try {
+        const placeholders = ids.map(() => '?').join(',');
+
+        const query = `DELETE FROM qr_codes WHERE qr_id IN (${placeholders});`;
+        await pool.query(query, ids);
+        
+        return {success: true, message: "QR(s) deleted successfully."};
+    } catch (error) {
+        console.log(error);
+        return {success: false, message: "Unable to delete QR(s)!"};
     }
 };

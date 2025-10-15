@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { NewQrModels } from '../models/QrCodesModels.js';
-import { getNewQrLogic, postNewQrLogic, updateNewQrLogic, deleteNewQrLogic } from '../services/QrCodesServices.js';
+import { QrModels } from '../models/QrCodesModels.js';
+import { getQrLogic, postQrLogic, updateQrLogic, updateStatusLogic, deleteQrLogic } from '../services/QrCodesServices.js';
 
-interface NewQrReqBody {
+interface QrReqBody {
     user_id: string; 
     name: string;
     qr_type: string;
@@ -11,12 +11,12 @@ interface NewQrReqBody {
     configuration: object;
 }
 
-interface NewQrReqParams {
-    id?: string;
-    uid?: string;
+interface QrReqParams {
+    id?: number;
+    ids?: number[];
 }
 
-export const getNewQr = async (req: Request, res: Response) => {
+export const getQr = async (req: Request, res: Response) => {
     const search = req.body.search || '';
     const sortBy = req.body.sortBy || '';
     const filterData = req.body.filterData || {activeStatus: [], selectedTypes: []};
@@ -30,7 +30,7 @@ export const getNewQr = async (req: Request, res: Response) => {
     }
 
     try {
-        let response = await getNewQrLogic(search, sortBy, filterData, uid, limit, offset);
+        let response = await getQrLogic(search, sortBy, filterData, uid, limit, offset);
         if(response.success){
             return res.status(200).json(response);
         }else{
@@ -42,17 +42,17 @@ export const getNewQr = async (req: Request, res: Response) => {
     }
 }
 
-export const postNewQr = async(req: Request<{}, {}, NewQrReqBody>, res: Response)=>{
+export const postQr = async (req: Request<{}, {}, QrReqBody>, res: Response)=>{
     const { user_id, name, qr_type, content, design, configuration } = req.body;
     
     if(!user_id || !name || !qr_type || !content){
         return res.status(400).json({success: false, message: "Fill all the required fields!"});
     }
     
-    const newQrData = new NewQrModels({user_id, name, qr_type, content, design, configuration});
+    const QrData = new QrModels({user_id, name, qr_type, content, design, configuration});
     
     try {
-        const response = await postNewQrLogic(newQrData);
+        const response = await postQrLogic(QrData);
         if(response.success){
             return res.status(200).json(response);
         }else{
@@ -64,18 +64,18 @@ export const postNewQr = async(req: Request<{}, {}, NewQrReqBody>, res: Response
     }
 }
 
-export const updateNewQr = async(req: Request<NewQrReqParams, {}, NewQrReqBody>, res: Response)=>{
-    const { id } = req.params;
+export const updateQr = async (req: Request<QrReqParams, {}, QrReqBody>, res: Response) => {
+    const { ids } = req.params;
     const {user_id, name, qr_type, content, design, configuration } = req.body;
 
-    if(!id || !user_id || !name || !qr_type || !content){
+    if(!ids || !user_id || !name || !qr_type || !content){
         return res.status(400).json({success: false, message: "Fill all the required fields!"});
     }
 
-    const newQrData = new NewQrModels({user_id, name, qr_type, content, design, configuration});
+    const QrData = new QrModels({user_id, name, qr_type, content, design, configuration});
     
     try {
-        let response = await updateNewQrLogic(Number(id), newQrData);
+        let response = await updateQrLogic(Number(ids), QrData);
         if(response.success){
             return res.status(200).json(response);
         }else{
@@ -87,15 +87,35 @@ export const updateNewQr = async(req: Request<NewQrReqParams, {}, NewQrReqBody>,
     }
 }
 
-export const deleteNewQr = async(req: Request<NewQrReqParams>, res: Response)=>{
-    const { id } = req.params;    
+export const updateStatus = async (req: Request<QrReqParams>, res: Response) => {
+    const { ids } = req.body;
 
-    if(!id){
-        return res.status(400).json({success: false, message: "Qr id not found!"});
+    if (!ids || ids.length === 0) {
+        return res.status(400).json({ success: false, message: "No valid IDs provided." });
     }
 
     try {
-        const response = await deleteNewQrLogic(Number(id));
+        const response = await updateStatusLogic(ids);
+        if(response.success){
+            return res.status(200).json(response);
+        }else{
+            return res.status(400).json(response);
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({success:false,message:"Internal Server error!"});
+    }
+}
+
+export const deleteQr = async(req: Request<QrReqParams>, res: Response) => {
+    const { ids } = req.body;
+
+    if (!ids || ids.length === 0) {
+        return res.status(400).json({ success: false, message: "No valid IDs provided for deletion." });
+    }
+
+    try {
+        const response = await deleteQrLogic(ids);
         if(response.success){
             return res.status(200).json(response);
         }else{

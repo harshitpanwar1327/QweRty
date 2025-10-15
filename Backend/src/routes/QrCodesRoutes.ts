@@ -1,11 +1,12 @@
 import express from 'express';
-import { getNewQr, postNewQr, updateNewQr, deleteNewQr } from '../controllers/QrCodesControllers.js';
+import { getQr, postQr, updateQr, updateStatus, deleteQr } from '../controllers/QrCodesControllers.js';
 
 let router = express.Router();
 
-router.post('/get-qr', getNewQr);
-router.post('/qr', postNewQr);
-router.put('/qr/:id', updateNewQr);
-router.delete('/qr/:id', deleteNewQr);
+router.post('/get-qr', getQr);
+router.post('/qr', postQr);
+router.put('/qr/:id', updateQr);
+router.put('/qr-status', updateStatus);
+router.delete('/qr', deleteQr);
 
 export default router;

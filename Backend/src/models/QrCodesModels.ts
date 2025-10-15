@@ -32,7 +32,7 @@ interface QrConfiguration {
   password?: string;
 }
 
-interface NewQrData {
+interface QrData {
   user_id: string;
   name: string;
   qr_type: string;
@@ -41,7 +41,7 @@ interface NewQrData {
   configuration: QrConfiguration;
 }
 
-export class NewQrModels {
+export class QrModels {
   user_id: string;
   name: string;
   qr_type: string;
@@ -49,7 +49,7 @@ export class NewQrModels {
   design: QrDesign;
   configuration: QrConfiguration;
 
-  constructor(data: NewQrData) {
+  constructor(data: QrData) {
     this.user_id = data.user_id;
     this.name = data.name;
     this.qr_type = data.qr_type;
