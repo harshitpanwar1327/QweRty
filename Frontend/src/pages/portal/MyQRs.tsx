@@ -13,6 +13,7 @@ import { toast } from 'react-toastify'
 import Swal from 'sweetalert2'
 import DownloadQR from '../../modals/DownloadQR'
 import { data } from 'react-router-dom'
+import EditQr from '../../modals/MyQrs/EditQr'
 
 interface QRData {
   qr_id: number;
@@ -33,7 +34,7 @@ const sortByOptions = ['Most Recent', 'Name', 'Most Scanned', 'Last Modified'];
 
 const myQrOptions = [
   { icon: <DownloadRounded sx={{fontSize: '16px'}} />, label: "Download" },
-  // { icon: <EditRounded sx={{fontSize: '16px'}} />, label: "Edit" },
+  { icon: <EditRounded sx={{fontSize: '16px'}} />, label: "Edit" },
   { icon: <DeleteRounded sx={{fontSize: '16px'}} />, label: "Delete" }
 ]
 
@@ -73,6 +74,7 @@ const MyQRs = () => {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
   const [openViewQrModal, setOpenViewQrModal] = useState<boolean>(false);
+  const [openEditQrModal, setOpenEditQrModal] = useState<boolean>(false);
   const [openDownloadModal, setOpenDownloadModal] = useState<boolean>(false);
   const [selectedQr, setselectedQr] = useState<QRData>({
     qr_id: 0,
@@ -189,7 +191,7 @@ const MyQRs = () => {
     if(index===0) {
       handleDownload(data);
     } else if(index===1) {
-      handleEdit();
+      handleEdit(data);
     } else if(index===2) {
       handleDelete([data.qr_id]);
     } else {
@@ -202,8 +204,9 @@ const MyQRs = () => {
     setselectedQr(data);
   }
 
-  const handleEdit = () => {
-
+  const handleEdit = (data: QRData) => {
+    setOpenEditQrModal(true);
+    setselectedQr(data);
   }
 
   const handleDelete = async (ids: number[]) => {
@@ -443,6 +446,9 @@ const MyQRs = () => {
       </AnimatePresence>
       <AnimatePresence>
         {openViewQrModal && <ViewQr setOpenViewQrModal={setOpenViewQrModal} selectedQr={selectedQr}/>}
+      </AnimatePresence>
+      <AnimatePresence>
+        {openEditQrModal && <EditQr setOpenEditQrModal={setOpenEditQrModal} selectedQr={selectedQr}/>}
       </AnimatePresence>
       {openDownloadModal && <DownloadQR setOpenDownloadModal={setOpenDownloadModal} qrPreview={selectedQr.qr} qrName={selectedQr.name} />}
     </div>
