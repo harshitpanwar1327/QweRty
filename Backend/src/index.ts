@@ -14,7 +14,7 @@ import QrAnalyticsRoutes from './routes/QrAnalyticsRoutes.js'
 dotenv.config();
 
 let app = express();
-let PORT = process.env.PORT || 8080;
+let PORT = Number(process.env.PORT) || 8080;
 
 app.use(cors());
 app.use(helmet());
@@ -43,7 +43,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     res.status(500).send({message: "Internal Server Error!"});
 })
 
-app.listen(PORT, async() => {
+app.listen(PORT, '0.0.0.0', async() => {
     console.log(`Listening to the port ${PORT}`);
     try {
         await checkConnection();

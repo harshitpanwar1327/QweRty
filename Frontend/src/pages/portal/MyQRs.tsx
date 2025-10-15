@@ -33,7 +33,7 @@ const sortByOptions = ['Most Recent', 'Name', 'Most Scanned', 'Last Modified'];
 
 const myQrOptions = [
   { icon: <DownloadRounded sx={{fontSize: '16px'}} />, label: "Download" },
-  { icon: <EditRounded sx={{fontSize: '16px'}} />, label: "Edit" },
+  // { icon: <EditRounded sx={{fontSize: '16px'}} />, label: "Edit" },
   { icon: <DeleteRounded sx={{fontSize: '16px'}} />, label: "Delete" }
 ]
 
@@ -428,7 +428,7 @@ const MyQRs = () => {
 
             <div className="flex items-center gap-4">
               <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500 flex items-center gap-2 border border-gray-200" onClick={()=>handleDelete(selectedRows)}><Delete /> Delete</button>
-              <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500 flex items-center gap-2 border border-gray-200" onClick={()=>handleStatus(selectedRows)}><PauseCircleOutline /> Pause</button>
+              {/* <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500 flex items-center gap-2 border border-gray-200" onClick={()=>handleStatus(selectedRows)}><PauseCircleOutline /> Pause</button> */}
             </div>
 
             <div className="flex items-center gap-2 text-gray-500">
