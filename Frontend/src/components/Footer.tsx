@@ -1,4 +1,4 @@
-import YoutubeIcon from "@mui/icons-material/Youtube"
+import YouTubeIcon from "@mui/icons-material/YouTube"
 import InstagramIcon from "@mui/icons-material/Instagram"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import FooterQr from '../assets/FooterQr.png'
@@ -37,7 +37,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm pt-8 text-gray-400">
           <p>2025 &copy; QR Code Generator</p>
           <div className="flex items-center gap-6">
-            <YoutubeIcon className="cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
+            <YouTubeIcon className="cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
             <InstagramIcon className="cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
             <LinkedInIcon className="cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
           </div>

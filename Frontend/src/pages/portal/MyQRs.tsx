@@ -8,11 +8,11 @@ import TablePagination from '@mui/material/TablePagination'
 import { HashLoader  } from "react-spinners"
 import { motion, AnimatePresence } from 'framer-motion'
 import ViewQr from '../../modals/MyQrs/ViewQr'
-import { Language, AccountBox, PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge, Loop, PlayArrowRounded, MoreVert, DownloadRounded, EditRounded, DeleteRounded, FilterAlt, SortRounded, Delete, PauseCircleOutline } from "@mui/icons-material"
-import { toast } from 'react-toastify'
+import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, MoreVert, DownloadRounded, DeleteRounded, FilterAlt, SortRounded, Delete } from "@mui/icons-material"
+// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, People, Feedback, Badge, Loop, PlayArrowRounded, EditRounded, PauseCircleOutline } from "@mui/icons-material"
+// import { toast } from 'react-toastify'
 import Swal from 'sweetalert2'
 import DownloadQR from '../../modals/DownloadQR'
-import { data } from 'react-router-dom'
 
 interface QRData {
   qr_id: number;
@@ -260,24 +260,24 @@ const MyQRs = () => {
     }
   };
 
-  const handleStatus = async (ids: number[]) => {
-    try {
-      setLoading(true);
-      await API.put('/qr-status', {
-        data: { ids }
-      });
-      fetchQr();
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || "QR not deleted!");
-      } else {
-        toast.error("Unexpected error occurred!");
-      }
-    }
-  }
+  // const handleStatus = async (ids: number[]) => {
+  //   try {
+  //     setLoading(true);
+  //     await API.put('/qr-status', {
+  //       data: { ids }
+  //     });
+  //     fetchQr();
+  //     setLoading(false);
+  //   } catch (error) {
+  //     setLoading(false);
+  //     console.log(error);
+  //     if (axios.isAxiosError(error)) {
+  //       toast.error(error.response?.data?.message || "QR not deleted!");
+  //     } else {
+  //       toast.error("Unexpected error occurred!");
+  //     }
+  //   }
+  // }
 
   return (
     <div className="w-screen flex">

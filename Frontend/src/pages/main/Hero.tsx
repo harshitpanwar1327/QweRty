@@ -1,22 +1,23 @@
-import { Language, PictureAsPdf, AccountBox, Image, Videocam, Apps, Event, QueueMusic, WhatsApp, Email, Wifi, People, Feedback, TextFields, LocationOn, Badge } from "@mui/icons-material"
+import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn } from "@mui/icons-material"
+// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, People, Feedback, Badge } from "@mui/icons-material"
 import Footer from "../../components/Footer.js"
 import Header from "../../components/Header.js"
 import Website from "../../section/Website.js"
 import Text from "../../section/Text.js"
-import Pdf from "../../section/Pdf.js"
+// import Pdf from "../../section/Pdf.js"
 import Whatsapp from '../../section/Whatsapp.js'
 import EmailSection from '../../section/Email.js'
 import WifiSection from '../../section/Wifi.js'
-import SocialMedia from "../../section/SocialMedia.js"
-import App from "../../section/Apps.js"
-import Feedbacks from "../../section/Feedback.js"
+// import SocialMedia from "../../section/SocialMedia.js"
+// import App from "../../section/Apps.js"
+// import Feedbacks from "../../section/Feedback.js"
 import Contact from "../../section/VCard.js"
-import Events from "../../section/Event.js"
+// import Events from "../../section/Event.js"
 import Location from "../../section/Location.js"
-import MP3 from "../../section/MP3.js"
-import Video from "../../section/Video.js"
-import Images from "../../section/Image.js"
-import ContactPlus from "../../section/VCardPlus.js"
+// import MP3 from "../../section/MP3.js"
+// import Video from "../../section/Video.js"
+// import Images from "../../section/Image.js"
+// import ContactPlus from "../../section/VCardPlus.js"
 import { useNavigate } from 'react-router-dom'
 import type { AppDispatch } from '../../app/Store'
 import { useDispatch } from 'react-redux'
