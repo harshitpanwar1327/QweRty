@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Menu, QrCode, QrCode2, CreditCard, BarChart, AccountCircle, KeyboardArrowDown, Logout } from "@mui/icons-material"
+import { Menu, QrCode, QrCode2, AccountCircle, KeyboardArrowDown, Logout } from "@mui/icons-material"
+// import { CreditCard, BarChart } from "@mui/icons-material"
 import { motion, AnimatePresence } from 'framer-motion'
 import Swal from 'sweetalert2'
 import { auth } from '../util/Firebase.js'

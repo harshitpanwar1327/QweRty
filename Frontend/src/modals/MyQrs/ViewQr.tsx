@@ -1,4 +1,5 @@
-import { Close, Language, WhatsApp, Email, AccountBox, Wifi, TextFields, LocationOn, People, Apps, Feedback, PictureAsPdf, Image, Videocam, QueueMusic, Event, Badge } from "@mui/icons-material"
+import { Close, Language, WhatsApp, Email, AccountBox, Wifi, TextFields, LocationOn } from "@mui/icons-material"
+// import { People, Apps, Feedback, PictureAsPdf, Image, Videocam, QueueMusic, Event, Badge } from "@mui/icons-material"
 import { Download } from "lucide-react"
 import { motion } from "motion/react"
 import { useState } from "react"

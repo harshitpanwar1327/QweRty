@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
-import { QrCode, QrCode2, CreditCard, BarChart } from "@mui/icons-material"
+import { QrCode, QrCode2 } from "@mui/icons-material"
+// import { CreditCard, BarChart } from "@mui/icons-material"
 
 const NavigationBar = () => {
   return (

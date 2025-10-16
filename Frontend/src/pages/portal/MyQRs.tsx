@@ -149,7 +149,7 @@ const MyQRs = () => {
     fetchQr();
   }, [search, sortBy, filterData, page, rowsPerPage]);
 
-  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+  const handleChangePage = (_event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
 
