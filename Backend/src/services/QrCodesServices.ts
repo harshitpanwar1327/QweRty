@@ -120,6 +120,13 @@ export const postQrLogic = async (newQrData: any) => {
             default:
                 throw new Error("Invalid QR type");
         }
+
+        const [rows]: any = await pool.query(`SELECT name FROM qr_codes WHERE user_id = ?`, [newQrData.user_id]);
+        const isDuplicate = rows.some((data: any) => data.name.trim() === newQrData.name.trim());
+
+        if (isDuplicate) {
+            return { success: false, message: 'QR name must be unique!' };
+        }
         
         const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr) VALUES (?, ?, ?, ?, ?, ?, '');`;
 

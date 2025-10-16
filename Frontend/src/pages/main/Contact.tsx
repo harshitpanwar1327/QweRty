@@ -1,38 +1,53 @@
-import {useRef, type FormEvent} from 'react'
+import { useState, useRef, type FormEvent } from 'react'
 import { Phone, Mail } from "lucide-react"
 import Header from '../../components/Header.js'
 import Footer from '../../components/Footer.js'
 import { ArrowRight } from "lucide-react"
 import emailjs from '@emailjs/browser'
 import { toast } from 'react-toastify'
+import { HashLoader } from "react-spinners"
 
 const Contact = () => {
   const form = useRef<HTMLFormElement | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const sendEmail = (e: FormEvent<HTMLFormElement>) => {
+  const sendEmail = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!form.current) return;
 
-    emailjs
-      .sendForm(import.meta.env.VITE_SERVICE_ID, import.meta.env.VITE_TEMPLATE_ID, form.current, {
-        publicKey: import.meta.env.VITE_PUBLIC_KEY,
-      })
-      .then(
-        () => {
-          console.log('SUCCESS!');
-          toast.success("Email sent successfully");
-          form.current?.reset();
-        },
-        (error) => {
-          console.log('FAILED...', error.text);
-          toast.error("Email not sent!");
-        },
+    setLoading(true);
+
+    try {
+      await emailjs.sendForm(
+        import.meta.env.VITE_SERVICE_ID,
+        import.meta.env.VITE_TEMPLATE_ID,
+        form.current,
+        { publicKey: import.meta.env.VITE_PUBLIC_KEY }
       );
+
+      toast.success("Email sent successfully.");
+      form.current.reset();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("FAILED...", error.message);
+      } else {
+        console.error("FAILED...", error);
+      }
+      toast.error("Email not sent.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
       <div className="flex flex-col w-screen h-screen overflow-y-auto">
+        {loading && (
+          <div className='fixed top-0 left-0 h-screen w-screen flex justify-center items-center backdrop-blur-md bg-black/25 z-100'>
+            <HashLoader color="#dc3753" />
+          </div>
+        )}
+
         <Header />
 
         <div className="grow py-4 md:py-8 lg:py-16 px-4 md:px-12 lg:px-20 flex flex-col lg:flex-row gap-8 lg:gap-16">

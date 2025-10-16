@@ -124,6 +124,18 @@ const NewQR = () => {
 
       const response = await API.post("/qr", qrPayload);
       setQrPreview(response.data.qr_image);
+      dispatch(activeTab('website'));
+      setQrName('');
+      setContent({});
+      setDesignTab('Shape');
+      setForegroundColor('#000000');
+      setBackgroundColor('#FFFFFF');
+      setErrorCorrectionLevel('Q');
+      setFromDate('');
+      setToDate('');
+      setScanLimit(null);
+      setPassword('');
+      setConfirmPassword('');
       toast.success("QR generated successfully.");
       setLoading(false);
     } catch (error: unknown) {
@@ -329,7 +341,9 @@ const NewQR = () => {
           </div>
         </form>
       </div>
-      {openDownloadModal && <DownloadQR setOpenDownloadModal={setOpenDownload} qrPreview={qrPreview} qrName={qrName} />}
+      <AnimatePresence>
+        {openDownloadModal && <DownloadQR setOpenDownloadModal={setOpenDownload} qrPreview={qrPreview} qrName={qrName} />}
+      </AnimatePresence>
     </div>
   )
 }

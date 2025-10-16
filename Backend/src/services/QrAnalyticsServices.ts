@@ -145,7 +145,7 @@ export const verifyPasswordLogic = async (id: number, password: string, clientIp
         }
 
         if (configuration.password !== password) {
-            return { success: false, message: "Incorrect password. Please try again." }
+            return { success: false, message: "Incorrect password. Please try again.", incorrectPassword: true }
         }
         
         const content = typeof qrData.content === "string" ? JSON.parse(qrData.content) : qrData.content;

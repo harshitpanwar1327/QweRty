@@ -45,7 +45,7 @@ const sendWelcomeMail = async (name: string, email: string) => {
                     <!-- Body -->
                     <tr>
                     <td style="padding:30px;">
-                        <p style="font-size:16px; color:#333333; margin:0 0 15px 0;">Hi <strong>{{name}}</strong>, 👋</p>
+                        <p style="font-size:16px; color:#333333; margin:0 0 15px 0;">Hi <strong>${name}</strong>, 👋</p>
                         
                         <p style="font-size:16px; color:#444444; line-height:1.6; margin:0 0 15px 0;">
                         We’re so excited to have you with us! With <strong>QweRty</strong>, you can design beautiful and customizable QR codes for any purpose — from business to personal use.
@@ -63,7 +63,7 @@ const sendWelcomeMail = async (name: string, email: string) => {
 
                         <!-- CTA Button -->
                         <div style="text-align:center; margin:30px 0;">
-                        <a href="https://qwerty.site/new-qr" 
+                        <a href="http://3.108.152.119/new-qr" 
                             style="background:#ec4899; color:#ffffff; padding:14px 30px; 
                                     text-decoration:none; border-radius:8px; font-size:16px; font-weight:bold; display:inline-block;">
                             Generate Your First QR

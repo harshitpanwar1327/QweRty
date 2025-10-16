@@ -5,14 +5,15 @@ import API from '../../util/API'
 import axios from "axios"
 import Filter from "../../modals/MyQrs/Filter"
 import TablePagination from '@mui/material/TablePagination'
-import { HashLoader  } from "react-spinners"
+import { HashLoader } from "react-spinners"
 import { motion, AnimatePresence } from 'framer-motion'
 import ViewQr from '../../modals/MyQrs/ViewQr'
-import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, MoreVert, DownloadRounded, DeleteRounded, FilterAlt, SortRounded, Delete } from "@mui/icons-material"
-// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, People, Feedback, Badge, Loop, PlayArrowRounded, EditRounded, PauseCircleOutline } from "@mui/icons-material"
+import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, MoreVert, DownloadRounded, DeleteRounded, FilterAlt, SortRounded, EditRounded, Delete } from "@mui/icons-material"
+// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, People, Feedback, Badge, Loop, PlayArrowRounded, PauseCircleOutline } from "@mui/icons-material"
 // import { toast } from 'react-toastify'
 import Swal from 'sweetalert2'
 import DownloadQR from '../../modals/DownloadQR'
+import { toast } from 'react-toastify'
 
 interface QRData {
   qr_id: number;
@@ -33,7 +34,7 @@ const sortByOptions = ['Most Recent', 'Name', 'Most Scanned', 'Last Modified'];
 
 const myQrOptions = [
   { icon: <DownloadRounded sx={{fontSize: '16px'}} />, label: "Download" },
-  // { icon: <EditRounded sx={{fontSize: '16px'}} />, label: "Edit" },
+  { icon: <EditRounded sx={{fontSize: '16px'}} />, label: "Edit" },
   { icon: <DeleteRounded sx={{fontSize: '16px'}} />, label: "Delete" }
 ]
 
@@ -203,7 +204,7 @@ const MyQRs = () => {
   }
 
   const handleEdit = () => {
-
+    toast.info('This feature is coming soon.');
   }
 
   const handleDelete = async (ids: number[]) => {
@@ -324,7 +325,7 @@ const MyQRs = () => {
             </div>
           </div>
 
-          <div className="border border-gray-200 p-2 rounded flex flex-col gap-2 overflow-y-auto">
+          <div className="grow border border-gray-200 p-2 rounded flex flex-col gap-2 overflow-y-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-2">
               <div className="flex items-center gap-2 border border-gray-200 rounded-md px-3 py-2 w-full md:w-1/3">
                 <span className="text-gray-500">🔍</span>
@@ -342,12 +343,12 @@ const MyQRs = () => {
               />
             </div>
 
-            <div className="grow overflow-y-auto">
+            <div className="grow overflow-auto">
               <table className="w-full text-left p-3">
                 <thead className="bg-gray-100 text-gray-500 text-sm">
                   <tr>
                     <th className='p-3'><input type="checkbox" checked={selectAllRows} onChange={handleSelectAll}/></th>
-                    <th></th>
+                    <th className='pr-15 md:p-0'></th>
                     <th className="p-3">Name</th>
                     <th className="p-3">QR Type</th>
                     <th className="p-3">Created</th>
@@ -358,64 +359,72 @@ const MyQRs = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {qrData.map((data)=>(
-                    <tr key={data.qr_id}>
-                      <td className="p-3">
-                        <input type="checkbox" checked={selectedRows.includes(data.qr_id)} onChange={()=>handleRowSelect(data.qr_id)}/>
-                      </td>
-                      <td className='p-3 pr-0' onClick={()=>handleQr(data)}>
-                        <img src={data.qr} alt="Qr" width={50} className='cursor-pointer border border-gray-200 rounded'/>
-                      </td>
-                      <td className="p-3">{data.name}</td>
-                      <td className="p-3">
-                        <div className='flex justify-center items-center gap-1 py-1 px-2 bg-pink-100 text-pink-500 rounded'>
-                          {qrTypes[data.qr_type]?.icon}
-                          <p className='text-sm font-semibold'>{qrTypes[data.qr_type]?.label}</p>
-                        </div>
-                      </td>
-                      <td className="p-3 text-sm text-gray-500">
-                        {new Date(data.created_at).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </td>
-                      <td className="p-3 text-sm text-gray-500">
-                        {new Date(data.updated_at).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </td>
-                      <td className="p-3">
-                        <p className={`text-sm font-semibold text-white px-2 py-1 rounded flex justify-center items-center ${data.state==='Active'? 'bg-[#46CB48]': data.state==='Pause'? 'bg-blue-500': 'bg-[#FE8E3E]'}`}>{data.state}</p>
-                      </td>
-                      <td className="p-3 font-semibold">{data.total_scans}</td>
-                      <td className='p-3'>
-                        <div className='relative' ref={activeOptionRef}>
-                          <MoreVert className='cursor-pointer' onClick={()=>setActiveOptionRow(activeOptionRow===data.qr_id ? null: data.qr_id)}/>
-                          
-                          <AnimatePresence>
-                            {activeOptionRow===data.qr_id && (
-                              <motion.div className="absolute right-6 top-0 bg-white border border-gray-200 shadow-lg rounded-lg z-10"
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{ duration: 0.3 }}
-                              >
-                                {myQrOptions.map((option, index) => (
-                                  <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500 flex items-center gap-2" key={index} onClick={()=>handleOption(index, data)}>
-                                    {option.icon}
-                                    <span>{option.label}</span>
-                                  </p>
-                                ))}
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
+                  {qrData.length > 0 ? (
+                    qrData.map((data)=>(
+                      <tr key={data.qr_id}>
+                        <td className="p-3">
+                          <input type="checkbox" checked={selectedRows.includes(data.qr_id)} onChange={()=>handleRowSelect(data.qr_id)}/>
+                        </td>
+                        <td className='p-3 pr-0' onClick={()=>handleQr(data)}>
+                          <img src={data.qr} alt="Qr" className='w-12 h-12 object-contain cursor-pointer border border-gray-200 rounded'/>
+                        </td>
+                        <td className="p-3">{data.name}</td>
+                        <td className="p-3">
+                          <div className='flex justify-center items-center gap-1 py-1 px-2 bg-pink-100 text-pink-500 rounded'>
+                            {qrTypes[data.qr_type]?.icon}
+                            <p className='text-sm font-semibold'>{qrTypes[data.qr_type]?.label}</p>
+                          </div>
+                        </td>
+                        <td className="p-3 text-sm text-gray-500">
+                          {new Date(data.created_at).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </td>
+                        <td className="p-3 text-sm text-gray-500">
+                          {new Date(data.updated_at).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </td>
+                        <td className="p-3">
+                          <p className={`text-sm font-semibold text-white px-2 py-1 rounded flex justify-center items-center ${data.state==='Active'? 'bg-[#46CB48]': data.state==='Pause'? 'bg-blue-500': 'bg-[#FE8E3E]'}`}>{data.state}</p>
+                        </td>
+                        <td className="p-3 font-semibold">{data.total_scans}</td>
+                        <td className='p-3'>
+                          <div className='relative' ref={activeOptionRef}>
+                            <MoreVert className='cursor-pointer' onClick={()=>setActiveOptionRow(activeOptionRow===data.qr_id ? null: data.qr_id)}/>
+                            
+                            <AnimatePresence>
+                              {activeOptionRow===data.qr_id && (
+                                <motion.div className="absolute right-6 top-0 bg-white border border-gray-200 shadow-lg rounded-lg z-10"
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -10 }}
+                                  transition={{ duration: 0.3 }}
+                                >
+                                  {myQrOptions.map((option, index) => (
+                                    <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500 flex items-center gap-2" key={index} onClick={()=>handleOption(index, data)}>
+                                      {option.icon}
+                                      <span>{option.label}</span>
+                                    </p>
+                                  ))}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td className="p-3" colSpan={8}>
+                        <p className='text-center text-sm font-semibold text-gray-500'>No QR available</p>
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -444,7 +453,9 @@ const MyQRs = () => {
       <AnimatePresence>
         {openViewQrModal && <ViewQr setOpenViewQrModal={setOpenViewQrModal} selectedQr={selectedQr}/>}
       </AnimatePresence>
-      {openDownloadModal && <DownloadQR setOpenDownloadModal={setOpenDownloadModal} qrPreview={selectedQr.qr} qrName={selectedQr.name} />}
+      <AnimatePresence>
+        {openDownloadModal && <DownloadQR setOpenDownloadModal={setOpenDownloadModal} qrPreview={selectedQr.qr} qrName={selectedQr.name} />}
+      </AnimatePresence>
     </div>
   )
 }

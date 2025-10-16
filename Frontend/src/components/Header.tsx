@@ -58,10 +58,10 @@ const Header = () => {
         </div>
       )}
 
-      <div className="flex items-center gap-2 cursor-pointer" onClick={()=>navigate('/hero')}>
+      <NavLink to={'/hero'} className="flex items-center gap-2 cursor-pointer">
         <div className="px-2 py-1 bg-pink-500 text-white rounded-md text-lg font-bold">QR</div>
         <p className="font-bold text-2xl text-black">QweRty</p>
-      </div>
+      </NavLink>
 
       <div className='hidden lg:flex items-center gap-4'>
         <NavLink to={'/new-qr'} className='!text-black'>QR Generator</NavLink>
@@ -91,10 +91,10 @@ const Header = () => {
             className="lg:hidden flex flex-col items-center gap-8 p-8 fixed top-0 left-0 text-black bg-white w-full z-50 shadow-md"
           >
             <div className="flex justify-between items-center w-full border-b border-gray-300 pb-4">
-              <div className="flex items-center gap-2">
+              <NavLink to={'/hero'} className="flex items-center gap-2">
                 <div className="px-2 py-1 bg-pink-500 text-white rounded-md text-lg font-bold">QR</div>
                 <p className="font-bold text-2xl text-black">QweRty</p>
-              </div>
+              </NavLink>
               <CloseIcon className="cursor-pointer" onClick={()=>setOpenNav(false)}/>
             </div>
 
@@ -109,7 +109,7 @@ const Header = () => {
                 <NavLink to="/register"><button className="px-6 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition duration-300 hover:scale-102">Register</button></NavLink>
               </div>
             ) : (
-              <button className="ml-auto px-6 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition duration-300 hover:scale-102" onClick={handleLogout}>Logout</button>
+              <button className="m-auto px-6 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition duration-300 hover:scale-102" onClick={handleLogout}>Logout</button>
             )}
           </motion.div>
         )}

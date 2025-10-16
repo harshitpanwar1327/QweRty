@@ -21,6 +21,11 @@ const ConfigPassword = () => {
             password
         });
 
+        if(res.data.incorrectPassword) {
+            toast.error('Incorrect password!');
+            return;
+        }
+
         if (res.data.success && res.data.redirectURL) {
             window.location.href = res.data.redirectURL;
         } else {

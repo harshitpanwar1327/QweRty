@@ -2,6 +2,7 @@ import { toast } from 'react-toastify'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import CropOriginalIcon from '@mui/icons-material/CropOriginal'
 import FilterCenterFocusIcon from '@mui/icons-material/FilterCenterFocus'
+import { motion } from 'framer-motion'
 
 interface DownloadQRProp {
   setOpenDownloadModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -59,6 +60,7 @@ const DownloadQR: React.FC<DownloadQRProp> = ({ setOpenDownloadModal, qrPreview,
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      setOpenDownloadModal(false);
     } catch (err) {
       console.error(err);
       toast.error("Failed to download QR.");
@@ -66,8 +68,13 @@ const DownloadQR: React.FC<DownloadQRProp> = ({ setOpenDownloadModal, qrPreview,
   };
 
   return (
-    <div className='fixed top-0 left-0 h-screen w-screen flex justify-center items-center bg-[#0000005a] z-10' onClick={()=>setOpenDownloadModal(false)}>
-      <div className="w-4/5 md:w-1/2 lg:w-1/3 bg-white rounded-xl shadow-md flex flex-col" onClick={(e)=>e.stopPropagation()}>
+    <div className='fixed top-0 left-0 h-screen w-screen p-4 flex justify-end items-center bg-[#0000005a] z-10' onClick={()=>setOpenDownloadModal(false)}>
+      <motion.div className="w-4/5 md:w-1/2 lg:w-1/3 bg-white rounded-xl shadow-md flex flex-col" onClick={(e)=>e.stopPropagation()}
+        initial={{opacity: 0, x: '100%'}}
+        animate={{opacity: 1, x: 0}}
+        exit={{opacity: 0, x: '100%'}}
+        transition={{duration: 0.3}}
+      >
         <div className='p-4 flex justify-between items-center border-b border-gray-200'>
           <h4 className='text-lg font-semibold'>Save as...</h4>
           <CloseRoundedIcon className='cursor-pointer' onClick={()=>setOpenDownloadModal(false)}/>
@@ -98,7 +105,7 @@ const DownloadQR: React.FC<DownloadQRProp> = ({ setOpenDownloadModal, qrPreview,
             <p className='p-2 border-l border-gray-200'>Vector File.</p>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

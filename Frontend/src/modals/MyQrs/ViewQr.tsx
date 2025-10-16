@@ -1,7 +1,7 @@
 import { Close, Language, WhatsApp, Email, AccountBox, Wifi, TextFields, LocationOn } from "@mui/icons-material"
 // import { People, Apps, Feedback, PictureAsPdf, Image, Videocam, QueueMusic, Event, Badge } from "@mui/icons-material"
 import { Download } from "lucide-react"
-import { motion } from "motion/react"
+import { motion, AnimatePresence } from "motion/react"
 import { useState } from "react"
 import DownloadQR from "../DownloadQR"
 
@@ -47,7 +47,7 @@ const ViewQr: React.FC<ViewQrProps> = ({setOpenViewQrModal, selectedQr}) => {
 
   return (
     <div className='fixed top-0 left-0 w-screen h-screen p-4 flex justify-end items-center bg-[#0000005a] z-10' onClick={()=>setOpenViewQrModal(false)}>
-      <motion.div className="w-full md:w-1/2 lg:w-1/3 bg-white rounded-md shadow-md p-4 flex flex-col gap-4" onClick={(e)=>e.stopPropagation()}
+      <motion.div className="w-2/3 md:w-1/3 lg:w-1/4 bg-white rounded-md shadow-md p-4 flex flex-col gap-4" onClick={(e)=>e.stopPropagation()}
         initial={{opacity: 0, x: '100%'}}
         animate={{opacity: 1, x: 0}}
         exit={{opacity: 0, x: '100%'}}
@@ -71,14 +71,18 @@ const ViewQr: React.FC<ViewQrProps> = ({setOpenViewQrModal, selectedQr}) => {
         </div>
 
         <div className="flex flex-col items-start gap-2">
-          <img src={selectedQr.qr} className="w-full bg-white rounded-lg shadow-lg" alt='Qr' />
+          <div className="w-full flex justify-center p-4 bg-gray-100 rounded-lg">
+            <img src={selectedQr.qr} className="bg-white rounded-lg shadow-lg" alt='Qr' />
+          </div>
           <button className="flex items-center justify-center bg-blue-500 p-1 rounded-full hover:bg-blue-700 group" onClick={()=>setOpenDownloadModal(true)}>
             <p className='text-sm text-white px-3'>Download QR</p>
             <Download size={32} className='bg-white rounded-full p-2 rotate-0 group-hover:rotate-180 transition duration-300 ease-in-out'/>
           </button>
         </div>
       </motion.div>
-      {openDownloadModal && <DownloadQR setOpenDownloadModal={setOpenDownloadModal} qrPreview={selectedQr.qr} qrName={selectedQr.name} />}
+      <AnimatePresence>
+        {openDownloadModal && <DownloadQR setOpenDownloadModal={setOpenDownloadModal} qrPreview={selectedQr.qr} qrName={selectedQr.name} />}
+      </AnimatePresence>
     </div>
   )
 }
