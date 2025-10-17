@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from 'react'
-import { useParams } from "react-router-dom"
+import { useParams, NavLink } from "react-router-dom"
 import { Lock } from "lucide-react"
 import API from '../../util/API'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { HashLoader  } from "react-spinners"
+import { HashLoader } from "react-spinners"
 
 const ConfigPassword = () => {
   const { id } = useParams();
@@ -17,40 +17,48 @@ const ConfigPassword = () => {
 
     try {
         setLoading(true);
-        const res = await API.post(`/verify/${id}`, {
-            password
-        });
 
-        if(res.data.incorrectPassword) {
-            toast.error('Incorrect password!');
-            return;
+        const res = await API.post(`/verify/${id}`, { password });
+
+        if (res.data.incorrectPassword) {
+        toast.error("Invalid password!");
+        return;
         }
 
         if (res.data.success && res.data.redirectURL) {
-            window.location.href = res.data.redirectURL;
-        } else {
-            console.log(res.data.message || "Incorrect password!");
+        toast.success("QR verified successfully!");
+        window.location.href = res.data.redirectURL;
+        return;
         }
-        toast.success("QR verified successfully.");
-        setLoading(false);
+
+        toast.error(res.data.message || "Verification failed!");
     } catch (error) {
-        setLoading(false);
-        console.log(error);
+        console.error(error);
+
         if (axios.isAxiosError(error)) {
-            toast.error(error.response?.data?.message || error);
+        toast.error(error.response?.data?.message || "Server error");
         } else {
-            toast.error("QR verification failed!");
+        toast.error("QR verification failed!");
         }
+    } finally {
+        setLoading(false);
     }
-  };
+    };
 
   return (
-    <div className='flex justify-center items-center w-screen h-screen'>
+    <div className='bg-pink-500 flex justify-center items-center w-screen h-screen'>
         {loading && (
             <div className='fixed top-0 left-0 h-screen w-screen flex justify-center items-center backdrop-blur-md bg-black/25 z-100'>
-            <HashLoader color="#dc3753" />
+                <HashLoader color="#dc3753" />
             </div>
         )}
+
+        <div className='fixed top-0 left-0 w-full bg-white shadow-sm border-b border-gray-200 flex items-center gap-8 py-4 px-4 md:px-8'>
+            <NavLink to={'/hero'} className="flex items-center gap-2 cursor-pointer">
+                <div className="px-2 py-1 bg-pink-500 text-white rounded-md text-lg font-bold">QR</div>
+                <p className="font-bold text-2xl text-black">QweRty</p>
+            </NavLink>
+        </div>
 
         <div className="bg-white shadow-xl rounded-2xl p-10 w-[90%] md:w-[450px] flex flex-col items-center gap-4 text-center">
             <Lock className="text-blue-600" />

@@ -58,8 +58,8 @@ export const scanAnalyticsLogic = async (id: number, clientIp: string | null, de
                 break;
 
             case "text":
-                redirectURL = `data:text/plain,${encodeURIComponent(content.textContent)}`;
-                break;
+                const text = content.textContent;
+                return { success: true, text};
 
             case "whatsapp":
                 const phone = content.whatsappNumber?.replace(/\D/g, "");
@@ -72,8 +72,8 @@ export const scanAnalyticsLogic = async (id: number, clientIp: string | null, de
                 break;
 
             case "wifi":
-                redirectURL = `WIFI:T:${content.wifiEncryption};S:${content.wifiSsid};P:${content.wifiPassword};;`;
-                break;
+                const wifi = `WIFI:T:${content.wifiEncryption};S:${content.wifiSsid};P:${content.wifiPassword};;`;
+                return { success: true, wifi };
 
             case "location":
                 if (content.locationTab === "Coordinates") {
@@ -116,7 +116,7 @@ export const scanAnalyticsLogic = async (id: number, clientIp: string | null, de
                     .filter(Boolean)
                     .join("\n");
 
-                return { success: true, vcard, filename: contact.firstName || "contact" };
+                return { success: true, vcard };
             
             default:
                 throw new Error("Invalid QR type");
@@ -147,7 +147,7 @@ export const verifyPasswordLogic = async (id: number, password: string, clientIp
         if (configuration.password !== password) {
             return { success: false, message: "Incorrect password. Please try again.", incorrectPassword: true }
         }
-        
+
         const content = typeof qrData.content === "string" ? JSON.parse(qrData.content) : qrData.content;
 
         const { country, city } = await getLocationFromIP(clientIp);
@@ -164,8 +164,8 @@ export const verifyPasswordLogic = async (id: number, password: string, clientIp
                 break;
 
             case "text":
-                redirectURL = `data:text/plain,${encodeURIComponent(content.textContent)}`;
-                break;
+                const text = `data:text/plain,${encodeURIComponent(content.textContent)}`;
+                return { success: true, text};
 
             case "whatsapp":
                 const phone = content.whatsappNumber?.replace(/\D/g, "");
@@ -178,8 +178,8 @@ export const verifyPasswordLogic = async (id: number, password: string, clientIp
                 break;
 
             case "wifi":
-                redirectURL = `WIFI:T:${content.wifiEncryption};S:${content.wifiSsid};P:${content.wifiPassword};;`;
-                break;
+                const wifi = `WIFI:T:${content.wifiEncryption};S:${content.wifiSsid};P:${content.wifiPassword};;`;
+                return { success: true, wifi };
 
             case "location":
                 if (content.locationTab === "Coordinates") {

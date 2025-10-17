@@ -20,6 +20,7 @@ const checkConnection = async()=>{
         connection.release();
     } catch (error) {
         console.log(error);
+        process.exit(1);
     }
 };
 
