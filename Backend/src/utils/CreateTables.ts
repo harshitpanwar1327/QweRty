@@ -28,7 +28,7 @@ const qr_codes = `CREATE TABLE IF NOT EXISTS qr_codes(
     design JSON,
     configuration JSON,
     qr TEXT NOT NULL,
-    state ENUM('Active', 'Paused', 'Finished') DEFAULT 'Active',
+    state ENUM('-', 'Active', 'Paused', 'Finished') DEFAULT '-',
     total_scans INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

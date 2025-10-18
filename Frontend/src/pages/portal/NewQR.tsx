@@ -9,7 +9,7 @@ import SampleQr from '../../assets/SampleQR.png'
 import API from "../../util/API"
 import axios from "axios"
 import { toast } from "react-toastify"
-import { HashLoader  } from "react-spinners"
+import { HashLoader } from "react-spinners"
 import DownloadQR from "../../modals/DownloadQR"
 import type { AppDispatch, RootState } from '../../app/Store.js'
 import { useSelector, useDispatch } from 'react-redux'
@@ -122,8 +122,14 @@ const NewQR = () => {
         }
       };
 
-      const response = await API.post("/qr", qrPayload);
-      setQrPreview(response.data.qr_image);
+      if(["text", "wifi", "vcard"].includes(qrType)) {
+        const response = await API.post("/static-qr", qrPayload);
+        setQrPreview(response.data.qr_image);
+      } else {
+        const response = await API.post("/dynamic-qr", qrPayload);
+        setQrPreview(response.data.qr_image);
+      }
+      
       dispatch(activeTab('website'));
       setQrName('');
       setContent({});
@@ -190,6 +196,21 @@ const NewQR = () => {
 
         <form className="grow bg-white rounded-md overflow-y-auto flex flex-col md:flex-row gap-8 p-2" onSubmit={handleGenerateQr}>
           <div className="w-full md:w-2/3 flex flex-col gap-8 md:p-6 md:overflow-y-auto">
+            <AnimatePresence>
+              {["text", "wifi", "vcard"].includes(qrType) && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.5 }}
+                  className="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-md"
+                >
+                  <strong>Note:</strong> The selected QR type is <span className="font-medium capitalize">{qrType}</span>. 
+                  These are <strong>static QR codes</strong> — analytics and tracking features are not available for them.
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">1</span> Select the QR type</h3>
               <Select value={qrType} onChange={(e) => dispatch(activeTab(e.target.value))} className="w-full lg:w-2/3" required>
@@ -254,78 +275,82 @@ const NewQR = () => {
               }
             </div>
 
-            <hr className="text-gray-300"/>
+            {!['text', 'wifi', 'vcard'].includes(qrType) &&
+              <>
+                <hr className="text-gray-300"/>
 
-            <div className="flex flex-col gap-4">
-              <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">5</span> Customize your QR</h3>
-              <div>
-                <div className="w-full p-3 flex items-center gap-2 cursor-pointer hover:bg-gray-100" onClick={() => setOpenTimeScheduling(!openTimeScheduling)}>
-                  <PlayArrowRounded sx={{ fontSize: "16px", color: "gray" }} className={`!transition duration-300 ${openTimeScheduling ? "rotate-90" : "rotate-0"}`} /> Time Scheduling
+                <div className="flex flex-col gap-4">
+                  <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">5</span> Customize your QR</h3>
+                  <div>
+                    <div className="w-full p-3 flex items-center gap-2 cursor-pointer hover:bg-gray-100" onClick={() => setOpenTimeScheduling(!openTimeScheduling)}>
+                      <PlayArrowRounded sx={{ fontSize: "16px", color: "gray" }} className={`!transition duration-300 ${openTimeScheduling ? "rotate-90" : "rotate-0"}`} /> Time Scheduling
+                    </div>
+                    <AnimatePresence>
+                      {openTimeScheduling &&
+                        <motion.div
+                          initial={{opacity: 0, height: 0}}
+                          animate={{opacity: 1, height: 'auto'}}
+                          exit={{opacity: 0, height: 0}}
+                          transition={{duration: 0.5}}
+                        >
+                          <div className="flex flex-col gap-3 p-3">
+                            <p className="text-sm text-gray-600">Control when your QR code will be active. Set a start and end date to automatically enable or disable access. Useful for time-limited campaigns, events, or offers.</p>
+                            <div className="grid grid-cols-2 gap-2">
+                              <input type="date" name="fromDate" id="fromDate" className="p-2 border border-gray-300 rounded" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} />
+                              <input type="date" name="toDate" id="toDate" className="p-2 border border-gray-300 rounded" value={toDate} onChange={(e)=>setToDate(e.target.value)} />
+                            </div>
+                          </div>
+                        </motion.div>
+                      }
+                    </AnimatePresence>
+                    <div className="w-full p-3 flex items-center gap-2 cursor-pointer hover:bg-gray-100 border-t border-gray-200" onClick={() => setOpenScanLimit(!openScanLimit)}>
+                      <PlayArrowRounded sx={{ fontSize: "16px", color: "gray" }} className={`!transition duration-300 ${openScanLimit ? "rotate-90" : "rotate-0"}`} /> Scan Limit
+                    </div>
+                    <AnimatePresence>
+                      {openScanLimit &&
+                        <motion.div
+                          initial={{opacity: 0, height: 0}}
+                          animate={{opacity: 1, height: 'auto'}}
+                          exit={{opacity: 0, height: 0}}
+                          transition={{duration: 0.5}}
+                        >
+                          <div className="flex flex-col gap-3 p-3">
+                            <p className="text-sm text-gray-600">Restrict the number of times your QR code can be scanned. Once the limit is reached, users will no longer be able to access the linked content. Perfect for exclusive offers, limited trials, or controlled access.</p>
+                            <input type="number" name="scanLimit" id="scanLimit" placeholder="Limit number of scans" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={scanLimit || ''} onChange={(e)=>setScanLimit(e.target.value ? Number(e.target.value) : null)} />
+                          </div>
+                        </motion.div>
+                      }
+                    </AnimatePresence>
+                    <div className="w-full p-3 flex items-center gap-2 cursor-pointer hover:bg-gray-100 border-t border-gray-200" onClick={() => setOpenPassword(!openPassword)}>
+                      <PlayArrowRounded sx={{ fontSize: "16px", color: "gray" }} className={`!transition duration-300 ${openPassword ? "rotate-90" : "rotate-0"}`} /> Password
+                    </div>
+                    <AnimatePresence>
+                      {openPassword &&
+                        <motion.div
+                          initial={{opacity: 0, height: 0}}
+                          animate={{opacity: 1, height: 'auto'}}
+                          exit={{opacity: 0, height: 0}}
+                          transition={{duration: 0.5}}
+                        >
+                          <div className="flex flex-col gap-3 p-3">
+                            <p className="text-sm text-gray-600">Protect your QR code with a password. Users will need to enter the correct password before they can view or access the linked content. Ideal for private documents, internal links, or sensitive materials.</p>
+                            <div className="grid grid-cols-2 gap-2">
+                              <input type="password" name="password" id="password" placeholder="Set a password" className="p-2 border border-gray-300 rounded" value={password} onChange={(e)=>setPassword(e.target.value)} />
+                              <input type="text" name="confirmPassword" id="confirmPassword" placeholder="Confirm password" className="p-2 border border-gray-300 rounded" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)} />
+                            </div>
+                          </div>
+                        </motion.div>
+                      }
+                    </AnimatePresence>
+                  </div>
                 </div>
-                <AnimatePresence>
-                  {openTimeScheduling &&
-                    <motion.div
-                      initial={{opacity: 0, height: 0}}
-                      animate={{opacity: 1, height: 'auto'}}
-                      exit={{opacity: 0, height: 0}}
-                      transition={{duration: 0.5}}
-                    >
-                      <div className="flex flex-col gap-3 p-3">
-                        <p className="text-sm text-gray-600">Control when your QR code will be active. Set a start and end date to automatically enable or disable access. Useful for time-limited campaigns, events, or offers.</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          <input type="date" name="fromDate" id="fromDate" className="p-2 border border-gray-300 rounded" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} />
-                          <input type="date" name="toDate" id="toDate" className="p-2 border border-gray-300 rounded" value={toDate} onChange={(e)=>setToDate(e.target.value)} />
-                        </div>
-                      </div>
-                    </motion.div>
-                  }
-                </AnimatePresence>
-                <div className="w-full p-3 flex items-center gap-2 cursor-pointer hover:bg-gray-100 border-t border-gray-200" onClick={() => setOpenScanLimit(!openScanLimit)}>
-                  <PlayArrowRounded sx={{ fontSize: "16px", color: "gray" }} className={`!transition duration-300 ${openScanLimit ? "rotate-90" : "rotate-0"}`} /> Scan Limit
-                </div>
-                <AnimatePresence>
-                  {openScanLimit &&
-                    <motion.div
-                      initial={{opacity: 0, height: 0}}
-                      animate={{opacity: 1, height: 'auto'}}
-                      exit={{opacity: 0, height: 0}}
-                      transition={{duration: 0.5}}
-                    >
-                      <div className="flex flex-col gap-3 p-3">
-                        <p className="text-sm text-gray-600">Restrict the number of times your QR code can be scanned. Once the limit is reached, users will no longer be able to access the linked content. Perfect for exclusive offers, limited trials, or controlled access.</p>
-                        <input type="number" name="scanLimit" id="scanLimit" placeholder="Limit number of scans" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={scanLimit || ''} onChange={(e)=>setScanLimit(e.target.value ? Number(e.target.value) : null)} />
-                      </div>
-                    </motion.div>
-                  }
-                </AnimatePresence>
-                <div className="w-full p-3 flex items-center gap-2 cursor-pointer hover:bg-gray-100 border-t border-gray-200" onClick={() => setOpenPassword(!openPassword)}>
-                  <PlayArrowRounded sx={{ fontSize: "16px", color: "gray" }} className={`!transition duration-300 ${openPassword ? "rotate-90" : "rotate-0"}`} /> Password
-                </div>
-                <AnimatePresence>
-                  {openPassword &&
-                    <motion.div
-                      initial={{opacity: 0, height: 0}}
-                      animate={{opacity: 1, height: 'auto'}}
-                      exit={{opacity: 0, height: 0}}
-                      transition={{duration: 0.5}}
-                    >
-                      <div className="flex flex-col gap-3 p-3">
-                        <p className="text-sm text-gray-600">Protect your QR code with a password. Users will need to enter the correct password before they can view or access the linked content. Ideal for private documents, internal links, or sensitive materials.</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          <input type="password" name="password" id="password" placeholder="Set a password" className="p-2 border border-gray-300 rounded" value={password} onChange={(e)=>setPassword(e.target.value)} />
-                          <input type="text" name="confirmPassword" id="confirmPassword" placeholder="Confirm password" className="p-2 border border-gray-300 rounded" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)} />
-                        </div>
-                      </div>
-                    </motion.div>
-                  }
-                </AnimatePresence>
-              </div>
-            </div>
+              </>
+            }
           </div>
 
           <div className="w-full md:w-1/3">
             <div className="w-full rounded-md p-8 flex flex-col items-center gap-4 bg-gray-100">
-              <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">6</span> Generate QR</h3>
+              <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">{['text', 'wifi', 'vcard'].includes(qrType)? 5: 6}</span> Generate QR</h3>
               <img src={qrPreview || SampleQr} className="w-full bg-white rounded-lg shadow-lg p-2" alt='Qr' />
               <button type="submit" className="flex items-center bg-black p-1 rounded-full hover:bg-black/85 group">
                 <p className='text-sm text-white px-3'>Generate QR</p>

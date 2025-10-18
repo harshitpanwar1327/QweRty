@@ -56,39 +56,23 @@ export const getQrLogic = async (search: string, sortBy: string, filterData: Fil
     }
 };
 
-export const postQrLogic = async (newQrData: any) => {
+export const postStaticQrLogic = async (newQrData: any) => {
     try {
+        const [rows]: any = await pool.query(`SELECT name FROM qr_codes WHERE user_id = ?`, [newQrData.user_id]);
+        const isDuplicate = rows.some((data: any) => data.name.trim() === newQrData.name.trim());
+
+        if (isDuplicate) {
+            return { success: false, message: 'QR name must be unique!' };
+        }
+
         let actualPayload = "";
         switch (newQrData.qr_type) {
-            case "website":
-                actualPayload = newQrData.content.websiteContent as string;
-                break;
-
             case "text":
                 actualPayload = newQrData.content.textContent as string;
                 break;
 
-            case "whatsapp":
-                const phone = newQrData.content.whatsappNumber?.replace(/\D/g, "");
-                const message = encodeURIComponent(newQrData.content.whatsappMessage || "");
-                actualPayload = `https://wa.me/${phone}${message ? `?text=${message}` : ""}`;
-                break;
-
-            case "email":
-                actualPayload = `mailto:${newQrData.content.emailContent}`;
-                break;
-
             case "wifi":
                 actualPayload = `WIFI:T:${newQrData.content.wifiEncryption};S:${newQrData.content.wifiSsid};P:${newQrData.content.wifiPassword};;`;
-                break;
-
-            case "location":
-                if (newQrData.content.locationTab === "Complete") {
-                    const fullAddress = `${newQrData.content.locationStreet || ""}, ${newQrData.content.locationArea || ""}, ${newQrData.content.locationCity || ""}, ${newQrData.content.locationState || ""}, ${newQrData.content.locationCountry || ""}`;
-                    actualPayload = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
-                } else {
-                    actualPayload = `https://www.google.com/maps?q=${newQrData.content.latitude},${newQrData.content.longitude}`;
-                }
                 break;
 
             case "vcard":
@@ -121,6 +105,68 @@ export const postQrLogic = async (newQrData: any) => {
                 throw new Error("Invalid QR type");
         }
 
+        const qrOptions = {
+            errorCorrectionLevel: newQrData.design?.errorCorrectionLevel || 'Q',
+            color: {
+                dark: newQrData.design?.color?.foregroundColor || '#000000',
+                light: newQrData.design?.color?.backgroundColor || '#ffffff'
+            }
+        };
+
+        const qrImageBase64 = await QRCode.toDataURL(actualPayload, qrOptions);
+
+        const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr) VALUES (?, ?, ?, ?, ?, ?, ?);`;
+
+        const values = [
+            newQrData.user_id,
+            newQrData.name,
+            newQrData.qr_type,
+            JSON.stringify(newQrData.content),
+            JSON.stringify(newQrData.design),
+            JSON.stringify(newQrData.configuration),
+            qrImageBase64
+        ];
+
+        await pool.query(query, values);
+
+        return { success: true, message: "QR generated successfully.", qr_image: qrImageBase64 };
+    } catch(error) {
+        console.error(error);
+        return { success: false, message: "Unable to generate QR!" };
+    }
+}
+
+export const postDynamicQrLogic = async (newQrData: any) => {
+    try {
+        let actualPayload = "";
+        switch (newQrData.qr_type) {
+            case "website":
+                actualPayload = newQrData.content.websiteContent as string;
+                break;
+
+            case "whatsapp":
+                const phone = newQrData.content.whatsappNumber?.replace(/\D/g, "");
+                const message = encodeURIComponent(newQrData.content.whatsappMessage || "");
+                actualPayload = `https://wa.me/${phone}${message ? `?text=${message}` : ""}`;
+                break;
+
+            case "email":
+                actualPayload = `mailto:${newQrData.content.emailContent}`;
+                break;
+
+            case "location":
+                if (newQrData.content.locationTab === "Complete") {
+                    const fullAddress = `${newQrData.content.locationStreet || ""}, ${newQrData.content.locationArea || ""}, ${newQrData.content.locationCity || ""}, ${newQrData.content.locationState || ""}, ${newQrData.content.locationCountry || ""}`;
+                    actualPayload = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+                } else {
+                    actualPayload = `https://www.google.com/maps?q=${newQrData.content.latitude},${newQrData.content.longitude}`;
+                }
+                break;
+
+            default:
+                throw new Error("Invalid QR type");
+        }
+
         const [rows]: any = await pool.query(`SELECT name FROM qr_codes WHERE user_id = ?`, [newQrData.user_id]);
         const isDuplicate = rows.some((data: any) => data.name.trim() === newQrData.name.trim());
 
@@ -128,7 +174,7 @@ export const postQrLogic = async (newQrData: any) => {
             return { success: false, message: 'QR name must be unique!' };
         }
         
-        const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr) VALUES (?, ?, ?, ?, ?, ?, '');`;
+        const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr, state) VALUES (?, ?, ?, ?, ?, ?, '', 'Active');`;
 
         const values = [
             newQrData.user_id,
@@ -178,12 +224,12 @@ export const updateQrLogic = async (id: number, newQrData: any) => {
     }
 };
 
-export const updateStatusLogic = async (ids: number[]) => {
+export const updateStatusLogic = async (ids: number[], state: string) => {
     try {
         const placeholders = ids.map(() => '?').join(',');
 
-        await pool.query(`UPDATE qr_codes SET status = ?`);
-
+        await pool.query(`UPDATE qr_codes SET state = ? WHERE qr_id IN (${placeholders}) AND state NOT IN ('Finished', '-')`, [state, ...ids]);
+        
         return {success: true, message: "QR(s) updated successfully."};
     } catch (error) {
         console.log(error);

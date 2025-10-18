@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { QrModels } from '../models/QrCodesModels.js';
-import { getQrLogic, postQrLogic, updateQrLogic, updateStatusLogic, deleteQrLogic } from '../services/QrCodesServices.js';
+import { getQrLogic, postStaticQrLogic, postDynamicQrLogic, updateQrLogic, updateStatusLogic, deleteQrLogic } from '../services/QrCodesServices.js';
 
 interface QrReqBody {
     user_id: string; 
@@ -8,7 +8,7 @@ interface QrReqBody {
     qr_type: string;
     content: object;
     design: object;
-    configuration: object;
+    configuration?: object;
 }
 
 interface QrReqParams {
@@ -42,7 +42,29 @@ export const getQr = async (req: Request, res: Response) => {
     }
 }
 
-export const postQr = async (req: Request<{}, {}, QrReqBody>, res: Response)=>{
+export const postStaticQr = async (req: Request<{}, {}, QrReqBody>, res: Response) => {
+    const { user_id, name, qr_type, content, design } = req.body;
+
+    if(!user_id || !name || !qr_type || !content){
+        return res.status(400).json({success: false, message: "Fill all the required fields!"});
+    }
+
+    const QrData = new QrModels({user_id, name, qr_type, content, design});
+
+    try {
+        const response = await postStaticQrLogic(QrData);
+        if(response.success){
+            return res.status(200).json(response);
+        }else{
+            return res.status(400).json(response);
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({success: false, message: "Internal server error!"});
+    }
+}
+
+export const postDynamicQr = async (req: Request<{}, {}, QrReqBody>, res: Response)=>{
     const { user_id, name, qr_type, content, design, configuration } = req.body;
     
     if(!user_id || !name || !qr_type || !content){
@@ -52,7 +74,7 @@ export const postQr = async (req: Request<{}, {}, QrReqBody>, res: Response)=>{
     const QrData = new QrModels({user_id, name, qr_type, content, design, configuration});
     
     try {
-        const response = await postQrLogic(QrData);
+        const response = await postDynamicQrLogic(QrData);
         if(response.success){
             return res.status(200).json(response);
         }else{
@@ -87,15 +109,15 @@ export const updateQr = async (req: Request<QrReqParams, {}, QrReqBody>, res: Re
     }
 }
 
-export const updateStatus = async (req: Request<QrReqParams>, res: Response) => {
-    const { ids } = req.body;
+export const updateStatus = async (req: Request, res: Response) => {
+    const { ids, state } = req.body;
 
-    if (!ids || ids.length === 0) {
-        return res.status(400).json({ success: false, message: "No valid IDs provided." });
+    if (!ids || ids.length === 0 || !state) {
+        return res.status(400).json({ success: false, message: "No valid IDs or state provided!" });
     }
 
     try {
-        const response = await updateStatusLogic(ids);
+        const response = await updateStatusLogic(ids, state);
         if(response.success){
             return res.status(200).json(response);
         }else{
@@ -107,11 +129,11 @@ export const updateStatus = async (req: Request<QrReqParams>, res: Response) => 
     }
 }
 
-export const deleteQr = async(req: Request<QrReqParams>, res: Response) => {
+export const deleteQr = async(req: Request, res: Response) => {
     const { ids } = req.body;
 
     if (!ids || ids.length === 0) {
-        return res.status(400).json({ success: false, message: "No valid IDs provided for deletion." });
+        return res.status(400).json({ success: false, message: "No valid IDs provided for deletion!" });
     }
 
     try {

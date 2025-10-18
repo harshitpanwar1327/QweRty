@@ -38,7 +38,7 @@ interface QrData {
   qr_type: string;
   content: QrContent;
   design: QrDesign;
-  configuration: QrConfiguration;
+  configuration?: QrConfiguration;
 }
 
 export class QrModels {
@@ -47,7 +47,7 @@ export class QrModels {
   qr_type: string;
   content: QrContent;
   design: QrDesign;
-  configuration: QrConfiguration;
+  configuration?: QrConfiguration;
 
   constructor(data: QrData) {
     this.user_id = data.user_id;

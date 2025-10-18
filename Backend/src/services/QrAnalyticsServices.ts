@@ -10,7 +10,7 @@ export const scanAnalyticsLogic = async (id: number, clientIp: string | null, de
 
         const qrData = rows[0];
 
-        if(qrData.state==='Pause') {
+        if(qrData.state==='Paused') {
             return { success: false, message: 'QR code is paused by the owner!', isPaused: true }
         }
         
@@ -57,10 +57,6 @@ export const scanAnalyticsLogic = async (id: number, clientIp: string | null, de
                 redirectURL = content.websiteContent;
                 break;
 
-            case "text":
-                const text = content.textContent;
-                return { success: true, text};
-
             case "whatsapp":
                 const phone = content.whatsappNumber?.replace(/\D/g, "");
                 const message = encodeURIComponent(content.whatsappMessage || "");
@@ -71,10 +67,6 @@ export const scanAnalyticsLogic = async (id: number, clientIp: string | null, de
                 redirectURL = `mailto:${content.emailContent}`;
                 break;
 
-            case "wifi":
-                const wifi = `WIFI:T:${content.wifiEncryption};S:${content.wifiSsid};P:${content.wifiPassword};;`;
-                return { success: true, wifi };
-
             case "location":
                 if (content.locationTab === "Coordinates") {
                     redirectURL = `https://www.google.com/maps?q=${content.latitude},${content.longitude}`;
@@ -84,40 +76,6 @@ export const scanAnalyticsLogic = async (id: number, clientIp: string | null, de
                 }
                 break;
 
-            case "vCard":
-                const contact = content;
-
-                interface PhoneNumber {
-                    type: string,
-                    number: string
-                }
-
-                const address = `${contact.locationStreet || ""};${contact.locationCity || ""};${contact.locationState || ""};${contact.locationPostalCode || ""};${contact.locationCountry || ""}`;
-
-                const vcard = [
-                    "BEGIN:VCARD",
-                    "VERSION:3.0",
-                    `N:${contact.lastName || ""};${contact.firstName || ""};;;`,
-                    `FN:${contact.firstName || ""} ${contact.lastName || ""}`,
-                    contact.company ? `ORG:${contact.company}` : "",
-                    contact.title ? `TITLE:${contact.title}` : "",
-                    ...(Array.isArray(contact.phones)
-                        ? contact.phones
-                            .filter((p: PhoneNumber) => p.number && p.type)
-                            .map((p: PhoneNumber) => `TEL;TYPE=${p.type.toUpperCase()}:${p.number}`)
-                        : []),
-                    contact.email ? `EMAIL;TYPE=WORK:${contact.email}` : "",
-                    contact.website ? `URL:${contact.website}` : "",
-                    (contact.locationStreet || contact.locationCity || contact.locationState || contact.locationPostalCode || contact.locationCountry)
-                        ? `ADR;TYPE=WORK:;;${address}`
-                        : "",
-                    "END:VCARD",
-                ]
-                    .filter(Boolean)
-                    .join("\n");
-
-                return { success: true, vcard };
-            
             default:
                 throw new Error("Invalid QR type");
         }
@@ -163,10 +121,6 @@ export const verifyPasswordLogic = async (id: number, password: string, clientIp
                 redirectURL = content.websiteContent;
                 break;
 
-            case "text":
-                const text = `data:text/plain,${encodeURIComponent(content.textContent)}`;
-                return { success: true, text};
-
             case "whatsapp":
                 const phone = content.whatsappNumber?.replace(/\D/g, "");
                 const message = encodeURIComponent(content.whatsappMessage || "");
@@ -177,10 +131,6 @@ export const verifyPasswordLogic = async (id: number, password: string, clientIp
                 redirectURL = `mailto:${content.emailContent}`;
                 break;
 
-            case "wifi":
-                const wifi = `WIFI:T:${content.wifiEncryption};S:${content.wifiSsid};P:${content.wifiPassword};;`;
-                return { success: true, wifi };
-
             case "location":
                 if (content.locationTab === "Coordinates") {
                     redirectURL = `https://www.google.com/maps?q=${content.latitude},${content.longitude}`;
@@ -190,40 +140,6 @@ export const verifyPasswordLogic = async (id: number, password: string, clientIp
                 }
                 break;
 
-            case "vCard":
-                const contact = content;
-
-                interface PhoneNumber {
-                    type: string,
-                    number: string
-                }
-
-                const address = `${contact.locationStreet || ""};${contact.locationCity || ""};${contact.locationState || ""};${contact.locationPostalCode || ""};${contact.locationCountry || ""}`;
-
-                const vcard = [
-                    "BEGIN:VCARD",
-                    "VERSION:3.0",
-                    `N:${contact.lastName || ""};${contact.firstName || ""};;;`,
-                    `FN:${contact.firstName || ""} ${contact.lastName || ""}`,
-                    contact.company ? `ORG:${contact.company}` : "",
-                    contact.title ? `TITLE:${contact.title}` : "",
-                    ...(Array.isArray(contact.phones)
-                        ? contact.phones
-                            .filter((p: PhoneNumber) => p.number && p.type)
-                            .map((p: PhoneNumber) => `TEL;TYPE=${p.type.toUpperCase()}:${p.number}`)
-                        : []),
-                    contact.email ? `EMAIL;TYPE=WORK:${contact.email}` : "",
-                    contact.website ? `URL:${contact.website}` : "",
-                    (contact.locationStreet || contact.locationCity || contact.locationState || contact.locationPostalCode || contact.locationCountry)
-                        ? `ADR;TYPE=WORK:;;${address}`
-                        : "",
-                    "END:VCARD",
-                ]
-                    .filter(Boolean)
-                    .join("\n");
-
-                return { success: true, vcard, filename: contact.firstName || "contact" };
-            
             default:
                 throw new Error("Invalid QR type");
         }

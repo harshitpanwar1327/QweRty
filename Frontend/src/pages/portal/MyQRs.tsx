@@ -8,8 +8,8 @@ import TablePagination from '@mui/material/TablePagination'
 import { HashLoader } from "react-spinners"
 import { motion, AnimatePresence } from 'framer-motion'
 import ViewQr from '../../modals/MyQrs/ViewQr'
-import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, MoreVert, DownloadRounded, DeleteRounded, FilterAlt, SortRounded, EditRounded, Delete } from "@mui/icons-material"
-// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, People, Feedback, Badge, Loop, PlayArrowRounded, PauseCircleOutline } from "@mui/icons-material"
+import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, MoreVert, DownloadRounded, DeleteRounded, FilterAlt, SortRounded, EditRounded, Delete, PauseCircleOutline, PlayCircleOutlineRounded } from "@mui/icons-material"
+// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, People, Feedback, Badge, Loop, PlayArrowRounded } from "@mui/icons-material"
 // import { toast } from 'react-toastify'
 import Swal from 'sweetalert2'
 import DownloadQR from '../../modals/DownloadQR'
@@ -261,24 +261,32 @@ const MyQRs = () => {
     }
   };
 
-  // const handleStatus = async (ids: number[]) => {
-  //   try {
-  //     setLoading(true);
-  //     await API.put('/qr-status', {
-  //       data: { ids }
-  //     });
-  //     fetchQr();
-  //     setLoading(false);
-  //   } catch (error) {
-  //     setLoading(false);
-  //     console.log(error);
-  //     if (axios.isAxiosError(error)) {
-  //       toast.error(error.response?.data?.message || "QR not deleted!");
-  //     } else {
-  //       toast.error("Unexpected error occurred!");
-  //     }
-  //   }
-  // }
+  const getSelectedStatus = () => {
+    const selectedQrItems = qrData.filter(qr => selectedRows.includes(qr.qr_id));
+    const states = selectedQrItems.map(qr => qr.state);
+
+    if (states.every(state => state === "Finished" || state==="-")) return "Finished";
+    if (states.every(state => state === "Active" || state === "Finished" || state==="-")) return "Active";
+    if (states.every(state => state === "Paused" || state === "Finished" || state==="-")) return "Paused";
+    return "Active";
+  }
+
+  const handleStatus = async (ids: number[], state: string) => {
+    try {
+      setLoading(true);
+      await API.put('/qr-status', { ids, state });
+      fetchQr();
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || "QR status not updated!");
+      } else {
+        toast.error("Unexpected error occurred!");
+      }
+    }
+  }
 
   return (
     <div className="w-screen flex">
@@ -390,9 +398,9 @@ const MyQRs = () => {
                           })}
                         </td>
                         <td className="p-3">
-                          <p className={`text-sm font-semibold text-white px-2 py-1 rounded flex justify-center items-center ${data.state==='Active'? 'bg-[#46CB48]': data.state==='Pause'? 'bg-blue-500': 'bg-[#FE8E3E]'}`}>{data.state}</p>
+                          <p className={`text-sm font-semibold text-white px-2 py-1 rounded flex justify-center items-center ${data.state==='Active'? 'bg-[#46CB48]': data.state==='Paused'? 'bg-blue-500': data.state==='Finished'? 'bg-[#FE8E3E]': 'bg-gray-300 text-gray-600'}`}>{data.state}</p>
                         </td>
-                        <td className="p-3 font-semibold">{data.total_scans}</td>
+                        <td className="p-3 font-semibold">{!['text', 'wifi', 'vcard'].includes(data.qr_type) ? data.total_scans : '-'}</td>
                         <td className='p-3'>
                           <div className='relative' ref={activeOptionRef}>
                             <MoreVert className='cursor-pointer' onClick={()=>setActiveOptionRow(activeOptionRow===data.qr_id ? null: data.qr_id)}/>
@@ -436,8 +444,21 @@ const MyQRs = () => {
             <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500" onClick={() => handleSelectedRows()}>Cancel</button>
 
             <div className="flex items-center gap-4">
-              <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500 flex items-center gap-2 border border-gray-200" onClick={()=>handleDelete(selectedRows)}><Delete /> Delete</button>
-              {/* <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500 flex items-center gap-2 border border-gray-200" onClick={()=>handleStatus(selectedRows)}><PauseCircleOutline /> Pause</button> */}
+              <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500 flex items-center gap-2 border border-gray-200" onClick={()=>handleDelete(selectedRows)}>
+                <Delete /> Delete
+              </button>
+
+              {getSelectedStatus() === "Active" && (
+                <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500 flex items-center gap-2 border border-gray-200" onClick={() => handleStatus(selectedRows, "Paused")}>
+                  <PauseCircleOutline /> Pause
+                </button>
+              )}
+
+              {getSelectedStatus() === "Paused" && (
+                <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500 flex items-center gap-2 border border-gray-200" onClick={() => handleStatus(selectedRows, "Active")}>
+                  <PlayCircleOutlineRounded /> Resume
+                </button>
+              )}
             </div>
 
             <div className="flex items-center gap-2 text-gray-500">

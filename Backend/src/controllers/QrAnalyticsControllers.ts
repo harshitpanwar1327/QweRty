@@ -27,18 +27,7 @@ export const scanAnalytics = async (req: Request<QrAnalyticsReqParams>, res: Res
     try {
         let response = await scanAnalyticsLogic(Number(id), clientIp, deviceType);
 
-        if (response.vcard) {
-            res.setHeader("Content-Disposition",`attachment; filename="contact".vcf"`);
-            res.setHeader("Content-Type", "text/vcard; charset=utf-8");
-            return res.send(response.vcard);
-        } else if (response.text) {
-            res.setHeader("Content-Disposition", 'attachment; filename="qr_text.txt"');
-            res.setHeader("Content-Type", "text/plain; charset=utf-8");
-            return res.send(response.text);
-        } else if (response.wifi) {
-            res.setHeader("Content-Type", "text/plain; charset=utf-8");
-            return res.json(response.wifi);
-        } else if (response.success && response.redirectURL) {
+        if (response.success && response.redirectURL) {
             return res.redirect(response.redirectURL);
         } else if (!response.success && response.isPaused) {
             return res.redirect(`${process.env.FRONTEND_URL}/#/config/pauseQR`);
@@ -70,19 +59,6 @@ export const verifyPassword = async (req: Request<QrAnalyticsReqParams, {}, QrAn
 
     try {
         let response = await verifyPasswordLogic(id, password, clientIp, deviceType);
-
-        if (response.vcard) {
-            res.setHeader("Content-Disposition", `attachment; filename="contact".vcf"`);
-            res.setHeader("Content-Type", "text/vcard; charset=utf-8");
-            return res.send(response.vcard);
-        } else if (response.text) {
-            res.setHeader("Content-Disposition", 'attachment; filename="qr_text.txt"');
-            res.setHeader("Content-Type", "text/plain; charset=utf-8");
-            return res.send(response.text);
-        } else if (response.wifi) {
-            res.setHeader("Content-Type", "text/plain; charset=utf-8");
-            return res.json(response.wifi);
-        }
 
         const isAjaxRequest = req.xhr || req.headers.accept?.includes("application/json");
 
