@@ -22,10 +22,18 @@ export const scanAnalyticsLogic = async (id: number, clientIp: string | null, de
             const startDate = new Date(configuration.from_date);
             const endDate = new Date(configuration.to_date);
 
-            if(now < startDate || now > endDate) {
+            if(now > endDate) {
                 await pool.query(`UPDATE qr_codes SET state = 'Finished' WHERE qr_id = ?;`, [id]);
 
                 return { success: false, message: 'QR code is not active at this time!', inActive: true }
+            } else if(now < startDate) {
+                await pool.query(`UPDATE qr_codes SET state = 'Paused' WHERE qr_id = ?;`, [id]);
+
+                return { success: false, message: 'QR code is not active at this time!', inActive: true }
+            } else {
+                await pool.query(`UPDATE qr_codes SET state = 'Active' WHERE qr_id = ?;`, [id]);
+
+                return { success: true, message: 'QR code is now active.' }
             }
         }
 

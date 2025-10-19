@@ -235,6 +235,7 @@ const MyQRs = () => {
           data: { ids }
         });
         fetchQr();
+        setSelectedRows([]);
         setLoading(false);
         Swal.fire({
           title: "Deleted!",
@@ -353,7 +354,7 @@ const MyQRs = () => {
 
             <div className="grow overflow-auto">
               <table className="w-full text-left p-3">
-                <thead className="bg-gray-100 text-gray-500 text-sm">
+                <thead className="bg-gray-100 text-gray-500 text-sm text-center">
                   <tr>
                     <th className='p-3'><input type="checkbox" checked={selectAllRows} onChange={handleSelectAll}/></th>
                     <th className='pr-15 md:p-0'></th>
@@ -366,7 +367,7 @@ const MyQRs = () => {
                     <th></th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className='text-center'>
                   {qrData.length > 0 ? (
                     qrData.map((data)=>(
                       <tr key={data.qr_id}>
@@ -391,14 +392,15 @@ const MyQRs = () => {
                           })}
                         </td>
                         <td className="p-3 text-sm text-gray-500">
-                          {new Date(data.updated_at).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
+                          {data.updated_at ? 
+                            new Date(data.updated_at).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            }) : '--'}
                         </td>
                         <td className="p-3">
-                          <p className={`text-sm font-semibold text-white px-2 py-1 rounded flex justify-center items-center ${data.state==='Active'? 'bg-[#46CB48]': data.state==='Paused'? 'bg-blue-500': data.state==='Finished'? 'bg-[#FE8E3E]': 'bg-gray-300 text-gray-600'}`}>{data.state}</p>
+                          <p className={`text-sm font-semibold text-white px-2 py-1 rounded flex justify-center items-center ${data.state==='Active'? 'bg-[#46CB48]': data.state==='Paused'? 'bg-blue-500': data.state==='Finished'? 'bg-[#FE8E3E]': 'bg-gray-300 !text-gray-600'}`}>{data.state}</p>
                         </td>
                         <td className="p-3 font-semibold">{!['text', 'wifi', 'vcard'].includes(data.qr_type) ? data.total_scans : '-'}</td>
                         <td className='p-3'>
@@ -469,7 +471,7 @@ const MyQRs = () => {
       </div>
 
       <AnimatePresence>
-        {openFilterModal && <Filter setOpenFilterModal={setOpenFilterModal} setFilterData={setFilterData}/>}
+        {openFilterModal && <Filter setOpenFilterModal={setOpenFilterModal} setFilterData={setFilterData} currentFilter={filterData}/>}
       </AnimatePresence>
       <AnimatePresence>
         {openViewQrModal && <ViewQr setOpenViewQrModal={setOpenViewQrModal} selectedQr={selectedQr}/>}

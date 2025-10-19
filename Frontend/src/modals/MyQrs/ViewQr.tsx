@@ -67,7 +67,7 @@ const ViewQr: React.FC<ViewQrProps> = ({setOpenViewQrModal, selectedQr}) => {
             {qrTypes[selectedQr.qr_type]?.icon}
             <p className='text-sm font-semibold'>{qrTypes[selectedQr.qr_type]?.label}</p>
           </div>
-          <p className={`text-sm font-semibold text-white py-1 px-3 rounded flex justify-center items-center ${selectedQr.state==='Active'? 'bg-[#46CB48]': selectedQr.state==='Pause'? 'bg-blue-500': 'bg-[#FE8E3E]'}`}>{selectedQr.state}</p>
+          <p className={`text-sm font-semibold text-white py-1 px-3 rounded flex justify-center items-center ${selectedQr.state==='Active'? 'bg-[#46CB48]': selectedQr.state==='Pause'? 'bg-blue-500': selectedQr.state==='Finished'? 'bg-[#FE8E3E]': 'bg-gray-300 !text-gray-600'}`}>{selectedQr.state}</p>
         </div>
 
         <div className="flex flex-col items-start gap-2">

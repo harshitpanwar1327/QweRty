@@ -3,7 +3,8 @@ import { QrModels } from '../models/QrCodesModels.js';
 import { getQrLogic, postStaticQrLogic, postDynamicQrLogic, updateQrLogic, updateStatusLogic, deleteQrLogic } from '../services/QrCodesServices.js';
 
 interface QrReqBody {
-    user_id: string; 
+    user_id?: string; 
+    qr_id?: number;
     name: string;
     qr_type: string;
     content: object;
@@ -11,15 +12,10 @@ interface QrReqBody {
     configuration?: object;
 }
 
-interface QrReqParams {
-    id?: number;
-    ids?: number[];
-}
-
 export const getQr = async (req: Request, res: Response) => {
     const search = req.body.search || '';
     const sortBy = req.body.sortBy || '';
-    const filterData = req.body.filterData || {activeStatus: [], selectedTypes: []};
+    const filterData = req.body.filterData || {activeStatus: [], selectedType: []};
     const uid = req.body.uid;
     const page = parseInt(req.body.page) || 0;
     const limit = parseInt(req.body.rowsPerPage) || 10;
@@ -86,18 +82,17 @@ export const postDynamicQr = async (req: Request<{}, {}, QrReqBody>, res: Respon
     }
 }
 
-export const updateQr = async (req: Request<QrReqParams, {}, QrReqBody>, res: Response) => {
-    const { ids } = req.params;
-    const {user_id, name, qr_type, content, design, configuration } = req.body;
+export const updateQr = async (req: Request<{}, {}, QrReqBody>, res: Response) => {
+    const {qr_id, name, qr_type, content, design, configuration } = req.body;
 
-    if(!ids || !user_id || !name || !qr_type || !content){
+    if(!qr_id || !name || !qr_type || !content){
         return res.status(400).json({success: false, message: "Fill all the required fields!"});
     }
 
-    const QrData = new QrModels({user_id, name, qr_type, content, design, configuration});
+    const QrData = new QrModels({qr_id, name, qr_type, content, design, configuration});
     
     try {
-        let response = await updateQrLogic(Number(ids), QrData);
+        let response = await updateQrLogic(QrData);
         if(response.success){
             return res.status(200).json(response);
         }else{

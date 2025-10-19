@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, Close, DeleteRounded } from "@mui/icons-material"
 import { motion } from 'framer-motion'
 
@@ -10,6 +10,7 @@ interface FilterData {
 interface FilterProp {
   setOpenFilterModal: React.Dispatch<React.SetStateAction<boolean>>;
   setFilterData: React.Dispatch<React.SetStateAction<FilterData>>;
+  currentFilter?: FilterData;
 }
 
 const qrStatus = ["Active", "Paused", "Finished"];
@@ -24,21 +25,28 @@ const qrTypes = [
   { key: 'vcard', name: "vCard", icon: <AccountBox fontSize="small" /> },
 ];
 
-const Filter: React.FC<FilterProp> = ({ setOpenFilterModal, setFilterData }) => {
+const Filter: React.FC<FilterProp> = ({ setOpenFilterModal, setFilterData, currentFilter }) => {
   const [activeStatus, setActiveStatus] = useState<string[]>([]);
-  const [selectedType, setSelectedTypes] = useState<string[]>([]);
+  const [selectedType, setSelectedType] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (currentFilter) {
+      setActiveStatus(currentFilter.activeStatus);
+      setSelectedType(currentFilter.selectedType);
+    }
+  }, [currentFilter]);
 
   const toggleStatus = (status: string) => {
-    setActiveStatus((prev) => prev.includes(status)? prev.filter((s) => s !== status) : [...prev, status])
+    setActiveStatus((prev) => prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status])
   }
 
   const toggleType = (type: string) => {
-    setSelectedTypes((prev) => prev.includes(type)? prev.filter((t) => t !== type) : [...prev, type])
+    setSelectedType((prev) => prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type])
   }
 
   const handleClearFilter = () => {
     setActiveStatus([]);
-    setSelectedTypes([]);
+    setSelectedType([]);
   }
 
   const handleResult = () => {

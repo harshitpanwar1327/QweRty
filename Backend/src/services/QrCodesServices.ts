@@ -3,7 +3,7 @@ import QRCode from "qrcode";
 
 interface FilterData {
     activeStatus: string[],
-    selectedTypes: string[]
+    selectedType: string[]
 }
 
 export const getQrLogic = async (search: string, sortBy: string, filterData: FilterData , uid: string, limit: number, offset: number) => {
@@ -19,10 +19,10 @@ export const getQrLogic = async (search: string, sortBy: string, filterData: Fil
             params.push(...filterData.activeStatus);
         }
 
-        if(filterData.selectedTypes?.length > 0) {
-            const placeholder = filterData.selectedTypes.map(()=>'?').join(',');
+        if(filterData.selectedType?.length > 0) {
+            const placeholder = filterData.selectedType.map(()=>'?').join(',');
             query += ` AND qr_type IN (${placeholder})`;
-            params.push(...filterData.selectedTypes);
+            params.push(...filterData.selectedType);
         }
 
         switch (sortBy) {
@@ -210,10 +210,18 @@ export const postDynamicQrLogic = async (newQrData: any) => {
     }
 };
 
-export const updateQrLogic = async (id: number, newQrData: any) => {
+export const updateQrLogic = async (qrData: any) => {
     try {
-        let query = `UPDATE qr_codes SET name=?,qr_type=?,content=?, design=?, from_date=?, to_date=?, scan_limit=?, password=?, state=? WHERE qr_id = ?;`;
-        let values = [newQrData.name, newQrData.qr_type, newQrData.content, newQrData.design, newQrData.from_date, newQrData.to_date, newQrData.scan_limit, newQrData.password, newQrData.state, id];
+        let query = '';
+        let values: any = [];
+
+        if(['text', 'wifi', 'vcard'].includes(qrData.qr_type)) {
+            query = `UPDATE qr_codes SET name=?, qr_type=?, content=?, design=? WHERE qr_id = ?;`;
+            values = [qrData.name, qrData.qr_type, qrData.content, qrData.design, qrData.qr_id];
+        } else {
+            query = `UPDATE qr_codes SET name=?, qr_type=?, content=?, design=?, from_date=?, to_date=?, scan_limit=?, password=?, state=? WHERE qr_id = ?;`;
+            values = [qrData.name, qrData.qr_type, qrData.content, qrData.design, qrData.from_date, qrData.to_date, qrData.scan_limit, qrData.password, qrData.state, qrData.qr_id];
+        }
 
         await pool.query(query, values);
 

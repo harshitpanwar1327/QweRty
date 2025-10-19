@@ -33,7 +33,8 @@ interface QrConfiguration {
 }
 
 interface QrData {
-  user_id: string;
+  user_id?: string;
+  qr_id?: number;
   name: string;
   qr_type: string;
   content: QrContent;
@@ -42,7 +43,8 @@ interface QrData {
 }
 
 export class QrModels {
-  user_id: string;
+  user_id?: string;
+  qr_id?: number;
   name: string;
   qr_type: string;
   content: QrContent;

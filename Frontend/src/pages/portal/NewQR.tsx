@@ -79,6 +79,7 @@ const NewQR = () => {
   const [openTimeScheduling, setOpenTimeScheduling] = useState<boolean>(false);
   const [openScanLimit, setOpenScanLimit] = useState<boolean>(false);
   const [openPassword, setOpenPassword] = useState<boolean>(false);
+  const today = new Date().toISOString().split("T")[0];
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
   const [scanLimit, setScanLimit] = useState<number | null>(null);
@@ -130,7 +131,6 @@ const NewQR = () => {
         setQrPreview(response.data.qr_image);
       }
       
-      dispatch(activeTab('website'));
       setQrName('');
       setContent({});
       setDesignTab('Shape');
@@ -296,8 +296,8 @@ const NewQR = () => {
                           <div className="flex flex-col gap-3 p-3">
                             <p className="text-sm text-gray-600">Control when your QR code will be active. Set a start and end date to automatically enable or disable access. Useful for time-limited campaigns, events, or offers.</p>
                             <div className="grid grid-cols-2 gap-2">
-                              <input type="date" name="fromDate" id="fromDate" className="p-2 border border-gray-300 rounded" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} />
-                              <input type="date" name="toDate" id="toDate" className="p-2 border border-gray-300 rounded" value={toDate} onChange={(e)=>setToDate(e.target.value)} />
+                              <input type="date" name="fromDate" id="fromDate" className="p-2 border border-gray-300 rounded" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} min={today}/>
+                              <input type="date" name="toDate" id="toDate" className="p-2 border border-gray-300 rounded" value={toDate} onChange={(e)=>setToDate(e.target.value)} min={fromDate || today} />
                             </div>
                           </div>
                         </motion.div>
