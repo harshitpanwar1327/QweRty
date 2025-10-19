@@ -115,7 +115,7 @@ export const postStaticQrLogic = async (newQrData: any) => {
 
         const qrImageBase64 = await QRCode.toDataURL(actualPayload, qrOptions);
 
-        const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr) VALUES (?, ?, ?, ?, ?, ?, ?);`;
+        const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr, state) VALUES (?, ?, ?, ?, ?, ?, ?, '-');`;
 
         const values = [
             newQrData.user_id,
@@ -174,7 +174,7 @@ export const postDynamicQrLogic = async (newQrData: any) => {
             return { success: false, message: 'QR name must be unique!' };
         }
         
-        const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr, state) VALUES (?, ?, ?, ?, ?, ?, '', 'Active');`;
+        const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr) VALUES (?, ?, ?, ?, ?, ?, '');`;
 
         const values = [
             newQrData.user_id,
