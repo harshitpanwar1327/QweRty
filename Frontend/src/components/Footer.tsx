@@ -37,9 +37,15 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm pt-8 text-gray-400">
           <p>2025 &copy; QR Code Generator</p>
           <div className="flex items-center gap-6">
-            <YouTubeIcon className="cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
-            <InstagramIcon className="cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
-            <LinkedInIcon className="cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
+            <a href="https://www.youtube.com/channel/UCdL7XtgIMC64BQ4SpZ8qWDA" target="_blank">
+              <YouTubeIcon className="text-white/50 cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
+            </a>
+            <a href="https://www.instagram.com/codeweave1327/" target="_blank">
+              <InstagramIcon className="text-white/50 cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
+            </a>
+            <a href="https://www.linkedin.com/company/codeweave1327/" target="_blank">
+              <LinkedInIcon className="text-white/50 cursor-pointer !transition duration-300 hover:scale-105 hover:text-white"/>
+            </a>
           </div>
         </div>
       </div>

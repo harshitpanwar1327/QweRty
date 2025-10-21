@@ -63,7 +63,7 @@ const sendWelcomeMail = async (name: string, email: string) => {
 
                         <!-- CTA Button -->
                         <div style="text-align:center; margin:30px 0;">
-                        <a href="http://3.108.152.119/new-qr" 
+                        <a href="https://codeweaveqwerty.site" 
                             style="background:#ec4899; color:#ffffff; padding:14px 30px; 
                                     text-decoration:none; border-radius:8px; font-size:16px; font-weight:bold; display:inline-block;">
                             Generate Your First QR

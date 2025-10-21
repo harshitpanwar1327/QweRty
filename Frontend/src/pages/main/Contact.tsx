@@ -56,7 +56,7 @@ const Contact = () => {
             <p className='text-justify'>We’d love to hear from you! Whether you have a question, feedback, or just want to say hi, drop us a message and we’ll respond quickly.</p>
             <hr className='text-black/50'/>
             <p className='flex items-center gap-3'><Phone className='w-5 h-5'/>+91 8595994381, +91 9311201990</p>
-            <p className='flex items-center gap-3'><Mail className='w-5 h-5'/>codeweave.site@gmail.com</p>
+            <p className='flex items-center gap-3'><Mail className='w-5 h-5'/>codeweave1327@gmail.com</p>
           </div>
 
           <form className='w-full lg:w-1/2 bg-gray-300 p-8 rounded-2xl space-y-4' ref={form} onSubmit={sendEmail}>
@@ -68,11 +68,11 @@ const Contact = () => {
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <div>
                 <label className='block mb-2'>Email</label>
-                <input type="email" placeholder='example@example.com' className='w-full p-3 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-white' name='email' required/>
+                <input type="email" placeholder='example@gmail.com' className='w-full p-3 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-white' name='email' required/>
               </div>
               <div>
                 <label className='block mb-2'>Phone (optional)</label>
-                <input type="tel" placeholder='+123456789' className='w-full p-3 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-white' name='phone' required/>
+                <input type="tel" placeholder='+91 9876543210' className='w-full p-3 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-white' name='phone' required/>
               </div>
             </div>
 
