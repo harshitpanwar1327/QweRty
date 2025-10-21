@@ -110,7 +110,10 @@ export const postStaticQrLogic = async (newQrData: any) => {
             color: {
                 dark: newQrData.design?.color?.foregroundColor || '#000000',
                 light: newQrData.design?.color?.backgroundColor || '#ffffff'
-            }
+            },
+            width: 1000,
+            margin: 2,
+            scale: 10
         };
 
         const qrImageBase64 = await QRCode.toDataURL(actualPayload, qrOptions);
@@ -196,7 +199,10 @@ export const postDynamicQrLogic = async (newQrData: any) => {
             color: {
                 dark: newQrData.design?.color?.foregroundColor || '#000000',
                 light: newQrData.design?.color?.backgroundColor || '#ffffff'
-            }
+            },
+            width: 1000,
+            margin: 2,
+            scale: 10
         };
 
         const qrImageBase64 = await QRCode.toDataURL(trackingUrl, qrOptions);

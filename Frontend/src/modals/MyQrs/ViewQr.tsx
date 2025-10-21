@@ -47,7 +47,7 @@ const ViewQr: React.FC<ViewQrProps> = ({setOpenViewQrModal, selectedQr}) => {
 
   return (
     <div className='fixed top-0 left-0 w-screen h-screen p-4 flex justify-end items-center bg-[#0000005a] z-10' onClick={()=>setOpenViewQrModal(false)}>
-      <motion.div className="w-2/3 md:w-1/3 lg:w-1/4 bg-white rounded-md shadow-md p-4 flex flex-col gap-4" onClick={(e)=>e.stopPropagation()}
+      <motion.div className="w-full md:w-1/2 lg:w-1/3 bg-white rounded-md shadow-md p-4 flex flex-col gap-4" onClick={(e)=>e.stopPropagation()}
         initial={{opacity: 0, x: '100%'}}
         animate={{opacity: 1, x: 0}}
         exit={{opacity: 0, x: '100%'}}

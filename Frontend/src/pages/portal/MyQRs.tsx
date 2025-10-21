@@ -34,8 +34,8 @@ const sortByOptions = ['Most Recent', 'Name', 'Most Scanned', 'Last Modified'];
 
 const myQrOptions = [
   { icon: <DownloadRounded sx={{fontSize: '16px'}} />, label: "Download" },
-  { icon: <EditRounded sx={{fontSize: '16px'}} />, label: "Edit" },
-  { icon: <DeleteRounded sx={{fontSize: '16px'}} />, label: "Delete" }
+  { icon: <DeleteRounded sx={{fontSize: '16px'}} />, label: "Delete" },
+  { icon: <EditRounded sx={{fontSize: '16px'}} />, label: "Edit" }
 ]
 
 const qrTypes = {
@@ -190,9 +190,9 @@ const MyQRs = () => {
     if(index===0) {
       handleDownload(data);
     } else if(index===1) {
-      handleEdit();
-    } else if(index===2) {
       handleDelete([data.qr_id]);
+    } else if(index===2) {
+      handleEdit(data);
     } else {
       console.log('Invalid index.');
     }
@@ -201,10 +201,6 @@ const MyQRs = () => {
   const handleDownload = (data: QRData) => {
     setOpenDownloadModal(true);
     setselectedQr(data);
-  }
-
-  const handleEdit = () => {
-    toast.info('This feature is coming soon.');
   }
 
   const handleDelete = async (ids: number[]) => {
@@ -261,6 +257,11 @@ const MyQRs = () => {
       }
     }
   };
+
+  const handleEdit = async (data: QRData) => {
+    console.log(data);
+    toast.info('This feature is coming soon.');
+  }
 
   const getSelectedStatus = () => {
     const selectedQrItems = qrData.filter(qr => selectedRows.includes(qr.qr_id));
@@ -415,11 +416,13 @@ const MyQRs = () => {
                                   exit={{ opacity: 0, y: -10 }}
                                   transition={{ duration: 0.3 }}
                                 >
-                                  {myQrOptions.map((option, index) => (
-                                    <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500 flex items-center gap-2" key={index} onClick={()=>handleOption(index, data)}>
-                                      {option.icon}
-                                      <span>{option.label}</span>
-                                    </p>
+                                  {myQrOptions
+                                    .filter((_, index) => !(['text', 'wifi', 'vcard'].includes(data.qr_type) && index === 2))
+                                    .map((option, index) => (
+                                      <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-500 flex items-center gap-2" key={index} onClick={()=>handleOption(index, data)}>
+                                        {option.icon}
+                                        <span>{option.label}</span>
+                                      </p>
                                   ))}
                                 </motion.div>
                               )}

@@ -213,7 +213,9 @@ const NewQR = () => {
 
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">1</span> Select the QR type</h3>
-              <Select value={qrType} onChange={(e) => dispatch(activeTab(e.target.value))} className="w-full lg:w-2/3" required>
+              <Select value={qrType} className="w-full lg:w-2/3" required
+                onChange={(e) => dispatch(activeTab(e.target.value))}
+              >
                 {qrTypes.map((data, index) => (
                   <MenuItem value={data.key} key={index}>
                     <span className="flex items-center gap-2 text-pink-500">
