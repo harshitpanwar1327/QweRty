@@ -12,7 +12,7 @@ interface WifiLogicProps {
   setContent: Dispatch<SetStateAction<WifiContent>>;
 }
 
-const WifiLogic: React.FC<WifiLogicProps> = ({ content, setContent }) => {
+const WifiEditLogic: React.FC<WifiLogicProps> = ({ content, setContent }) => {
   const [wifiSsid, setWifiSsid] = useState<string>("");
   const [wifiPassword, setWifiPassword] = useState<string>("");
   const [wifiEncryption, setWifiEncryption] = useState<string>("");
@@ -22,16 +22,16 @@ const WifiLogic: React.FC<WifiLogicProps> = ({ content, setContent }) => {
   }, [wifiSsid, wifiPassword, wifiEncryption, setContent]);
 
   useEffect(() => {
-    if (!content?.wifiSsid) {
-      setWifiSsid('');
+    if (content?.wifiSsid && content.wifiSsid !== wifiSsid) {
+      setWifiSsid(content.wifiSsid);
     }
 
-    if (!content?.wifiPassword) {
-      setWifiPassword('');
+    if (content?.wifiPassword && content.wifiPassword !== wifiPassword) {
+      setWifiPassword(content.wifiPassword);
     }
 
-    if (!content?.wifiEncryption) {
-      setWifiEncryption('');
+    if (content?.wifiEncryption && content.wifiEncryption !== wifiEncryption) {
+      setWifiEncryption(content.wifiEncryption);
     }
   }, [content]);
 
@@ -79,4 +79,4 @@ const WifiLogic: React.FC<WifiLogicProps> = ({ content, setContent }) => {
   );
 };
 
-export default WifiLogic;
+export default WifiEditLogic;

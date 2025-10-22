@@ -41,7 +41,7 @@ export const scanAnalyticsLogic = async (id: number, clientIp: string | null, de
             const [analyticsData]: any = await pool.query(`SELECT COUNT(*) AS scans FROM qr_analytics WHERE qr_id = ?`, [id]);
 
             const alreadyScans = analyticsData[0].scans;
-            if(alreadyScans >= configuration.scan_limit) {
+            if(alreadyScans >=  configuration.scan_limit) {
                 await pool.query(`UPDATE qr_codes SET state = 'Finished' WHERE qr_id = ?;`, [id]);
 
                 return { success: false, message: 'QR code scan limit reached!', limitReached: true }

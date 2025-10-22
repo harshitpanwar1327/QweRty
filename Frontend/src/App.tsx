@@ -13,6 +13,7 @@ import MyQRs from './pages/portal/MyQRs.js'
 import NewQR from './pages/portal/NewQR.js'
 import Plans from './pages/portal/Plans.js'
 import Stats from './pages/portal/Stats.js'
+import EditQR from './pages/portal/EditQR.js'
 import ProtectedRoutes from './components/ProtectedRoutes.js'
 import ConfigPauseQR from './pages/qr/ConfigPauseQR.js'
 import ConfigTimeSchedule from './pages/qr/ConfigTimeSchedule.js'
@@ -45,6 +46,7 @@ function App() {
           <Route path='/new-qr' element={<NewQR />}/>
           <Route path='/plans' element={<Plans />}/>
           <Route path='/stats' element={<Stats />}/>
+          <Route path='/edit-qr/:id' element={<EditQR />}/>
         </Route>
 
         <Route path='*' element={<Navigate to='/' />}/>

@@ -18,7 +18,7 @@ interface LocationLogicProps {
   setContent: Dispatch<SetStateAction<LocationContent>>;
 }
 
-const LocationLogic: React.FC<LocationLogicProps> = ({ content, setContent }) => {
+const LocationEditLogic: React.FC<LocationLogicProps> = ({ content, setContent }) => {
   const locationTabs = ["Complete", "Coordinates"];
   const [locationTab, setLocationTab] = useState<string>("Complete");
 
@@ -37,38 +37,38 @@ const LocationLogic: React.FC<LocationLogicProps> = ({ content, setContent }) =>
   }, [locationTab, locationStreet, locationArea, locationPostalCode, locationCity, locationState, locationCountry, latitude, longitude, setContent]);
 
   useEffect(() => {
-      if (!content?.locationStreet) {
-        setLocationStreet('');
-      }
-  
-      if (!content?.locationArea) {
-        setLocationArea('');
-      }
-  
-      if (!content?.locationPostalCode) {
-        setLocationPostalCode('');
-      }
-  
-      if (!content?.locationCity) {
-        setLocationCity('');
-      }
-  
-      if (!content?.locationState) {
-        setLocationState('');
-      }
-  
-      if (!content?.locationCountry) {
-        setLocationCountry('');
-      }
-  
-      if (!content?.latitude) {
-        setLatitude('');
-      }
-  
-      if (!content?.longitude && content.longitude !== longitude) {
-        setLongitude('');
-      }
-    }, [content]);
+    if (content?.locationStreet && content.locationStreet !== locationStreet) {
+      setLocationStreet(content.locationStreet);
+    }
+
+    if (content?.locationArea && content.locationStreet !== locationArea) {
+      setLocationArea(content.locationArea);
+    }
+
+    if (content?.locationPostalCode && content.locationPostalCode !== locationPostalCode) {
+      setLocationPostalCode(content.locationPostalCode);
+    }
+
+    if (content?.locationCity && content.locationCity !== locationCity) {
+      setLocationCity(content.locationCity);
+    }
+
+    if (content?.locationState && content.locationState !== locationState) {
+      setLocationState(content.locationState);
+    }
+
+    if (content?.locationCountry && content.locationCountry !== locationCountry) {
+      setLocationCountry(content.locationCountry);
+    }
+
+    if (content?.latitude && content.latitude !== latitude) {
+      setLatitude(content.latitude);
+    }
+
+    if (content?.longitude && content.longitude !== longitude) {
+      setLongitude(content.longitude);
+    }
+  }, [content]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -155,4 +155,4 @@ const LocationLogic: React.FC<LocationLogicProps> = ({ content, setContent }) =>
   );
 };
 
-export default LocationLogic;
+export default LocationEditLogic;

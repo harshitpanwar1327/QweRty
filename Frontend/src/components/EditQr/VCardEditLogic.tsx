@@ -29,7 +29,7 @@ interface VCardLogicProps {
   setContent: Dispatch<SetStateAction<VCardContent>>;
 }
 
-const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
+const VCardEditLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
   const [openName, setOpenName] = useState<boolean>(false);
   const [openInfo, setOpenInfo] = useState<boolean>(false);
   const [openLocation, setOpenLocation] = useState<boolean>(false);
@@ -63,54 +63,54 @@ const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
   }, [firstName, lastName, phones, email, website, locationStreet, locationPostalCode, locationCity, locationState, locationCountry, company, title, setContent]);
 
   useEffect(() => {
-    if (!content?.firstName) {
-      setFirstName('');
+    if (content?.firstName && content.firstName !== firstName) {
+      setFirstName(content.firstName);
     }
 
-    if (!content?.lastName) {
-      setLastName('');
+    if (content?.lastName && content.lastName !== lastName) {
+      setLastName(content.lastName);
     }
 
-    if (!content?.phones) {
-      setPhones([]);
+    if (content?.phones && content.phones !== phones) {
+      setPhones(content.phones);
     }
 
-    if (!content?.email) {
-      setEmail('');
+    if (content?.email && content.email !== email) {
+      setEmail(content.email);
     }
 
-    if (!content?.website) {
-      setWebsite('');
+    if (content?.website && content.website !== website) {
+      setWebsite(content.website);
     }
 
-    if (!content?.locationStreet) {
-      setLocationStreet('');
+    if (content?.locationStreet && content.locationStreet !== locationStreet) {
+      setLocationStreet(content.locationStreet);
     }
 
-    if (!content?.locationPostalCode) {
-      setLocationPostalCode('');
+    if (content?.locationPostalCode && content.locationPostalCode !== locationPostalCode) {
+      setLocationPostalCode(content.locationPostalCode);
     }
 
-    if (!content?.locationCity) {
-      setLocationCity('');
+    if (content?.locationCity && content.locationCity !== locationCity) {
+      setLocationCity(content.locationCity);
     }
 
-    if (!content?.locationState) {
-      setLocationState('');
+    if (content?.locationState && content.locationState !== locationState) {
+      setLocationState(content.locationState);
     }
 
-    if (!content?.locationCountry) {
-      setLocationCountry('');
+    if (content?.locationCountry && content.locationCountry !== locationCountry) {
+      setLocationCountry(content.locationCountry);
     }
 
-    if (!content?.company) {
-      setCompany('');
+    if (content?.company && content.company !== company) {
+      setCompany(content.company);
     }
 
-    if (!content?.title) {
-      setTitle('');
+    if (content?.title && content.title !== title) {
+      setTitle(content.title);
     }
-  }, [content])
+  }, [content]);
 
   const handleAddPhone = () => {
     setPhones([...phones, { type: 'Mobile', number: '' }]);
@@ -341,4 +341,4 @@ const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
   );
 };
 
-export default VCardLogic;
+export default VCardEditLogic;

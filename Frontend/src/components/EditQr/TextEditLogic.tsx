@@ -10,7 +10,7 @@ interface TextLogicProps {
   setContent: Dispatch<SetStateAction<TextContent>>;
 }
 
-const TextLogic: React.FC<TextLogicProps> = ({ content, setContent }) => {
+const TextEditLogic: React.FC<TextLogicProps> = ({ content, setContent }) => {
   const [textContent, setTextContent] = useState<string>("");
   
   useEffect(() => {
@@ -18,10 +18,10 @@ const TextLogic: React.FC<TextLogicProps> = ({ content, setContent }) => {
   }, [textContent, setContent]);
 
   useEffect(() => {
-      if (!content?.textContent) {
-        setTextContent('');
-      }
-    }, [content]);
+    if (content?.textContent && content.textContent !== textContent) {
+      setTextContent(content.textContent);
+    }
+  }, [content]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -42,4 +42,4 @@ const TextLogic: React.FC<TextLogicProps> = ({ content, setContent }) => {
   );
 };
 
-export default TextLogic;
+export default TextEditLogic;

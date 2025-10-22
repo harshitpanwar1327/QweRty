@@ -14,6 +14,7 @@ import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, Mo
 import Swal from 'sweetalert2'
 import DownloadQR from '../../modals/DownloadQR'
 import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
 
 interface QRData {
   qr_id: number;
@@ -104,6 +105,8 @@ const MyQRs = () => {
 
   const sortByRef = useRef<HTMLDivElement>(null);
   const activeOptionRef = useRef<HTMLDivElement>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -259,8 +262,7 @@ const MyQRs = () => {
   };
 
   const handleEdit = async (data: QRData) => {
-    console.log(data);
-    toast.info('This feature is coming soon.');
+    navigate(`/edit-qr/${data.qr_id}`);
   }
 
   const getSelectedStatus = () => {

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { QrModels } from '../models/QrCodesModels.js';
-import { getQrLogic, postStaticQrLogic, postDynamicQrLogic, updateQrLogic, updateStatusLogic, deleteQrLogic } from '../services/QrCodesServices.js';
+import { getQrDetailsLogic, getQrLogic, postStaticQrLogic, postDynamicQrLogic, updateQrLogic, updateStatusLogic, deleteQrLogic } from '../services/QrCodesServices.js';
 
 interface QrReqBody {
     user_id?: string; 
@@ -10,6 +10,22 @@ interface QrReqBody {
     content: object;
     design: object;
     configuration?: object;
+}
+
+export const getQrDetails = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    
+    try {
+        let response = await getQrDetailsLogic(Number(id));
+        if(response.success){
+            return res.status(200).json(response);
+        }else{
+            return res.status(400).json(response);
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({success: false, message: "Internal Server Error!"});
+    }
 }
 
 export const getQr = async (req: Request, res: Response) => {
@@ -83,13 +99,13 @@ export const postDynamicQr = async (req: Request<{}, {}, QrReqBody>, res: Respon
 }
 
 export const updateQr = async (req: Request<{}, {}, QrReqBody>, res: Response) => {
-    const {qr_id, name, qr_type, content, design, configuration } = req.body;
+    const {qr_id, name, qr_type, content, configuration } = req.body;
 
     if(!qr_id || !name || !qr_type || !content){
         return res.status(400).json({success: false, message: "Fill all the required fields!"});
     }
 
-    const QrData = new QrModels({qr_id, name, qr_type, content, design, configuration});
+    const QrData = new QrModels({qr_id, name, qr_type, content, configuration});
     
     try {
         let response = await updateQrLogic(QrData);

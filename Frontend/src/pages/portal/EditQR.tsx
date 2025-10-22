@@ -1,27 +1,32 @@
-import { useState, type FormEvent, type ReactNode } from "react"
+import { useState, useEffect, type FormEvent, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
-import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, Loop, PlayArrowRounded } from "@mui/icons-material"
-// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, People, Feedback, Badge } from "@mui/icons-material"
+import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, PlayArrowRounded, ArrowBack } from "@mui/icons-material"
 import { Select, MenuItem } from "@mui/material"
-import { ArrowRight, Download } from "lucide-react"
-import SampleQr from '../../assets/SampleQR.png'
 import API from "../../util/API"
 import axios from "axios"
 import { toast } from "react-toastify"
 import { HashLoader } from "react-spinners"
-import DownloadQR from "../../modals/DownloadQR"
 import type { AppDispatch, RootState } from '../../app/Store.js'
 import { useSelector, useDispatch } from 'react-redux'
 import { activeTab } from "../../features/qrType/QrTypeSlice.js"
 import { motion, AnimatePresence } from 'framer-motion'
-import WebsiteLogic from "../../components/NewQr/WebsiteLogic.js"
-import TextLogic from "../../components/NewQr/TextLogic.js"
-import WhatsappLogic from "../../components/NewQr/WhatsappLogic.js"
-import EmailLogic from "../../components/NewQr/EmailLogic.js"
-import WifiLogic from "../../components/NewQr/WifiLogic.js"
-import LocationLogic from "../../components/NewQr/LocationLogic.js"
-import VCardLogic from "../../components/NewQr/VCardLogic.js"
+import { NavLink, useParams, useNavigate } from "react-router-dom"
+import WebsiteEditLogic from "../../components/EditQr/WebsiteEditLogic.js"
+import TextEditLogic from "../../components/EditQr/TextEditLogic.js"
+import WhatsappEditLogic from "../../components/EditQr/WhatsappEditLogic.js"
+import EmailEditLogic from "../../components/EditQr/EmailEditLogic.js"
+import WifiEditLogic from "../../components/EditQr/WifiEditLogic.js"
+import LocationEditLogic from "../../components/EditQr/LocationEditLogic.js"
+import VCardEditLogic from "../../components/EditQr/VCardEditLogic.js"
+import EmailImage from '../../assets/hero/Email.png'
+import LocationImage from '../../assets/hero/Location.png'
+import TextImage from '../../assets/hero/Text.png'
+import vCardImage from '../../assets/hero/vCard.png'
+import WebsiteImage from '../../assets/hero/Website.png'
+import WhatsappImage from '../../assets/hero/Whatsapp.png'
+import WifiImage from '../../assets/hero/Wifi.png'
+import { ArrowRight } from "lucide-react"
 
 interface QRTypeArray {
   key: string,
@@ -48,33 +53,23 @@ const qrTypes: QRTypeArray[] = [
   // { key: "vcardplus", icon: <Badge fontSize="medium" />, label: "vCard Plus" },
 ];
 
-const designTabsArray: string[] = ["Shape", "Level"];
+const qrTypeImages: Record<string, string> = {
+  website: WebsiteImage,
+  text: TextImage,
+  whatsapp: WhatsappImage,
+  email: EmailImage,
+  wifi: WifiImage,
+  location: LocationImage,
+  vcard: vCardImage,
+};
 
-interface levelObject {
-  key: string,
-  label: string,
-  percentage: number
-}
-
-const levelTabsArray: levelObject[] = [
-  { key: 'Q', label: 'Level Q', percentage: 25 },
-  { key: 'H', label: 'Level H', percentage: 30 },
-  { key: 'M', label: 'Level M', percentage: 15 },
-  { key: 'L', label: 'Level L', percentage: 7 }
-]
-
-const NewQR = () => {
-  const uid = sessionStorage.getItem('userId') || '';
+const EditQR = () => {
+  const { id } = useParams();
 
   const qrType = useSelector((state: RootState) => state.qrType.type);
   const dispatch = useDispatch<AppDispatch>();
 
   const [qrName, setQrName] = useState<string>('');
-
-  const [designTab, setDesignTab] = useState<string>('Shape');
-  const [foregroundColor, setForegroundColor] = useState<string>('#000000');
-  const [backgroundColor, setBackgroundColor] = useState<string>('#ffffff');
-  const [errorCorrectionLevel, setErrorCorrectionLevel] = useState<string>('Q');
 
   const [openTimeScheduling, setOpenTimeScheduling] = useState<boolean>(false);
   const [openScanLimit, setOpenScanLimit] = useState<boolean>(false);
@@ -86,96 +81,89 @@ const NewQR = () => {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
 
-  const [qrPreview, setQrPreview] = useState<string>("");
-  const [openDownloadModal, setOpenDownload] = useState<boolean>(false);
-
   const [content, setContent] = useState({});
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleGenerateQr = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const navigate = useNavigate();
 
-    if(password!==confirmPassword) {
-      toast.error('Password and confirm password not match!');
-      return;
+  const fetchQrDetails = async () => {
+    try {
+      setLoading(true);
+      const response = await API.get(`/qr-details/${id}`);
+      const qrDetails = response.data.data[0];
+      dispatch(activeTab(qrDetails?.qr_type ?? 'website'));
+      setQrName(qrDetails?.name);
+      setContent(qrDetails?.content);
+      setFromDate(qrDetails?.configuration?.from_date);
+      setToDate(qrDetails?.configuration?.to_date);
+      setScanLimit(qrDetails?.configuration?.scan_limit);
+      setPassword(qrDetails?.configuration?.password);
+      setConfirmPassword(qrDetails?.configuration?.password);
+      setLoading(false);
+      console.log(qrDetails);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.data?.message || error);
+      } else {
+        console.log("QR generation failed!");
+      }
     }
+  }
+
+  useEffect(()=>{
+    fetchQrDetails();
+  }, [])
+
+  const handleEditQr = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
     try {
       setLoading(true);
-      const qrPayload = {
-        user_id: uid,
+      await API.put('/qr', {
+        qr_id: id,
         name: qrName,
         qr_type: qrType,
         content,
-        design: {
-          color: {
-            foregroundColor,
-            backgroundColor,
-          },
-          errorCorrectionLevel
-        },
         configuration: {
           from_date: fromDate,
           to_date: toDate,
           scan_limit: scanLimit,
           password,
         }
-      };
-
-      if(["text", "wifi", "vcard"].includes(qrType)) {
-        const response = await API.post("/static-qr", qrPayload);
-        setQrPreview(response.data.qr_image);
-      } else {
-        const response = await API.post("/dynamic-qr", qrPayload);
-        setQrPreview(response.data.qr_image);
-      }
-      
-      setQrName('');
-      setContent({});
-      setDesignTab('Shape');
-      setForegroundColor('#000000');
-      setBackgroundColor('#FFFFFF');
-      setErrorCorrectionLevel('Q');
-      setFromDate('');
-      setToDate('');
-      setScanLimit(null);
-      setPassword('');
-      setConfirmPassword('');
-      toast.success("QR generated successfully.");
+      });
+      navigate('/my-qr');
+      toast.success("QR updated succesfully.");
       setLoading(false);
-    } catch (error: unknown) {
+    } catch (error) {
       setLoading(false);
       console.log(error);
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || error);
       } else {
-        toast.error("QR generation failed!");
+        toast.error("QR update failed!");
       }
     }
-  };
-
-  const handleInvert = () => {
-    setBackgroundColor(foregroundColor);
-    setForegroundColor(backgroundColor);
   }
 
   const renderQRContent = () => {
     switch (qrType) {
       case "website":
-        return <WebsiteLogic content={content} setContent={setContent} />;
+        return <WebsiteEditLogic content={content} setContent={setContent} />;
       case "text":
-        return <TextLogic content={content} setContent={setContent} />;
+        return <TextEditLogic content={content} setContent={setContent} />;
       case "whatsapp":
-        return <WhatsappLogic content={content} setContent={setContent} />;
+        return <WhatsappEditLogic content={content} setContent={setContent} />;
       case "email":
-        return <EmailLogic content={content} setContent={setContent} />;
+        return <EmailEditLogic content={content} setContent={setContent} />;
       case "wifi":
-        return <WifiLogic content={content} setContent={setContent} />;
+        return <WifiEditLogic content={content} setContent={setContent} />;
       case "location":
-        return <LocationLogic content={content} setContent={setContent} />;
+        return <LocationEditLogic content={content} setContent={setContent} />;
       case "vcard":
-        return <VCardLogic content={content} setContent={setContent} />;
+        return <VCardEditLogic content={content} setContent={setContent} />;
       default:
         return null;
     }
@@ -192,9 +180,9 @@ const NewQR = () => {
       <NavigationBar />
 
       <div className="grow flex flex-col gap-2 p-2 overflow-auto">
-        <Menubar heading='New QR'/>
+        <Menubar heading='Edit QR'/>
 
-        <form className="grow bg-white rounded-md overflow-y-auto flex flex-col md:flex-row gap-8 p-2" onSubmit={handleGenerateQr}>
+        <form className="grow bg-white rounded-md overflow-y-auto flex flex-col md:flex-row gap-8 p-2" onSubmit={handleEditQr}>
           <div className="w-full md:w-2/3 flex flex-col gap-8 md:p-6 md:overflow-y-auto">
             <AnimatePresence>
               {["text", "wifi", "vcard"].includes(qrType) && (
@@ -210,6 +198,8 @@ const NewQR = () => {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            <NavLink to={'/my-qr'} className="flex items-center gap-1 !underline"><ArrowBack sx={{fontSize: '16px'}}/>Back</NavLink>
 
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">1</span> Select the QR type</h3>
@@ -241,48 +231,12 @@ const NewQR = () => {
               {renderQRContent()}
             </div>
 
-            <hr className="text-gray-300"/>
-
-            <div className="flex flex-col gap-4">
-              <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">4</span> Design your QR</h3>
-              <div className="grid grid-cols-4 gap-2">
-                {designTabsArray.map((tab, index) => (
-                  <button type="button" key={index} onClick={()=>setDesignTab(tab)} className={`py-3 text-sm rounded-md ${designTab === tab ? "text-pink-500 bg-pink-100" : "text-gray-600 hover:text-pink-500 hover:bg-pink-100"} transition duration-300`}>{tab}</button>
-                ))}
-              </div>
-
-              {designTab==='Shape' &&
-                <div className="flex justify-between items-end bg-gray-100 p-4 rounded-md">
-                  <div className="flex gap-4">
-                    <div className="flex flex-col gap-2">
-                      <label className="text-sm font-semibold">Foreground Color</label>
-                      <input type="color" name="foreground" id="foreground" value={foregroundColor} onChange={(e)=>setForegroundColor(e.target.value)} />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <label className="text-sm font-semibold">Background Color</label>
-                      <input type="color" name="background" id="background" value={backgroundColor} onChange={(e)=>setBackgroundColor(e.target.value)} />
-                    </div>
-                  </div>
-
-                  <button type="button" className="text-sm font-semibold text-blue-500 hover:text-blue-600 border border-gray-300 px-2 rounded-full" onClick={handleInvert}><Loop sx={{fontSize: '14px'}} /> Invert</button>
-                </div>
-              }
-
-              {designTab==='Level' &&
-                <div className="flex flex-wrap gap-5 p-4 bg-gray-100 rounded-md">
-                  {levelTabsArray.map((level, index)=>(
-                    <p className={`text-sm font-semibold flex items-center gap-3 cursor-pointer ${errorCorrectionLevel===level.key? 'text-pink-500': ''} transition duration-300`} key={index} onClick={()=>setErrorCorrectionLevel(level.key)}>{level.label} <span className={`text-gray-500 border p-2 rounded-md ${errorCorrectionLevel===level.key? 'text-pink-500 border-pink-500': 'border-gray-200'} transition duration-300`}>{level.percentage}%</span></p>
-                  ))}
-                </div>
-              }
-            </div>
-
             {!['text', 'wifi', 'vcard'].includes(qrType) &&
               <>
                 <hr className="text-gray-300"/>
 
                 <div className="flex flex-col gap-4">
-                  <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">5</span> Customize your QR</h3>
+                  <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">4</span> Customize your QR</h3>
                   <div>
                     <div className="w-full p-3 flex items-center gap-2 cursor-pointer hover:bg-gray-100" onClick={() => setOpenTimeScheduling(!openTimeScheduling)}>
                       <PlayArrowRounded sx={{ fontSize: "16px", color: "gray" }} className={`!transition duration-300 ${openTimeScheduling ? "rotate-90" : "rotate-0"}`} /> Time Scheduling
@@ -348,29 +302,30 @@ const NewQR = () => {
                 </div>
               </>
             }
+
+            <button type="submit" className="self-start flex items-center bg-black p-1 rounded-full hover:bg-black/85 group">
+              <p className='text-sm text-white px-3'>Update QR</p>
+              <ArrowRight size={32} className='bg-white rounded-full p-2 -rotate-45 group-hover:rotate-0 transition duration-300 ease-in-out'/>
+            </button>
           </div>
 
-          <div className="w-full md:w-1/3 rounded-md p-8 flex flex-col items-center gap-4 bg-gray-100">
-              <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">{['text', 'wifi', 'vcard'].includes(qrType)? 5: 6}</span> Generate QR</h3>
-              <img src={qrPreview || SampleQr} className="w-full bg-white rounded-lg shadow-lg p-2" alt='Qr' />
-              <button type="submit" className="flex items-center bg-black p-1 rounded-full hover:bg-black/85 group">
-                <p className='text-sm text-white px-3'>Generate QR</p>
-                <ArrowRight size={32} className='bg-white rounded-full p-2 -rotate-45 group-hover:rotate-0 transition duration-300 ease-in-out'/>
-              </button>
-              {qrPreview &&
-                <button type="button" onClick={()=>setOpenDownload(true)} className="flex items-center bg-blue-500 p-1 rounded-full hover:bg-blue-700 group">
-                  <p className='text-sm text-white px-3'>Download QR</p>
-                  <Download size={32} className='bg-white rounded-full p-2 rotate-0 group-hover:rotate-180 transition duration-300 ease-in-out'/>
-                </button>
-              }
+          <div className="w-full md:w-1/3 flex items-center justify-center">
+            {qrType && (
+              <motion.img
+                key={qrType}
+                src={qrTypeImages[qrType] || WebsiteImage}
+                alt={qrType}
+                className="max-w-full max-h-[600px] object-contain"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+              />
+            )}
           </div>
         </form>
       </div>
-      <AnimatePresence>
-        {openDownloadModal && <DownloadQR setOpenDownloadModal={setOpenDownload} qrPreview={qrPreview} qrName={qrName} />}
-      </AnimatePresence>
     </div>
   )
 }
 
-export default NewQR
+export default EditQR

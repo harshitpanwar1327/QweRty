@@ -10,16 +10,16 @@ interface EmailLogicProps {
   setContent: Dispatch<SetStateAction<EmailContent>>;
 }
 
-const EmailLogic: React.FC<EmailLogicProps> = ({ content, setContent }) => {
+const EmailEditLogic: React.FC<EmailLogicProps> = ({ content, setContent }) => {
   const [emailContent, setEmailContent] = useState<string>("");
-
+  
   useEffect(() => {
     setContent({ emailContent });
   }, [emailContent, setContent]);
 
   useEffect(() => {
-    if (!content?.emailContent) {
-      setEmailContent('');
+    if (content?.emailContent && content.emailContent !== emailContent) {
+      setEmailContent(content.emailContent);
     }
   }, [content]);
 
@@ -35,7 +35,7 @@ const EmailLogic: React.FC<EmailLogicProps> = ({ content, setContent }) => {
         required
       />
     </div>
-  );
-};
+  )
+}
 
-export default EmailLogic;
+export default EmailEditLogic

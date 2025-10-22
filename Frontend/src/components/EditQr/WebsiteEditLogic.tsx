@@ -10,7 +10,7 @@ interface WebsiteLogicProps {
   setContent: Dispatch<SetStateAction<WebsiteContent>>;
 }
 
-const WebsiteLogic: React.FC<WebsiteLogicProps> = ({ content, setContent }) => {
+const WebsiteEditLogic: React.FC<WebsiteLogicProps> = ({ content, setContent }) => {
   const [websiteContent, setWebsiteContent] = useState<string>("");
 
   useEffect(() => {
@@ -18,8 +18,8 @@ const WebsiteLogic: React.FC<WebsiteLogicProps> = ({ content, setContent }) => {
   }, [websiteContent, setContent]);
 
   useEffect(() => {
-    if (!content?.websiteContent) {
-      setWebsiteContent('');
+    if (content?.websiteContent && content.websiteContent !== websiteContent) {
+      setWebsiteContent(content.websiteContent);
     }
   }, [content]);
 
@@ -38,4 +38,4 @@ const WebsiteLogic: React.FC<WebsiteLogicProps> = ({ content, setContent }) => {
   );
 };
 
-export default WebsiteLogic;
+export default WebsiteEditLogic;

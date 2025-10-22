@@ -11,7 +11,7 @@ interface WhatsappLogicProps {
   setContent: Dispatch<SetStateAction<WhatsappContent>>;
 }
 
-const WhatsappLogic: React.FC<WhatsappLogicProps> = ({ content, setContent }) => {
+const WhatsappEditLogic: React.FC<WhatsappLogicProps> = ({ content, setContent }) => {
   const [whatsappNumber, setWhatsappNumber] = useState<string>("");
   const [whatsappMessage, setWhatsappMessage] = useState<string>("");
     
@@ -20,12 +20,12 @@ const WhatsappLogic: React.FC<WhatsappLogicProps> = ({ content, setContent }) =>
   }, [whatsappNumber, whatsappMessage, setContent]);
 
   useEffect(() => {
-    if (!content?.whatsappNumber) {
-      setWhatsappNumber('');
+    if (content?.whatsappNumber && content.whatsappNumber !== whatsappNumber) {
+      setWhatsappNumber(content.whatsappNumber);
     }
 
-    if (!content?.whatsappMessage) {
-      setWhatsappMessage('');
+    if (content?.whatsappMessage && content.whatsappMessage !== whatsappMessage) {
+      setWhatsappMessage(content.whatsappMessage);
     }
   }, [content]);
   
@@ -61,4 +61,4 @@ const WhatsappLogic: React.FC<WhatsappLogicProps> = ({ content, setContent }) =>
   );
 };
 
-export default WhatsappLogic;
+export default WhatsappEditLogic;

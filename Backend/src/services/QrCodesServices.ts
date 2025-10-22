@@ -6,6 +6,17 @@ interface FilterData {
     selectedType: string[]
 }
 
+export const getQrDetailsLogic = async (id: number) => {
+    try {
+        const [rows] = await pool.query(`SELECT * FROM qr_codes WHERE qr_id = ?`, [id]);
+
+        return { success: true, data: rows };
+    } catch (error) {
+        console.error("Get QR details:", error);
+        return { success: false, message: "Failed to fetch QR details!" };
+    }
+}
+
 export const getQrLogic = async (search: string, sortBy: string, filterData: FilterData , uid: string, limit: number, offset: number) => {
     try {
         const searchQuery = `%${search}%`;
@@ -218,16 +229,14 @@ export const postDynamicQrLogic = async (newQrData: any) => {
 
 export const updateQrLogic = async (qrData: any) => {
     try {
-        let query = '';
-        let values: any = [];
-
-        if(['text', 'wifi', 'vcard'].includes(qrData.qr_type)) {
-            query = `UPDATE qr_codes SET name=?, qr_type=?, content=?, design=? WHERE qr_id = ?;`;
-            values = [qrData.name, qrData.qr_type, qrData.content, qrData.design, qrData.qr_id];
-        } else {
-            query = `UPDATE qr_codes SET name=?, qr_type=?, content=?, design=?, from_date=?, to_date=?, scan_limit=?, password=?, state=? WHERE qr_id = ?;`;
-            values = [qrData.name, qrData.qr_type, qrData.content, qrData.design, qrData.from_date, qrData.to_date, qrData.scan_limit, qrData.password, qrData.state, qrData.qr_id];
-        }
+        const query = `UPDATE qr_codes SET name=?, qr_type=?, content=?, configuration=? WHERE qr_id = ?;`;
+        const values = [
+            qrData.name,
+            qrData.qr_type,
+            JSON.stringify(qrData.content),
+            JSON.stringify(qrData.configuration),
+            qrData.qr_id
+        ];
 
         await pool.query(query, values);
 
