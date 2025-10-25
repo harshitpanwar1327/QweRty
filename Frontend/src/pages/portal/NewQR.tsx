@@ -2,7 +2,7 @@ import { useState, type FormEvent, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
 import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, Loop, PlayArrowRounded } from "@mui/icons-material"
-// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, People, Feedback, Badge } from "@mui/icons-material"
+// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, Feedback, Badge, People } from "@mui/icons-material"
 import { Select, MenuItem } from "@mui/material"
 import { ArrowRight, Download } from "lucide-react"
 import SampleQr from '../../assets/SampleQR.png'
@@ -22,6 +22,7 @@ import EmailLogic from "../../components/NewQr/EmailLogic.js"
 import WifiLogic from "../../components/NewQr/WifiLogic.js"
 import LocationLogic from "../../components/NewQr/LocationLogic.js"
 import VCardLogic from "../../components/NewQr/VCardLogic.js"
+import SocialMediaLogic from "../../components/NewQr/SocialMediaLogic.js"
 
 interface QRTypeArray {
   key: string,
@@ -176,6 +177,8 @@ const NewQR = () => {
         return <LocationLogic content={content} setContent={setContent} />;
       case "vcard":
         return <VCardLogic content={content} setContent={setContent} />;
+      case "social":
+        return <SocialMediaLogic content={content} setContent={setContent} />
       default:
         return null;
     }

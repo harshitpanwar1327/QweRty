@@ -110,7 +110,7 @@ const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
     if (!content?.title) {
       setTitle('');
     }
-  }, [content])
+  }, [content]);
 
   const handleAddPhone = () => {
     setPhones([...phones, { type: 'Mobile', number: '' }]);
