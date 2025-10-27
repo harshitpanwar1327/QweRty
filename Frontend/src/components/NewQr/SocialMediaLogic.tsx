@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import type { Dispatch, SetStateAction } from "react"
-import { InfoOutline, SpaceDashboard, KeyboardArrowRightRounded, PlayArrowRounded } from '@mui/icons-material'
+import { InfoOutline, SpaceDashboard, KeyboardArrowRightRounded, PlayArrowRounded, DeleteRounded } from '@mui/icons-material'
 import { motion, AnimatePresence } from 'framer-motion'
 import { styled } from '@mui/material/styles'
 import Button from '@mui/material/Button'
@@ -25,12 +25,17 @@ import Whatsapp from '../../assets/socialMedia/WhatApp.png'
 import X from '../../assets/socialMedia/X.png'
 import YouTube from '../../assets/socialMedia/YouTube.png'
 
-interface SocialMediaContent {
-  logo?: File,
-  title?: string,
+interface Contact {
   telephone?: string,
   email?: string,
   website?: string
+}
+
+interface SocialMediaContent {
+  logo?: File | null,
+  title?: string,
+  socialLinks?: Record<string, string>,
+  contact?: Contact
 }
 
 interface SocialMediaProps {
@@ -50,7 +55,12 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-const socialPlatforms = [
+interface SocialPlatforms {
+  icon: string,
+  label: string
+}
+
+const socialPlatforms: SocialPlatforms[] = [
   { icon: Behance, label: "Behance" },
   { icon: Discord, label: "Discord" },
   { icon: Dribbble, label: "Dribbble" },
@@ -79,12 +89,12 @@ const SocialMediaLogic: React.FC<SocialMediaProps> = ({ content, setContent}) =>
   const [openContact, setOpenContact] = useState<boolean>(false);
 
   // Basic Information
-  // const [logo, setLogo] = useState<File | null>(null);
+  const [logo, setLogo] = useState<File | null>(null);
   const [title, setTitle] = useState<string>();
 
   // Social Networks
-  // const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
-  // const [socialLinks, setSocialLinks] = useState<Record<string, string>>({});
+  const [selectedPlatforms, setSelectedPlatforms] = useState<SocialPlatforms[]>([]);
+  const [socialLinks, setSocialLinks] = useState<Record<string, string>>({});
 
   // Contact info
   const [telephone, setTelephone] = useState<string>('');
@@ -92,14 +102,30 @@ const SocialMediaLogic: React.FC<SocialMediaProps> = ({ content, setContent}) =>
   const [website, setWebsite] = useState<string>('');
 
   useEffect(() => {
-    setContent({ telephone, email, website });
-  }, [telephone, email, website, setContent]);
+    setContent({ 
+      logo,
+      title,
+      socialLinks,
+      contact: {
+        telephone,
+        email,
+        website
+      }
+     });
+  }, [logo, title, socialLinks, telephone, email, website, setContent]);
   
   useEffect(() => {
-    if (!content?.telephone) setTelephone('')
-    if (!content?.email) setEmail('')
-    if (!content?.website) setWebsite('')
+    if (!content?.logo) setLogo(null);
+    if (!content?.title) setTitle('');
+    if (!content?.socialLinks) setSocialLinks({});
+    if (!content?.contact?.telephone) setTelephone('')
+    if (!content?.contact?.email) setEmail('')
+    if (!content?.contact?.website) setWebsite('')
   }, [content]);
+
+  const handleInputChange = (platformName: string, value: string) => {
+    setSocialLinks(prev => ({ ...prev, [platformName]: value }));
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -128,10 +154,10 @@ const SocialMediaLogic: React.FC<SocialMediaProps> = ({ content, setContent}) =>
             >
               <Button component="label" role={undefined} variant="contained" tabIndex={-1} startIcon={<CloudUploadIcon />} className="self-start !mt-6">
                 Upload files
-                <VisuallyHiddenInput type="file" onChange={(event) => console.log(event.target.files)} multiple required />
+                <VisuallyHiddenInput type="file" accept="image/*" onChange={(e) => setLogo(e.target.files?.[0] || null)} required />
               </Button>
-              <div className="flex flex-col gap-2">
-                <label>Title</label>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-semibold text-gray-500">Title</label>
                 <input type="text" placeholder="E.g. Company name" value={title} onChange={(e)=>setTitle(e.target.value)} className="p-2 border border-gray-300 rounded" required />
               </div>
             </motion.div>
@@ -175,12 +201,24 @@ const SocialMediaLogic: React.FC<SocialMediaProps> = ({ content, setContent}) =>
                     transition={{duration: 0.5}}
                   >
                     <div className="flex flex-wrap gap-2 m-3 p-3 border border-gray-200 rounded-md">
-                      {socialPlatforms.map((platform) => (
-                        <div className="flex p-1 border border-gray-200 rounded cursor-pointer">
+                      {socialPlatforms.map((platform: SocialPlatforms) => (
+                        <div className="flex p-1 border border-gray-200 rounded cursor-pointer" key={platform.label} onClick={() => setSelectedPlatforms(prev => [...prev, platform])}>
                           <img src={platform.icon} alt="icon" className="w-6 h-6" />
                         </div>
                       ))}
                     </div>
+
+                    {selectedPlatforms.length > 0 &&
+                      <div className="flex flex-col gap-2 p-3">
+                        {selectedPlatforms.map((platform: SocialPlatforms, index) => (
+                          <div className="flex items-center gap-2 p-3 rounded-md bg-gray-100" key={index}>
+                            <img src={platform.icon} alt="icon" className="w-8 h-8" />
+                            <input type="text" placeholder="Enter your url or userId" className="w-full p-2 border border-gray-300 rounded" value={socialLinks[platform.label] || ''} onChange={(e) => handleInputChange(platform.label, e.target.value)} />
+                            <DeleteRounded className="cursor-pointer text-blue-500 hover:text-blue-700" onClick={()=>setSelectedPlatforms(selectedPlatforms.filter((__, i) => i!==index))}/>
+                          </div>
+                        ))}
+                      </div>
+                    }
                   </motion.div>
                 }
               </AnimatePresence>
@@ -198,16 +236,16 @@ const SocialMediaLogic: React.FC<SocialMediaProps> = ({ content, setContent}) =>
                     transition={{duration: 0.5}}
                   >
                     <div className="flex flex-col gap-4 p-3">
-                      <div className="flex flex-col gap-2">
-                        <label>Telephone</label>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-sm font-semibold text-gray-500">Telephone</label>
                         <input type="text" placeholder="E.g. +91 9876543210" value={telephone} onChange={(e)=>setTelephone(e.target.value)} className="p-2 border border-gray-300 rounded" />
                       </div>
-                      <div className="flex flex-col gap-2">
-                        <label>Email</label>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-sm font-semibold text-gray-500">Email</label>
                         <input type="text" placeholder="E.g. example@gmail.com" value={email} onChange={(e)=>setEmail(e.target.value)} className="p-2 border border-gray-300 rounded" />
                       </div>
-                      <div className="flex flex-col gap-2">
-                        <label>Website</label>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-sm font-semibold text-gray-500">Website</label>
                         <input type="text" placeholder="E.g. www.example.com" value={website} onChange={(e)=>setWebsite(e.target.value)} className="p-2 border border-gray-300 rounded" />
                       </div>
                     </div>

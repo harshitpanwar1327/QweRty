@@ -23,7 +23,6 @@ const WhatsappEditLogic: React.FC<WhatsappLogicProps> = ({ content, setContent }
     if (content?.whatsappNumber && content.whatsappNumber !== whatsappNumber) {
       setWhatsappNumber(content.whatsappNumber);
     }
-
     if (content?.whatsappMessage && content.whatsappMessage !== whatsappMessage) {
       setWhatsappMessage(content.whatsappMessage);
     }
@@ -31,8 +30,8 @@ const WhatsappEditLogic: React.FC<WhatsappLogicProps> = ({ content, setContent }
   
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
-        <label>Number</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-semibold text-gray-500">Number</label>
         <input
           type="text"
           placeholder="E.g. +919876543210"
@@ -43,8 +42,8 @@ const WhatsappEditLogic: React.FC<WhatsappLogicProps> = ({ content, setContent }
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label>Message</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-semibold text-gray-500">Message</label>
         <textarea
           placeholder="Enter a by default message..."
           rows={5}

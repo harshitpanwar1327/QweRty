@@ -20,19 +20,14 @@ const WhatsappLogic: React.FC<WhatsappLogicProps> = ({ content, setContent }) =>
   }, [whatsappNumber, whatsappMessage, setContent]);
 
   useEffect(() => {
-    if (!content?.whatsappNumber) {
-      setWhatsappNumber('');
-    }
-
-    if (!content?.whatsappMessage) {
-      setWhatsappMessage('');
-    }
+    if (!content?.whatsappNumber) setWhatsappNumber('');
+    if (!content?.whatsappMessage) setWhatsappMessage('');
   }, [content]);
   
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
-        <label>Number</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-semibold text-gray-500">Number</label>
         <input
           type="text"
           placeholder="E.g. +919876543210"
@@ -43,8 +38,8 @@ const WhatsappLogic: React.FC<WhatsappLogicProps> = ({ content, setContent }) =>
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label>Message</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-semibold text-gray-500">Message</label>
         <textarea
           placeholder="Enter a by default message..."
           rows={5}

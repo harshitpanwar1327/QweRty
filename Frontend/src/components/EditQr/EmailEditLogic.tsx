@@ -24,8 +24,8 @@ const EmailEditLogic: React.FC<EmailLogicProps> = ({ content, setContent }) => {
   }, [content]);
 
   return (
-    <div className="flex flex-col gap-2">
-      <label>Email</label>
+    <div className="flex flex-col gap-1">
+      <label className="text-sm font-semibold text-gray-500">Email</label>
       <input
         type="email"
         placeholder="E.g. myemail@gmail.com"

@@ -177,13 +177,20 @@ export const postDynamicQrLogic = async (newQrData: any) => {
                 }
                 break;
 
+            case "social":
+                actualPayload = JSON.stringify({
+                    socialLinks: newQrData.content.socialLinks || [],
+                    contact: newQrData.content.contact || {}
+                });
+                break;
+
             default:
                 throw new Error("Invalid QR type");
         }
 
-        const [rows]: any = await pool.query(`SELECT name FROM qr_codes WHERE user_id = ?`, [newQrData.user_id]);
-        const isDuplicate = rows.some((data: any) => data.name.trim() === newQrData.name.trim());
+        const [rows]: any = await pool.query(`SELECT name FROM qr_codes WHERE user_id = ?;`, [newQrData.user_id]);
 
+        const isDuplicate = rows.some((data: any) => data.name.trim() === newQrData.name.trim());
         if (isDuplicate) {
             return { success: false, message: 'QR name must be unique!' };
         }
@@ -229,12 +236,13 @@ export const postDynamicQrLogic = async (newQrData: any) => {
 
 export const updateQrLogic = async (qrData: any) => {
     try {
-        const query = `UPDATE qr_codes SET name=?, qr_type=?, content=?, configuration=? WHERE qr_id = ?;`;
+        const query = `UPDATE qr_codes SET name=?, qr_type=?, content=?, configuration=?, state=? WHERE qr_id = ?;`;
         const values = [
             qrData.name,
             qrData.qr_type,
             JSON.stringify(qrData.content),
             JSON.stringify(qrData.configuration),
+            "Active",
             qrData.qr_id
         ];
 

@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <div className="bg-[radial-gradient(circle_at_center,_#330e2f_0%,_#1e0b1f_100%)] text-white py-8 px-4 md:px-12 lg:px-20 flex justify-between gap-10">
+    <div className="bg-[radial-gradient(circle_at_center,_#330e2f_0%,_#1e0b1f_100%)] text-white py-8 px-4 md:px-12 lg:px-20 mt-8 flex justify-between gap-10">
       <div className="w-full lg:w-2/3">
         <div className="flex flex-col md:flex-row gap-4 pb-8">
           <div className="self-start flex items-center justify-center py-2 px-3 bg-pink-500 text-white rounded-md text-lg font-bold">QR</div>

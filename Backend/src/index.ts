@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import express, { Request, Response, NextFunction } from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
-import { rateLimit } from 'express-rate-limit'
+import { ipKeyGenerator, rateLimit } from 'express-rate-limit'
 import { checkConnection } from './config/Database.js'
 import { authMiddleware } from './middlewares/AuthMiddleware.js'
 import createAllTables from './utils/CreateTables.js'
@@ -21,9 +21,13 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.set('trust proxy', 1);
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
-	limit: 1000
+	limit: 1000,
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req, res) => ipKeyGenerator(req.ip ?? '', 64),
 });
 app.use(limiter);
 

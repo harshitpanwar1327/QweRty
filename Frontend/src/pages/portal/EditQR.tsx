@@ -1,7 +1,7 @@
 import { useState, useEffect, type FormEvent, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
-import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, PlayArrowRounded, ArrowBack } from "@mui/icons-material"
+import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, PlayArrowRounded, ArrowBack, People } from "@mui/icons-material"
 import { Select, MenuItem } from "@mui/material"
 import API from "../../util/API"
 import axios from "axios"
@@ -42,7 +42,7 @@ const qrTypes: QRTypeArray[] = [
   { key: "wifi", icon: <Wifi fontSize="medium" />, label: "WiFi" },
   { key: "location", icon: <LocationOn fontSize="medium" />, label: "Location" },
   { key: "vcard", icon: <AccountBox fontSize="medium" />, label: "vCard" },
-  // { key: "social", icon: <People fontSize="medium" />, label: "Social Media" },
+  { key: "social", icon: <People fontSize="medium" />, label: "Social Media" },
   // { key: "apps", icon: <Apps fontSize="medium" />, label: "Apps" },
   // { key: "feedback", icon: <Feedback fontSize="medium" />, label: "Feedback" },
   // { key: "pdf", icon: <PictureAsPdf fontSize="medium" />, label: "PDF" },
@@ -101,7 +101,6 @@ const EditQR = () => {
       setPassword(qrDetails?.configuration?.password);
       setConfirmPassword(qrDetails?.configuration?.password);
       setLoading(false);
-      console.log(qrDetails);
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -272,7 +271,7 @@ const EditQR = () => {
                         >
                           <div className="flex flex-col gap-3 p-3">
                             <p className="text-sm text-gray-600">Restrict the number of times your QR code can be scanned. Once the limit is reached, users will no longer be able to access the linked content. Perfect for exclusive offers, limited trials, or controlled access.</p>
-                            <input type="number" name="scanLimit" id="scanLimit" placeholder="Limit number of scans" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={scanLimit || ''} onChange={(e)=>setScanLimit(e.target.value ? Number(e.target.value) : null)} />
+                            <input type="number" name="scanLimit" id="scanLimit" placeholder="Limit number of scans" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={scanLimit || ''} onChange={(e)=>setScanLimit(e.target.value ? Number(e.target.value) : null)} min={scanLimit || 0}/>
                           </div>
                         </motion.div>
                       }

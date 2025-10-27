@@ -66,47 +66,36 @@ const VCardEditLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
     if (content?.firstName && content.firstName !== firstName) {
       setFirstName(content.firstName);
     }
-
     if (content?.lastName && content.lastName !== lastName) {
       setLastName(content.lastName);
     }
-
     if (content?.phones && content.phones !== phones) {
       setPhones(content.phones);
     }
-
     if (content?.email && content.email !== email) {
       setEmail(content.email);
     }
-
     if (content?.website && content.website !== website) {
       setWebsite(content.website);
     }
-
     if (content?.locationStreet && content.locationStreet !== locationStreet) {
       setLocationStreet(content.locationStreet);
     }
-
     if (content?.locationPostalCode && content.locationPostalCode !== locationPostalCode) {
       setLocationPostalCode(content.locationPostalCode);
     }
-
     if (content?.locationCity && content.locationCity !== locationCity) {
       setLocationCity(content.locationCity);
     }
-
     if (content?.locationState && content.locationState !== locationState) {
       setLocationState(content.locationState);
     }
-
     if (content?.locationCountry && content.locationCountry !== locationCountry) {
       setLocationCountry(content.locationCountry);
     }
-
     if (content?.company && content.company !== company) {
       setCompany(content.company);
     }
-
     if (content?.title && content.title !== title) {
       setTitle(content.title);
     }
@@ -135,27 +124,14 @@ const VCardEditLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
             transition={{duration: 0.5}}
           >
             <div className="grid grid-cols-2 gap-2 p-3">
-              <div className="flex flex-col gap-2">
-                <label>First Name</label>
-                <input
-                  type="text"
-                  placeholder="E.g. John"
-                  className="p-2 border border-gray-300 rounded"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  required
-                />
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-semibold text-gray-500">First Name</label>
+                <input type="text" placeholder="E.g. John" className="p-2 border border-gray-300 rounded" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label>Last Name</label>
-                <input
-                  type="text"
-                  placeholder="E.g. Smith"
-                  className="p-2 border border-gray-300 rounded"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                />
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-semibold text-gray-500">Last Name</label>
+                <input type="text" placeholder="E.g. Smith" className="p-2 border border-gray-300 rounded" value={lastName} onChange={(e) => setLastName(e.target.value)} />
               </div>
             </div>
           </motion.div>
@@ -174,7 +150,7 @@ const VCardEditLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
             exit={{opacity: 0, height: 0}}
             transition={{duration: 0.5}}
           >
-            <div className="flex flex-col gap-2 p-3">
+            <div className="flex flex-col gap-4 p-3">
               <div className="flex flex-col gap-2">
                 <label className="flex justify-between items-center">
                   <span className="text-sm font-semibold">Telephone</span>
@@ -182,63 +158,46 @@ const VCardEditLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
                 </label>
               </div>
 
-              {phones.map((phone, index) => (
-                <div className="flex items-start md:items-center gap-4 bg-gray-100 rounded-md p-2" key={index}>
-                  <div className="grow flex items-center flex-wrap gap-4">
-                    <select 
-                      name="type" 
-                      id="type" 
-                      value={phone.type} 
-                      onChange={(e) => {
-                        const updatedPhones = [...phones];
-                        updatedPhones[index].type = e.target.value;
-                        setPhones(updatedPhones);
-                      }}
-                      className="p-2 border border-gray-300 rounded"
-                    >
-                      <option value="Mobile">Mobile</option>
-                      <option value="Home">Home</option>
-                      <option value="Work">Work</option>
-                    </select>
-                    <input
-                      type="text"
-                      placeholder="E.g. +91 9876543210"
-                      className="grow p-2 border border-gray-300 rounded"
-                      value={phone.number}
-                      onChange={(e) => {
-                        const updatedPhones = [...phones];
-                        updatedPhones[index].number = e.target.value;
-                        setPhones(updatedPhones);
-                      }}
-                      required 
-                    />
-                  </div>
-                  <div className="text-blue-500 hover:text-blue-700 p-1 border border-gray-300 rounded-full flex justify-center items-center cursor-pointer" onClick={() => handleRemovePhone(index)}>
-                    <DeleteRounded />
-                  </div>
+              {phones.length > 0 &&
+                <div className="flex flex-col gap-2">
+                  {phones.map((phone, index) => (
+                    <div className="flex items-start md:items-center gap-4 bg-gray-100 rounded-md p-2" key={index}>
+                      <div className="grow flex items-center flex-wrap gap-2">
+                        <select name="type" id="type" value={phone.type} className="p-2 border border-gray-300 rounded"
+                          onChange={(e) => {
+                            const updatedPhones = [...phones];
+                            updatedPhones[index].type = e.target.value;
+                            setPhones(updatedPhones);
+                          }}
+                        >
+                          <option value="Mobile">Mobile</option>
+                          <option value="Home">Home</option>
+                          <option value="Work">Work</option>
+                        </select>
+                        <input type="text" placeholder="E.g. +91 9876543210" className="grow p-2 border border-gray-300 rounded" value={phone.number} required
+                          onChange={(e) => {
+                            const updatedPhones = [...phones];
+                            updatedPhones[index].number = e.target.value;
+                            setPhones(updatedPhones);
+                          }}
+                        />
+                      </div>
+                      <div className="text-blue-500 hover:text-blue-700 p-1 border border-gray-300 rounded-full flex justify-center items-center cursor-pointer" onClick={() => handleRemovePhone(index)}>
+                        <DeleteRounded />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              }
 
-              <div className="flex flex-col gap-2">
-                <label>Email</label>
-                <input
-                  type="text"
-                  placeholder="E.g. example@gmail.com"
-                  className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-semibold text-gray-500">Email</label>
+                <input type="text" placeholder="E.g. example@gmail.com" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={email} onChange={(e) => setEmail(e.target.value)}/>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label>Personal Website</label>
-                <input
-                  type="text"
-                  placeholder="E.g. www.example.com"
-                  className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"
-                  value={website}
-                  onChange={(e) => setWebsite(e.target.value)}
-                />
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-semibold text-gray-500">Personal Website</label>
+                <input type="text" placeholder="E.g. www.example.com" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={website} onChange={(e) => setWebsite(e.target.value)} />
               </div>
             </div>
           </motion.div>
@@ -259,27 +218,27 @@ const VCardEditLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
           >
             <div className="flex flex-col gap-4 p-3">
               <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col gap-2">
-                  <label>Street</label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-semibold text-gray-500">Street</label>
                   <input type="text" placeholder="E.g. 403" value={locationStreet} onChange={(e) => setLocationStreet(e.target.value)} className="p-2 border border-gray-300 rounded" />
                 </div>
-                <div className="flex flex-col gap-2">
-                  <label>Postal Code</label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-semibold text-gray-500">Postal Code</label>
                   <input type="text" placeholder="E.g. 122001" value={locationPostalCode} onChange={(e) => setLocationPostalCode(e.target.value)} className="p-2 border border-gray-300 rounded" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col gap-2">
-                  <label>City</label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-semibold text-gray-500">City</label>
                   <input type="text" placeholder="E.g. Gurugram" value={locationCity} onChange={(e) => setLocationCity(e.target.value)} className="p-2 border border-gray-300 rounded" />
                 </div>
-                <div className="flex flex-col gap-2">
-                  <label>State</label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-semibold text-gray-500">State</label>
                   <input type="text" placeholder="E.g. Haryana" value={locationState} onChange={(e) => setLocationState(e.target.value)} className="p-2 border border-gray-300 rounded" />
                 </div>
               </div>
-              <div className="flex flex-col gap-2">
-                <label>Country</label>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-semibold text-gray-500">Country</label>
                 <input type="text" placeholder="E.g. India" value={locationCountry} onChange={(e) => setLocationCountry(e.target.value)} className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" />
               </div>
             </div>
@@ -312,26 +271,14 @@ const VCardEditLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
             transition={{duration: 0.5}}
           >
             <div className="grid grid-cols-2 gap-2 p-3">
-              <div className="flex flex-col gap-2">
-                <label>Company</label>
-                <input
-                  type="text"
-                  placeholder="E.g. Company LLC"
-                  className="p-2 border border-gray-300 rounded"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                />
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-semibold text-gray-500">Company</label>
+                <input type="text" placeholder="E.g. Company LLC" className="p-2 border border-gray-300 rounded" value={company} onChange={(e) => setCompany(e.target.value)} />
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label>Title</label>
-                <input
-                  type="text"
-                  placeholder="E.g. Your profession/position"
-                  className="p-2 border border-gray-300 rounded"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-semibold text-gray-500">Title</label>
+                <input type="text" placeholder="E.g. Your profession/position" className="p-2 border border-gray-300 rounded" value={title} onChange={(e) => setTitle(e.target.value)} />
               </div>
             </div>
           </motion.div>

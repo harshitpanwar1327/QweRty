@@ -1,8 +1,8 @@
 import { useState, type FormEvent, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
-import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, Loop, PlayArrowRounded } from "@mui/icons-material"
-// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, Feedback, Badge, People } from "@mui/icons-material"
+import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, Loop, PlayArrowRounded, People } from "@mui/icons-material"
+// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, Feedback, Badge } from "@mui/icons-material"
 import { Select, MenuItem } from "@mui/material"
 import { ArrowRight, Download } from "lucide-react"
 import SampleQr from '../../assets/SampleQR.png'
@@ -38,7 +38,7 @@ const qrTypes: QRTypeArray[] = [
   { key: "wifi", icon: <Wifi fontSize="medium" />, label: "WiFi" },
   { key: "location", icon: <LocationOn fontSize="medium" />, label: "Location" },
   { key: "vcard", icon: <AccountBox fontSize="medium" />, label: "vCard" },
-  // { key: "social", icon: <People fontSize="medium" />, label: "Social Media" },
+  { key: "social", icon: <People fontSize="medium" />, label: "Social Media" },
   // { key: "apps", icon: <Apps fontSize="medium" />, label: "Apps" },
   // { key: "feedback", icon: <Feedback fontSize="medium" />, label: "Feedback" },
   // { key: "pdf", icon: <PictureAsPdf fontSize="medium" />, label: "PDF" },
@@ -67,16 +67,20 @@ const levelTabsArray: levelObject[] = [
 const NewQR = () => {
   const uid = sessionStorage.getItem('userId') || '';
 
+  // QR Type Section
   const qrType = useSelector((state: RootState) => state.qrType.type);
   const dispatch = useDispatch<AppDispatch>();
 
+  // Name Section
   const [qrName, setQrName] = useState<string>('');
 
+  // Design Section
   const [designTab, setDesignTab] = useState<string>('Shape');
   const [foregroundColor, setForegroundColor] = useState<string>('#000000');
   const [backgroundColor, setBackgroundColor] = useState<string>('#ffffff');
   const [errorCorrectionLevel, setErrorCorrectionLevel] = useState<string>('Q');
 
+  // Configuration Section
   const [openTimeScheduling, setOpenTimeScheduling] = useState<boolean>(false);
   const [openScanLimit, setOpenScanLimit] = useState<boolean>(false);
   const [openPassword, setOpenPassword] = useState<boolean>(false);
@@ -214,6 +218,7 @@ const NewQR = () => {
               )}
             </AnimatePresence>
 
+            {/* QR Type Section */}
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">1</span> Select the QR type</h3>
               <Select value={qrType} className="w-full lg:w-2/3" required
@@ -232,6 +237,7 @@ const NewQR = () => {
 
             <hr className="text-gray-300"/>
 
+            {/* Name Section */}
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">2</span> Name your QR</h3>
               <input type="text" placeholder="Enter name" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={qrName}onChange={(e) => setQrName(e.target.value)} required/>
@@ -239,6 +245,7 @@ const NewQR = () => {
 
             <hr className="text-gray-300"/>
 
+            {/* Content Section */}
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">3</span> Complete the content</h3>
               {renderQRContent()}
@@ -246,23 +253,24 @@ const NewQR = () => {
 
             <hr className="text-gray-300"/>
 
+            {/* Design Section */}
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">4</span> Design your QR</h3>
               <div className="grid grid-cols-4 gap-2">
                 {designTabsArray.map((tab, index) => (
-                  <button type="button" key={index} onClick={()=>setDesignTab(tab)} className={`py-3 text-sm rounded-md ${designTab === tab ? "text-pink-500 bg-pink-100" : "text-gray-600 hover:text-pink-500 hover:bg-pink-100"} transition duration-300`}>{tab}</button>
+                  <button type="button" key={index} onClick={()=>setDesignTab(tab)} className={`py-3 text-sm rounded-md font-semibold ${designTab === tab ? "text-pink-500 bg-pink-100" : "text-gray-600 hover:text-pink-500"} transition duration-300`}>{tab}</button>
                 ))}
               </div>
 
               {designTab==='Shape' &&
                 <div className="flex justify-between items-end bg-gray-100 p-4 rounded-md">
                   <div className="flex gap-4">
-                    <div className="flex flex-col gap-2">
-                      <label className="text-sm font-semibold">Foreground Color</label>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-sm font-semibold text-gray-500">Foreground Color</label>
                       <input type="color" name="foreground" id="foreground" value={foregroundColor} onChange={(e)=>setForegroundColor(e.target.value)} />
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <label className="text-sm font-semibold">Background Color</label>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-sm font-semibold text-gray-500">Background Color</label>
                       <input type="color" name="background" id="background" value={backgroundColor} onChange={(e)=>setBackgroundColor(e.target.value)} />
                     </div>
                   </div>
@@ -284,6 +292,7 @@ const NewQR = () => {
               <>
                 <hr className="text-gray-300"/>
 
+                {/* Customization Section */}
                 <div className="flex flex-col gap-4">
                   <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">5</span> Customize your QR</h3>
                   <div>
@@ -353,6 +362,7 @@ const NewQR = () => {
             }
           </div>
 
+          {/* Download QR Section */}
           <div className="w-full md:w-1/3 rounded-md p-8 flex flex-col items-center gap-4 bg-gray-100">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">{['text', 'wifi', 'vcard'].includes(qrType)? 5: 6}</span> Generate QR</h3>
               <img src={qrPreview || SampleQr} className="w-full bg-white rounded-lg shadow-lg p-2" alt='Qr' />

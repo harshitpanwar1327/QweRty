@@ -1,5 +1,5 @@
-import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn } from "@mui/icons-material"
-// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, Feedback, Badge, People } from "@mui/icons-material"
+import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, People } from "@mui/icons-material"
+// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, Feedback, Badge } from "@mui/icons-material"
 import Footer from "../../components/Footer.js"
 import Header from "../../components/Header.js"
 import Website from "../../section/Website.js"
@@ -8,7 +8,7 @@ import Text from "../../section/Text.js"
 import Whatsapp from '../../section/Whatsapp.js'
 import EmailSection from '../../section/Email.js'
 import WifiSection from '../../section/Wifi.js'
-// import SocialMedia from "../../section/SocialMedia.js"
+import SocialMedia from "../../section/SocialMedia.js"
 // import App from "../../section/Apps.js"
 // import Feedbacks from "../../section/Feedback.js"
 import Contact from "../../section/VCard.js"
@@ -31,7 +31,7 @@ const qrTypes = [
   { key: 'wifi', icon: <Wifi fontSize="large" />, label: "WiFi" },
   { key: 'location', icon: <LocationOn fontSize="large" />, label: "Location" },
   { key: 'vcard', icon: <AccountBox fontSize="large" />, label: "vCard" },
-  // { key: 'social', icon: <People fontSize="large" />, label: "Social Media" },
+  { key: 'social', icon: <People fontSize="large" />, label: "Social Media" },
   // { key: 'apps', icon: <Apps fontSize="large" />, label: "Apps" },
   // { key: 'feedback', icon: <Feedback fontSize="large" />, label: "Feedback" },
   // { key: 'pdf', icon: <PictureAsPdf fontSize="large" />, label: "PDF" },
@@ -78,7 +78,7 @@ const Hero = () => {
       <WifiSection />
       <Location />
       <Contact />
-      {/* <SocialMedia /> */}
+      <SocialMedia />
       {/* <App />
       <Feedbacks />
       <Pdf />

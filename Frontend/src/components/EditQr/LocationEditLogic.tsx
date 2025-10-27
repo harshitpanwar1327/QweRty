@@ -40,31 +40,24 @@ const LocationEditLogic: React.FC<LocationLogicProps> = ({ content, setContent }
     if (content?.locationStreet && content.locationStreet !== locationStreet) {
       setLocationStreet(content.locationStreet);
     }
-
     if (content?.locationArea && content.locationStreet !== locationArea) {
       setLocationArea(content.locationArea);
     }
-
     if (content?.locationPostalCode && content.locationPostalCode !== locationPostalCode) {
       setLocationPostalCode(content.locationPostalCode);
     }
-
     if (content?.locationCity && content.locationCity !== locationCity) {
       setLocationCity(content.locationCity);
     }
-
     if (content?.locationState && content.locationState !== locationState) {
       setLocationState(content.locationState);
     }
-
     if (content?.locationCountry && content.locationCountry !== locationCountry) {
       setLocationCountry(content.locationCountry);
     }
-
     if (content?.latitude && content.latitude !== latitude) {
       setLatitude(content.latitude);
     }
-
     if (content?.longitude && content.longitude !== longitude) {
       setLongitude(content.longitude);
     }
@@ -74,16 +67,7 @@ const LocationEditLogic: React.FC<LocationLogicProps> = ({ content, setContent }
     <div className="flex flex-col gap-2">
       <div className="grid grid-cols-3 md:grid-cols-4 gap-2 mb-2">
         {locationTabs.map((tab) => (
-          <button
-            type="button"
-            key={tab}
-            onClick={() => setLocationTab(tab)}
-            className={`py-3 text-sm rounded-md ${
-              locationTab === tab
-                ? "text-pink-500 bg-pink-100"
-                : "text-gray-600 hover:text-pink-500 hover:bg-pink-100"
-            } transition duration-300`}
-          >
+          <button type="button" key={tab} onClick={() => setLocationTab(tab)} className={`py-3 text-sm rounded-md font-semibold ${locationTab === tab ? "text-pink-500 bg-pink-100" : "text-gray-600 hover:text-pink-500"} transition duration-300`} >
             {tab}
           </button>
         ))}
@@ -92,31 +76,31 @@ const LocationEditLogic: React.FC<LocationLogicProps> = ({ content, setContent }
       {locationTab === "Complete" && (
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-3 gap-2">
-            <div className="w-full md:w-2/3 flex flex-col gap-2">
-              <label>Street</label>
+            <div className="w-full md:w-2/3 flex flex-col gap-1">
+              <label className="text-sm font-semibold text-gray-500">Street</label>
               <input type="text" placeholder="E.g. 403" value={locationStreet} onChange={(e) => setLocationStreet(e.target.value)} className="p-2 border border-gray-300 rounded" />
             </div>
-            <div className="flex flex-col gap-2">
-              <label>Area</label>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-semibold text-gray-500">Area</label>
               <input type="text" placeholder="E.g. Sector-3" value={locationArea} onChange={(e) => setLocationArea(e.target.value)} className="p-2 border border-gray-300 rounded" required />
             </div>
-            <div className="flex flex-col gap-2">
-              <label>Postal Code</label>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-semibold text-gray-500">Postal Code</label>
               <input type="text" placeholder="E.g. 122001" value={locationPostalCode} onChange={(e) => setLocationPostalCode(e.target.value)} className="p-2 border border-gray-300 rounded" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col gap-2">
-              <label>City</label>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-semibold text-gray-500">City</label>
               <input type="text" placeholder="E.g. Gurugram" value={locationCity} onChange={(e) => setLocationCity(e.target.value)} className="p-2 border border-gray-300 rounded" required/>
             </div>
-            <div className="flex flex-col gap-2">
-              <label>State</label>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-semibold text-gray-500">State</label>
               <input type="text" placeholder="E.g. Haryana" value={locationState} onChange={(e) => setLocationState(e.target.value)} className="p-2 border border-gray-300 rounded" required/>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
-            <label>Country</label>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-semibold text-gray-500">Country</label>
             <input type="text" placeholder="E.g. India" value={locationCountry} onChange={(e) => setLocationCountry(e.target.value)} className="p-2 border border-gray-300 rounded" required/>
           </div>
         </div>
@@ -124,12 +108,12 @@ const LocationEditLogic: React.FC<LocationLogicProps> = ({ content, setContent }
 
       {locationTab === "Coordinates" && (
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <label>Latitude</label>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-semibold text-gray-500">Latitude</label>
             <input type="text" placeholder="E.g. 28.4595" value={latitude} onChange={(e) => setLatitude(e.target.value)} className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" required/>
           </div>
-          <div className="flex flex-col gap-2">
-            <label>Longitude</label>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-semibold text-gray-500">Longitude</label>
             <input type="text" placeholder="E.g. 77.0266" value={longitude} onChange={(e) => setLongitude(e.target.value)} className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" required/>
           </div>
         </div>

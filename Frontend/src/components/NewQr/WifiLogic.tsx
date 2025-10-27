@@ -22,23 +22,15 @@ const WifiLogic: React.FC<WifiLogicProps> = ({ content, setContent }) => {
   }, [wifiSsid, wifiPassword, wifiEncryption, setContent]);
 
   useEffect(() => {
-    if (!content?.wifiSsid) {
-      setWifiSsid('');
-    }
-
-    if (!content?.wifiPassword) {
-      setWifiPassword('');
-    }
-
-    if (!content?.wifiEncryption) {
-      setWifiEncryption('');
-    }
+    if (!content?.wifiSsid) setWifiSsid('');
+    if (!content?.wifiPassword) setWifiPassword('');
+    if (!content?.wifiEncryption) setWifiEncryption('');
   }, [content]);
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
-        <label>Network name (SSID)</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-semibold text-gray-500">Network name (SSID)</label>
         <input
           type="text"
           placeholder="E.g. HomeWifi"
@@ -49,8 +41,8 @@ const WifiLogic: React.FC<WifiLogicProps> = ({ content, setContent }) => {
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label>Network password</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-semibold text-gray-500">Network password</label>
         <input
           type="password"
           placeholder="E.g. MyPassword"
@@ -61,8 +53,8 @@ const WifiLogic: React.FC<WifiLogicProps> = ({ content, setContent }) => {
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label>Type of encryption</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-semibold text-gray-500">Type of encryption</label>
         <select
           className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"
           value={wifiEncryption}

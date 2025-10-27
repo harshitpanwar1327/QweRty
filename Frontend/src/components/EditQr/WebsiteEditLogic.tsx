@@ -24,8 +24,8 @@ const WebsiteEditLogic: React.FC<WebsiteLogicProps> = ({ content, setContent }) 
   }, [content]);
 
   return (
-    <div className="flex flex-col gap-2">
-      <label>Enter your Website</label>
+    <div className="flex flex-col gap-1">
+      <label className="text-sm font-semibold text-gray-500">Enter your Website</label>
       <input
         type="text"
         placeholder="E.g. https://www.myweb.com/"

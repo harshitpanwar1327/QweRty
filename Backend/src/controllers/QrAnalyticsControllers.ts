@@ -16,7 +16,11 @@ interface QrAnalyticsReqBody {
 
 export const scanAnalytics = async (req: Request<QrAnalyticsReqParams>, res: Response) => {
     const { id } = req.params;
-    const clientIp = requestIp.getClientIp(req) || null;
+    const clientIp =
+        (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+        (req.headers['x-real-ip'] as string) ||
+        requestIp.getClientIp(req) ||
+        null;
     const agent = useragent.parse(req.headers["user-agent"]);
     const deviceType = agent.device.toString();
 
@@ -29,14 +33,6 @@ export const scanAnalytics = async (req: Request<QrAnalyticsReqParams>, res: Res
 
         if (response.success && response.redirectURL) {
             return res.redirect(response.redirectURL);
-        } else if (!response.success && response.isPaused) {
-            return res.redirect(`${process.env.FRONTEND_URL}/#/config/pauseQR`);
-        } else if (!response.success && response.inActive) {
-            return res.redirect(`${process.env.FRONTEND_URL}/#/config/timeSchedule`);
-        } else if (!response.success && response.limitReached) {
-            return res.redirect(`${process.env.FRONTEND_URL}/#/config/scanLimit`);
-        } else if (response.success && response.requiresPassword) {
-            return res.redirect(`${process.env.FRONTEND_URL}/#/config/password/${id}`);
         } else {
             return res.status(400).json(response);
         }
@@ -49,7 +45,11 @@ export const scanAnalytics = async (req: Request<QrAnalyticsReqParams>, res: Res
 export const verifyPassword = async (req: Request<QrAnalyticsReqParams, {}, QrAnalyticsReqBody>, res: Response) => {
     const { id } = req.params;
     const { password } = req.body;
-    const clientIp = requestIp.getClientIp(req) || null;
+    const clientIp =
+        (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+        (req.headers['x-real-ip'] as string) ||
+        requestIp.getClientIp(req) ||
+        null;
     const agent = useragent.parse(req.headers["user-agent"]);
     const deviceType = agent.device.toString();
 

@@ -18,14 +18,12 @@ const TextLogic: React.FC<TextLogicProps> = ({ content, setContent }) => {
   }, [textContent, setContent]);
 
   useEffect(() => {
-      if (!content?.textContent) {
-        setTextContent('');
-      }
-    }, [content]);
+    if (!content?.textContent) setTextContent('');
+  }, [content]);
 
   return (
-    <div className="flex flex-col gap-2">
-      <label>Message</label>
+    <div className="flex flex-col gap-1">
+      <label className="text-sm font-semibold text-gray-500">Message</label>
       <textarea
         placeholder="Enter some text..."
         rows={5}
