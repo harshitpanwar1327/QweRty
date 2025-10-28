@@ -1,6 +1,4 @@
 import axios from "axios";
-import { Request } from "express";
-import requestIp from "request-ip";
 
 // Maps available subscription products with amount & duration (days)
 export const SubscriptionProducts: Record<string, { amount: number; duration: number }> = {
@@ -13,7 +11,7 @@ export const SubscriptionProducts: Record<string, { amount: number; duration: nu
 };
 
 // Calculates adjusted days when switching plans mid-cycle
-export const calculateAdjustedDays = (oldPlan: { expiry_date: string; productId: string }, newPlanProductId: string): number => {
+export const calculateAdjustedDays = (oldPlan: any, newPlanProductId: string): number => {
   const today = new Date();
   const oldExpiryDate = new Date(oldPlan.expiry_date);
 
@@ -27,8 +25,7 @@ export const calculateAdjustedDays = (oldPlan: { expiry_date: string; productId:
     return 0;
   }
 
-  const oldPlanRemainingDays =
-    (oldExpiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+  const oldPlanRemainingDays = (oldExpiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
 
   const oldPlanPerDay = oldProduct.amount / oldProduct.duration;
   const newPlanPerDay = newProduct.amount / newProduct.duration;
