@@ -1,8 +1,8 @@
 import { useState, type FormEvent, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
-import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, Loop, PlayArrowRounded, People } from "@mui/icons-material"
-// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, Feedback, Badge } from "@mui/icons-material"
+import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, Loop, PlayArrowRounded } from "@mui/icons-material"
+// import { People, PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, Feedback, Badge } from "@mui/icons-material"
 import { Select, MenuItem } from "@mui/material"
 import { ArrowRight, Download } from "lucide-react"
 import SampleQr from '../../assets/SampleQR.png'
@@ -38,7 +38,7 @@ const qrTypes: QRTypeArray[] = [
   { key: "wifi", icon: <Wifi fontSize="medium" />, label: "WiFi" },
   { key: "location", icon: <LocationOn fontSize="medium" />, label: "Location" },
   { key: "vcard", icon: <AccountBox fontSize="medium" />, label: "vCard" },
-  { key: "social", icon: <People fontSize="medium" />, label: "Social Media" },
+  // { key: "social", icon: <People fontSize="medium" />, label: "Social Media" },
   // { key: "apps", icon: <Apps fontSize="medium" />, label: "Apps" },
   // { key: "feedback", icon: <Feedback fontSize="medium" />, label: "Feedback" },
   // { key: "pdf", icon: <PictureAsPdf fontSize="medium" />, label: "PDF" },
