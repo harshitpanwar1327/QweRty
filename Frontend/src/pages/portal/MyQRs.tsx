@@ -378,7 +378,7 @@ const MyQRs = () => {
                           <input type="checkbox" checked={selectedRows.includes(data.qr_id)} onChange={()=>handleRowSelect(data.qr_id)}/>
                         </td>
                         <td className='p-3 pr-0' onClick={()=>handleQr(data)}>
-                          <img src={data.qr} alt="Qr" className='w-12 h-full object-contain cursor-pointer border border-gray-200 rounded'/>
+                          <img src={data.qr} alt="Qr" className='w-12 object-contain cursor-pointer border border-gray-200 rounded'/>
                         </td>
                         <td className="p-3">{data.name}</td>
                         <td className="p-3">
