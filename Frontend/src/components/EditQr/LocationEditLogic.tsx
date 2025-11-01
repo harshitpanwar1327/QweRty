@@ -1,67 +1,25 @@
-import React, { useState, useEffect } from "react";
-import type { Dispatch, SetStateAction } from "react";
-
-interface LocationContent {
-  locationTab?: string,
-  locationStreet?: string;
-  locationArea?: string;
-  locationPostalCode?: string;
-  locationCity?: string;
-  locationState?: string;
-  locationCountry?: string;
-  latitude?: string;
-  longitude?: string;
-}
+import React, { useState } from "react";
+import type { UseFormRegister, FieldErrors, UseFormWatch } from "react-hook-form";
+import type { EditFormInputs } from "../../pages/portal/EditQR";
 
 interface LocationLogicProps {
-  content: LocationContent;
-  setContent: Dispatch<SetStateAction<LocationContent>>;
+  content?: EditFormInputs["content"];
+  register: UseFormRegister<EditFormInputs>;
+  errors?: FieldErrors<EditFormInputs>;
+  watch: UseFormWatch<EditFormInputs>;
 }
 
-const LocationEditLogic: React.FC<LocationLogicProps> = ({ content, setContent }) => {
+const LocationEditLogic: React.FC<LocationLogicProps> = ({ register, errors, watch }) => {
   const locationTabs = ["Complete", "Coordinates"];
   const [locationTab, setLocationTab] = useState<string>("Complete");
 
-  const [locationStreet, setLocationStreet] = useState<string>("");
-  const [locationArea, setLocationArea] = useState<string>("");
-  const [locationPostalCode, setLocationPostalCode] = useState<string>("");
-  const [locationCity, setLocationCity] = useState<string>("");
-  const [locationState, setLocationState] = useState<string>("");
-  const [locationCountry, setLocationCountry] = useState<string>("");
-
-  const [latitude, setLatitude] = useState<string>("");
-  const [longitude, setLongitude] = useState<string>("");
-
-  useEffect(() => {
-    setContent({ locationTab, locationStreet, locationArea, locationPostalCode, locationCity, locationState, locationCountry, latitude, longitude });
-  }, [locationTab, locationStreet, locationArea, locationPostalCode, locationCity, locationState, locationCountry, latitude, longitude, setContent]);
-
-  useEffect(() => {
-    if (content?.locationStreet && content.locationStreet !== locationStreet) {
-      setLocationStreet(content.locationStreet);
-    }
-    if (content?.locationArea && content.locationStreet !== locationArea) {
-      setLocationArea(content.locationArea);
-    }
-    if (content?.locationPostalCode && content.locationPostalCode !== locationPostalCode) {
-      setLocationPostalCode(content.locationPostalCode);
-    }
-    if (content?.locationCity && content.locationCity !== locationCity) {
-      setLocationCity(content.locationCity);
-    }
-    if (content?.locationState && content.locationState !== locationState) {
-      setLocationState(content.locationState);
-    }
-    if (content?.locationCountry && content.locationCountry !== locationCountry) {
-      setLocationCountry(content.locationCountry);
-    }
-    if (content?.latitude && content.latitude !== latitude) {
-      setLatitude(content.latitude);
-    }
-    if (content?.longitude && content.longitude !== longitude) {
-      setLongitude(content.longitude);
-    }
-  }, [content]);
+  const locationStreet = watch("content.locationStreet") || "";
+  const locationArea = watch("content.locationArea") || "";
+  const locationCity = watch("content.locationCity") || "";
+  const locationState = watch("content.locationState") || "";
+  const locationCountry = watch("content.locationCountry") || "";
+  const latitude = watch("content.latitude") || "";
+  const longitude = watch("content.longitude") || "";
 
   return (
     <div className="flex flex-col gap-2">
@@ -78,30 +36,67 @@ const LocationEditLogic: React.FC<LocationLogicProps> = ({ content, setContent }
           <div className="grid grid-cols-3 gap-2">
             <div className="w-full md:w-2/3 flex flex-col gap-1">
               <label className="text-sm font-semibold text-gray-500">Street</label>
-              <input type="text" placeholder="E.g. 403" value={locationStreet} onChange={(e) => setLocationStreet(e.target.value)} className="p-2 border border-gray-300 rounded" />
+              <input type="text" placeholder="E.g. 403" 
+                className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200" 
+                {...register("content.locationStreet")}
+              />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm font-semibold text-gray-500">Area</label>
-              <input type="text" placeholder="E.g. Sector-3" value={locationArea} onChange={(e) => setLocationArea(e.target.value)} className="p-2 border border-gray-300 rounded" required />
+              <input type="text" placeholder="E.g. Sector-3" 
+                className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200" 
+                {...register("content.locationArea", {
+                  required: "Area is required",
+                })}
+              />
+              {errors?.content?.locationArea && (<p className="text-red-500 text-sm">{errors.content?.locationArea.message}</p>)}
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm font-semibold text-gray-500">Postal Code</label>
-              <input type="text" placeholder="E.g. 122001" value={locationPostalCode} onChange={(e) => setLocationPostalCode(e.target.value)} className="p-2 border border-gray-300 rounded" />
+              <input type="text" placeholder="E.g. 122001" 
+                className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                {...register("content.locationPostalCode", {
+                  required: "Postal is required",
+                  pattern: {
+                    value: /^[0-9]{5,6}$/,
+                    message: "Enter a valid postal code",
+                  }
+                })}
+              />
+              {errors?.content?.locationPostalCode && (<p className="text-red-500 text-sm">{errors.content?.locationPostalCode.message}</p>)}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col gap-1">
               <label className="text-sm font-semibold text-gray-500">City</label>
-              <input type="text" placeholder="E.g. Gurugram" value={locationCity} onChange={(e) => setLocationCity(e.target.value)} className="p-2 border border-gray-300 rounded" required/>
+              <input type="text" placeholder="E.g. Gurugram" 
+                className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                {...register("content.locationCity", {
+                  required: "City is required"
+                })}
+              />
+              {errors?.content?.locationCity && (<p className="text-red-500 text-sm">{errors.content?.locationCity.message}</p>)}
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm font-semibold text-gray-500">State</label>
-              <input type="text" placeholder="E.g. Haryana" value={locationState} onChange={(e) => setLocationState(e.target.value)} className="p-2 border border-gray-300 rounded" required/>
+              <input type="text" placeholder="E.g. Haryana" 
+                className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                {...register("content.locationState", {
+                  required: "State is required"
+                })}
+              />
+              {errors?.content?.locationState && (<p className="text-red-500 text-sm">{errors.content?.locationState.message}</p>)}
             </div>
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-sm font-semibold text-gray-500">Country</label>
-            <input type="text" placeholder="E.g. India" value={locationCountry} onChange={(e) => setLocationCountry(e.target.value)} className="p-2 border border-gray-300 rounded" required/>
+            <input type="text" placeholder="E.g. India" 
+              className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+              {...register("content.locationCountry", {
+                required: "Country is required",
+              })}
+            />
+            {errors?.content?.locationCountry && (<p className="text-red-500 text-sm">{errors.content?.locationCountry.message}</p>)}
           </div>
         </div>
       )}
@@ -110,11 +105,23 @@ const LocationEditLogic: React.FC<LocationLogicProps> = ({ content, setContent }
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <label className="text-sm font-semibold text-gray-500">Latitude</label>
-            <input type="text" placeholder="E.g. 28.4595" value={latitude} onChange={(e) => setLatitude(e.target.value)} className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" required/>
+            <input type="text" placeholder="E.g. 28.4595" 
+              className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+              {...register("content.latitude", {
+                required: "Latitude is required"
+              })} 
+            />
+            {errors?.content?.latitude && (<p className="text-red-500 text-sm">{errors.content?.latitude.message}</p>)}
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-sm font-semibold text-gray-500">Longitude</label>
-            <input type="text" placeholder="E.g. 77.0266" value={longitude} onChange={(e) => setLongitude(e.target.value)} className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" required/>
+            <input type="text" placeholder="E.g. 77.0266" 
+              className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+              {...register("content.longitude", {
+                required: "Longitude is required"
+              })} 
+            />
+            {errors?.content?.longitude && (<p className="text-red-500 text-sm">{errors.content?.longitude.message}</p>)}
           </div>
         </div>
       )}

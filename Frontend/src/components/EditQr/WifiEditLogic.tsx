@@ -1,38 +1,14 @@
-import React, { useState, useEffect } from "react";
-import type { Dispatch, SetStateAction } from "react";
-
-interface WifiContent {
-  wifiSsid?: string;
-  wifiPassword?: string;
-  wifiEncryption?: string;
-}
+import React from "react";
+import type { UseFormRegister, FieldErrors } from "react-hook-form";
+import type { EditFormInputs } from "../../pages/portal/EditQR";
 
 interface WifiLogicProps {
-  content: WifiContent;
-  setContent: Dispatch<SetStateAction<WifiContent>>;
+  content?: EditFormInputs["content"];
+  register: UseFormRegister<EditFormInputs>;
+  errors?: FieldErrors<EditFormInputs>;
 }
 
-const WifiEditLogic: React.FC<WifiLogicProps> = ({ content, setContent }) => {
-  const [wifiSsid, setWifiSsid] = useState<string>("");
-  const [wifiPassword, setWifiPassword] = useState<string>("");
-  const [wifiEncryption, setWifiEncryption] = useState<string>("");
-
-  useEffect(() => {
-    setContent({ wifiSsid, wifiPassword, wifiEncryption });
-  }, [wifiSsid, wifiPassword, wifiEncryption, setContent]);
-
-  useEffect(() => {
-    if (content?.wifiSsid && content.wifiSsid !== wifiSsid) {
-      setWifiSsid(content.wifiSsid);
-    }
-    if (content?.wifiPassword && content.wifiPassword !== wifiPassword) {
-      setWifiPassword(content.wifiPassword);
-    }
-    if (content?.wifiEncryption && content.wifiEncryption !== wifiEncryption) {
-      setWifiEncryption(content.wifiEncryption);
-    }
-  }, [content]);
-
+const WifiEditLogic: React.FC<WifiLogicProps> = ({ register, errors }) => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
@@ -40,11 +16,13 @@ const WifiEditLogic: React.FC<WifiLogicProps> = ({ content, setContent }) => {
         <input
           type="text"
           placeholder="E.g. HomeWifi"
-          className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"
-          value={wifiSsid}
-          onChange={(e) => setWifiSsid(e.target.value)}
-          required
+          className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+          {...register("content.wifiSsid", {
+            required: "Network SSID is required",
+            maxLength: { value: 64, message: "SSID cannot exceed 64 characters" },
+          })}
         />
+        {errors?.content?.wifiSsid && <p className="text-red-500 text-sm">{errors.content?.wifiSsid.message}</p>}
       </div>
 
       <div className="flex flex-col gap-1">
@@ -52,26 +30,30 @@ const WifiEditLogic: React.FC<WifiLogicProps> = ({ content, setContent }) => {
         <input
           type="password"
           placeholder="E.g. MyPassword"
-          className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"
-          value={wifiPassword}
-          onChange={(e) => setWifiPassword(e.target.value)}
-          required
+          className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+          {...register("content.wifiPassword", {
+            required: "Network password is required",
+            minLength: { value: 8, message: "Password must be at least 8 characters" },
+            maxLength: { value: 64, message: "Password cannot exceed 64 characters" },
+          })}
         />
+        {errors?.content?.wifiPassword && (<p className="text-red-500 text-sm">{errors.content?.wifiPassword.message}</p>)}
       </div>
 
       <div className="flex flex-col gap-1">
         <label className="text-sm font-semibold text-gray-500">Type of encryption</label>
         <select
-          className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"
-          value={wifiEncryption}
-          onChange={(e) => setWifiEncryption(e.target.value)}
-          required
+          className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+          {...register("content.wifiEncryption", {
+            required: "Please select an encryption type",
+          })}
         >
           <option value="WEP">WEP</option>
           <option value="WPA">WPA</option>
           <option value="WPA2-EAP">WPA2-EAP</option>
           <option value="nopass">nopass</option>
         </select>
+        {errors?.content?.wifiEncryption && (<p className="text-red-500 text-sm">{errors.content?.wifiEncryption.message}</p>)}
       </div>
     </div>
   );

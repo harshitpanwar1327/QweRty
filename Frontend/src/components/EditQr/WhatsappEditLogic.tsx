@@ -1,33 +1,17 @@
-import React, { useState, useEffect } from "react";
-import type { Dispatch, SetStateAction } from "react";
-
-interface WhatsappContent {
-  whatsappNumber?: string;
-  whatsappMessage?: string;
-}
+import React from "react";
+import type { UseFormRegister, FieldErrors, UseFormWatch } from "react-hook-form";
+import type { EditFormInputs } from "../../pages/portal/EditQR";
 
 interface WhatsappLogicProps {
-  content: WhatsappContent;
-  setContent: Dispatch<SetStateAction<WhatsappContent>>;
+  content?: EditFormInputs["content"];
+  register: UseFormRegister<EditFormInputs>;
+  errors?: FieldErrors<EditFormInputs>;
+  watch: UseFormWatch<EditFormInputs>;
 }
 
-const WhatsappEditLogic: React.FC<WhatsappLogicProps> = ({ content, setContent }) => {
-  const [whatsappNumber, setWhatsappNumber] = useState<string>("");
-  const [whatsappMessage, setWhatsappMessage] = useState<string>("");
-    
-  useEffect(() => {
-    setContent({ whatsappNumber, whatsappMessage });
-  }, [whatsappNumber, whatsappMessage, setContent]);
+const WhatsappEditLogic: React.FC<WhatsappLogicProps> = ({ register, errors, watch }) => {
+  const whatsappMessage = watch("content.whatsappMessage") || "";
 
-  useEffect(() => {
-    if (content?.whatsappNumber && content.whatsappNumber !== whatsappNumber) {
-      setWhatsappNumber(content.whatsappNumber);
-    }
-    if (content?.whatsappMessage && content.whatsappMessage !== whatsappMessage) {
-      setWhatsappMessage(content.whatsappMessage);
-    }
-  }, [content]);
-  
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
@@ -35,11 +19,16 @@ const WhatsappEditLogic: React.FC<WhatsappLogicProps> = ({ content, setContent }
         <input
           type="text"
           placeholder="E.g. +919876543210"
-          className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"
-          value={whatsappNumber}
-          onChange={(e) => setWhatsappNumber(e.target.value)}
-          required
+          className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+          {...register("content.whatsappNumber", {
+            required: "WhatsApp number is required",
+            pattern: {
+              value: /^\+[1-9]\d{6,14}$/,
+              message: "Enter a valid number with country code (e.g. +919876543210)",
+            }
+          })}
         />
+        {errors?.content?.whatsappNumber && (<p className="text-red-500 text-sm">{errors.content?.whatsappNumber.message}</p>)}
       </div>
 
       <div className="flex flex-col gap-1">
@@ -47,10 +36,9 @@ const WhatsappEditLogic: React.FC<WhatsappLogicProps> = ({ content, setContent }
         <textarea
           placeholder="Enter a by default message..."
           rows={5}
-          className="w-full lg:w-2/3 p-2 border border-gray-300 rounded"
-          value={whatsappMessage}
-          onChange={(e) => setWhatsappMessage(e.target.value)}
+          className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
           maxLength={200}
+          {...register("content.whatsappMessage")}
         />
         <div className={`text-sm ${whatsappMessage.length === 200 ? "text-red-500" : "text-gray-500"}`}>
           {whatsappMessage.length}/200 characters

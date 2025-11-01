@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
 import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, Loop, PlayArrowRounded } from "@mui/icons-material"
@@ -22,7 +22,8 @@ import EmailLogic from "../../components/NewQr/EmailLogic.js"
 import WifiLogic from "../../components/NewQr/WifiLogic.js"
 import LocationLogic from "../../components/NewQr/LocationLogic.js"
 import VCardLogic from "../../components/NewQr/VCardLogic.js"
-import SocialMediaLogic from "../../components/NewQr/SocialMediaLogic.js"
+// import SocialMediaLogic from "../../components/NewQr/SocialMediaLogic.js"
+import { useForm, type SubmitHandler } from 'react-hook-form'
 
 interface QRTypeArray {
   key: string,
@@ -64,15 +65,45 @@ const levelTabsArray: levelObject[] = [
   { key: 'L', label: 'Level L', percentage: 7 }
 ]
 
+export interface FormInputs {
+  qrName: string
+  fromDate: string
+  toDate: string
+  scanLimit: number | null
+  password: string
+  confirmPassword: string
+}
+
 const NewQR = () => {
+  const { 
+    register,
+    handleSubmit,
+    control,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<FormInputs>({
+    defaultValues: {
+      qrName: '',
+      fromDate: '',
+      toDate: '',
+      scanLimit: null,
+      password: '',
+      confirmPassword: ''
+    }
+  });
+
   const uid = sessionStorage.getItem('userId') || '';
+
+  const fromDateValue = watch("fromDate");
+  const qrNameValue = watch("qrName");
 
   // QR Type Section
   const qrType = useSelector((state: RootState) => state.qrType.type);
   const dispatch = useDispatch<AppDispatch>();
 
-  // Name Section
-  const [qrName, setQrName] = useState<string>('');
+  // Content Section
+  const [content, setContent] = useState({});
 
   // Design Section
   const [designTab, setDesignTab] = useState<string>('Shape');
@@ -85,23 +116,15 @@ const NewQR = () => {
   const [openScanLimit, setOpenScanLimit] = useState<boolean>(false);
   const [openPassword, setOpenPassword] = useState<boolean>(false);
   const today = new Date().toISOString().split("T")[0];
-  const [fromDate, setFromDate] = useState<string>('');
-  const [toDate, setToDate] = useState<string>('');
-  const [scanLimit, setScanLimit] = useState<number | null>(null);
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
 
+  // Download Section
   const [qrPreview, setQrPreview] = useState<string>("");
   const [openDownloadModal, setOpenDownload] = useState<boolean>(false);
 
-  const [content, setContent] = useState({});
-
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleGenerateQr = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if(password!==confirmPassword) {
+  const handleGenerateQr: SubmitHandler<FormInputs> = async (data: FormInputs) => {
+    if(data.password!==data.confirmPassword) {
       toast.error('Password and confirm password not match!');
       return;
     }
@@ -110,7 +133,7 @@ const NewQR = () => {
       setLoading(true);
       const qrPayload = {
         user_id: uid,
-        name: qrName,
+        name: data.qrName,
         qr_type: qrType,
         content,
         design: {
@@ -121,33 +144,25 @@ const NewQR = () => {
           errorCorrectionLevel
         },
         configuration: {
-          from_date: fromDate,
-          to_date: toDate,
-          scan_limit: scanLimit,
-          password,
+          from_date: data.fromDate,
+          to_date: data.toDate,
+          scan_limit: data.scanLimit,
+          password: data.password,
         }
       };
 
-      if(["text", "wifi", "vcard"].includes(qrType)) {
-        const response = await API.post("/static-qr", qrPayload);
-        setQrPreview(response.data.qr_image);
-      } else {
-        const response = await API.post("/dynamic-qr", qrPayload);
-        setQrPreview(response.data.qr_image);
-      }
-      
-      setQrName('');
+      const response = ["text", "wifi", "vcard"].includes(qrType)
+        ? await API.post("/static-qr", qrPayload)
+        : await API.post("/dynamic-qr", qrPayload);
+      setQrPreview(response.data.qr_image);
+      toast.success("QR generated successfully.");
+
+      reset();
       setContent({});
       setDesignTab('Shape');
       setForegroundColor('#000000');
       setBackgroundColor('#FFFFFF');
       setErrorCorrectionLevel('Q');
-      setFromDate('');
-      setToDate('');
-      setScanLimit(null);
-      setPassword('');
-      setConfirmPassword('');
-      toast.success("QR generated successfully.");
       setLoading(false);
     } catch (error: unknown) {
       setLoading(false);
@@ -168,21 +183,21 @@ const NewQR = () => {
   const renderQRContent = () => {
     switch (qrType) {
       case "website":
-        return <WebsiteLogic content={content} setContent={setContent} />;
+        return <WebsiteLogic setContent={setContent} register={register} errors={errors} />;
       case "text":
-        return <TextLogic content={content} setContent={setContent} />;
+        return <TextLogic content={content} setContent={setContent} register={register} errors={errors} />;
       case "whatsapp":
-        return <WhatsappLogic content={content} setContent={setContent} />;
+        return <WhatsappLogic content={content} setContent={setContent} register={register} errors={errors} />;
       case "email":
-        return <EmailLogic content={content} setContent={setContent} />;
+        return <EmailLogic setContent={setContent} register={register} errors={errors} />;
       case "wifi":
-        return <WifiLogic content={content} setContent={setContent} />;
+        return <WifiLogic setContent={setContent} register={register} errors={errors} />;
       case "location":
-        return <LocationLogic content={content} setContent={setContent} />;
+        return <LocationLogic content={content} setContent={setContent} register={register} errors={errors} />;
       case "vcard":
-        return <VCardLogic content={content} setContent={setContent} />;
-      case "social":
-        return <SocialMediaLogic content={content} setContent={setContent} />
+        return <VCardLogic content={content} setContent={setContent} register={register} control={control} errors={errors} />;
+      // case "social":
+      //   return <SocialMediaLogic content={content} setContent={setContent} register={register} errors={errors} />
       default:
         return null;
     }
@@ -201,7 +216,7 @@ const NewQR = () => {
       <div className="grow flex flex-col gap-2 p-2 overflow-auto">
         <Menubar heading='New QR'/>
 
-        <form className="grow bg-white rounded-md overflow-y-auto flex flex-col md:flex-row gap-8 p-2" onSubmit={handleGenerateQr}>
+        <form className="grow bg-white rounded-md overflow-y-auto flex flex-col md:flex-row gap-8 p-2" onSubmit={handleSubmit(handleGenerateQr)}>
           <div className="w-full md:w-2/3 flex flex-col gap-8 md:p-6 md:overflow-y-auto">
             <AnimatePresence>
               {["text", "wifi", "vcard"].includes(qrType) && (
@@ -240,7 +255,10 @@ const NewQR = () => {
             {/* Name Section */}
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">2</span> Name your QR</h3>
-              <input type="text" placeholder="Enter name" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={qrName}onChange={(e) => setQrName(e.target.value)} required/>
+              <div>
+                <input type="text" placeholder="Enter name" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200" {...register("qrName", {required: "Name is required"})}/>
+                {errors.qrName && <p className="text-red-500 text-sm mt-1">{errors.qrName.message}</p>}
+              </div>
             </div>
 
             <hr className="text-gray-300"/>
@@ -310,8 +328,32 @@ const NewQR = () => {
                           <div className="flex flex-col gap-3 p-3">
                             <p className="text-sm text-gray-600">Control when your QR code will be active. Set a start and end date to automatically enable or disable access. Useful for time-limited campaigns, events, or offers.</p>
                             <div className="grid grid-cols-2 gap-2">
-                              <input type="date" name="fromDate" id="fromDate" className="p-2 border border-gray-300 rounded" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} min={today}/>
-                              <input type="date" name="toDate" id="toDate" className="p-2 border border-gray-300 rounded" value={toDate} onChange={(e)=>setToDate(e.target.value)} min={fromDate || today} />
+                              <div>
+                                <input type="date" id="fromDate" min={today}
+                                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                                  {...register("fromDate", {
+                                    validate: (value) => {
+                                      const toDate = watch("toDate");
+                                      if (!value && toDate) return "Please select From Date";
+                                      return true;
+                                    },
+                                  })}
+                                />
+                                {errors.fromDate && (<p className="text-red-500 text-sm mt-1">{errors.fromDate.message}</p>)}
+                              </div>
+                              <div>
+                                <input type="date" id="toDate" min={fromDateValue || today}
+                                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                                  {...register("toDate", {
+                                    validate: (value) => {
+                                      const fromDate = watch("fromDate");
+                                      if (!value && fromDate) return "Please select From Date";
+                                      return true;
+                                    },
+                                  })}
+                                />
+                                {errors.toDate && (<p className="text-red-500 text-sm mt-1">{errors.toDate.message}</p>)}
+                              </div>
                             </div>
                           </div>
                         </motion.div>
@@ -330,7 +372,19 @@ const NewQR = () => {
                         >
                           <div className="flex flex-col gap-3 p-3">
                             <p className="text-sm text-gray-600">Restrict the number of times your QR code can be scanned. Once the limit is reached, users will no longer be able to access the linked content. Perfect for exclusive offers, limited trials, or controlled access.</p>
-                            <input type="number" name="scanLimit" id="scanLimit" placeholder="Limit number of scans" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={scanLimit || ''} onChange={(e)=>setScanLimit(e.target.value ? Number(e.target.value) : null)} />
+                            <div>
+                              <input type="number" id="scanLimit" 
+                                placeholder="Limit number of scans" 
+                                className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200" 
+                                {...register("scanLimit", {
+                                  validate: (value) => {
+                                    if (value === null) return true;
+                                    return Number(value) > 0 || "Scan limit must be greater than 0";
+                                  },
+                                })}
+                              />
+                              {errors.scanLimit && (<p className="text-red-500 text-sm mt-1">{errors.scanLimit.message}</p>)}
+                            </div>
                           </div>
                         </motion.div>
                       }
@@ -349,8 +403,36 @@ const NewQR = () => {
                           <div className="flex flex-col gap-3 p-3">
                             <p className="text-sm text-gray-600">Protect your QR code with a password. Users will need to enter the correct password before they can view or access the linked content. Ideal for private documents, internal links, or sensitive materials.</p>
                             <div className="grid grid-cols-2 gap-2">
-                              <input type="password" name="password" id="password" placeholder="Set a password" className="p-2 border border-gray-300 rounded" value={password} onChange={(e)=>setPassword(e.target.value)} />
-                              <input type="text" name="confirmPassword" id="confirmPassword" placeholder="Confirm password" className="p-2 border border-gray-300 rounded" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)} />
+                              <div>
+                                <input type="password" id="password" 
+                                  placeholder="Set a password" 
+                                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200" 
+                                  {...register("password", {
+                                    validate: (value) => {
+                                      if (!value) return true;
+                                      if (value.length < 6) return "Password must be at least 6 characters";
+                                      return true;
+                                    }
+                                  })}
+                                />
+                                {errors.password && (<p className="text-red-500 text-sm mt-1">{errors.password.message}</p>)}
+                              </div>
+                              <div>
+                                <input type="password" id="confirmPassword" 
+                                  placeholder="Confirm password" 
+                                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200" 
+                                  {...register("confirmPassword", {
+                                    validate: (value) => {
+                                      const password = watch("password");
+                                      if (!value && !password) return true;
+                                      if (!value && password) return "Please confirm your password";
+                                      if (value !== password) return "Passwords do not match";
+                                      return true;
+                                    }
+                                  })}
+                                />
+                                {errors.confirmPassword && (<p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>)}
+                              </div>
                             </div>
                           </div>
                         </motion.div>
@@ -380,7 +462,7 @@ const NewQR = () => {
         </form>
       </div>
       <AnimatePresence>
-        {openDownloadModal && <DownloadQR setOpenDownloadModal={setOpenDownload} qrPreview={qrPreview} qrName={qrName} />}
+        {openDownloadModal && <DownloadQR setOpenDownloadModal={setOpenDownload} qrPreview={qrPreview} qrName={qrNameValue} />}
       </AnimatePresence>
     </div>
   )

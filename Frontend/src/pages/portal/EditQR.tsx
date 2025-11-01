@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent, type ReactNode } from "react"
+import { useState, useEffect, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
 import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, PlayArrowRounded, ArrowBack } from "@mui/icons-material"
@@ -28,6 +28,7 @@ import WebsiteImage from '../../assets/hero/Website.png'
 import WhatsappImage from '../../assets/hero/Whatsapp.png'
 import WifiImage from '../../assets/hero/Wifi.png'
 import { ArrowRight } from "lucide-react"
+import { useForm } from "react-hook-form"
 
 interface QRTypeArray {
   key: string,
@@ -64,25 +65,98 @@ const qrTypeImages: Record<string, string> = {
   vcard: vCardImage,
 };
 
+interface PhoneNumber {
+  type: string;
+  number: string;
+}
+
+interface ContentInputs {
+  websiteContent?: string;
+  textContent?: string;
+  emailContent?: string;
+  whatsappNumber?: string;
+  whatsappMessage?: string;
+  locationTab?: string;
+  locationStreet?: string;
+  locationArea?: string;
+  locationPostalCode?: string;
+  locationCity?: string;
+  locationState?: string;
+  locationCountry?: string;
+  latitude?: string;
+  longitude?: string;
+  wifiSsid?: string;
+  wifiPassword?: string;
+  wifiEncryption?: string;
+  firstName?: string;
+  lastName?: string;
+  phones?: PhoneNumber[];
+  email?: string;
+  website?: string;
+  company?: string;
+  title?: string;
+}
+
+export interface EditFormInputs {
+  qrName: string;
+  fromDate: string;
+  toDate: string;
+  scanLimit?: number | null;
+  password: string;
+  confirmPassword: string;
+  content: ContentInputs;
+}
+
 const EditQR = () => {
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<EditFormInputs>({
+    defaultValues: {
+      qrName: '',
+      fromDate: '',
+      toDate: '',
+      scanLimit: undefined,
+      password: '',
+      confirmPassword: '',
+      content: {
+        websiteContent: '',
+        textContent: '',
+        emailContent: '',
+        whatsappNumber: '',
+        whatsappMessage: '',
+        locationTab: '',
+        locationStreet: '',
+        locationArea: '',
+        locationPostalCode: '',
+        locationCity: '',
+        locationState: '',
+        locationCountry: '',
+        latitude: '',
+        longitude: '',
+        wifiSsid: '',
+        wifiPassword: '',
+        wifiEncryption: '',
+        firstName: '',
+        lastName: '',
+        phones: [{ type: 'Mobile', number: '' }],
+        email: '',
+        website: '',
+        company: '',
+        title: '',
+      }
+    }
+  });
+
   const { id } = useParams();
+
+  const fromDateValue = watch("fromDate");
+  const scanLimitValue = watch("scanLimit");
 
   const qrType = useSelector((state: RootState) => state.qrType.type);
   const dispatch = useDispatch<AppDispatch>();
-
-  const [qrName, setQrName] = useState<string>('');
 
   const [openTimeScheduling, setOpenTimeScheduling] = useState<boolean>(false);
   const [openScanLimit, setOpenScanLimit] = useState<boolean>(false);
   const [openPassword, setOpenPassword] = useState<boolean>(false);
   const today = new Date().toISOString().split("T")[0];
-  const [fromDate, setFromDate] = useState<string>('');
-  const [toDate, setToDate] = useState<string>('');
-  const [scanLimit, setScanLimit] = useState<number | null>(null);
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
-
-  const [content, setContent] = useState({});
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -93,14 +167,17 @@ const EditQR = () => {
       setLoading(true);
       const response = await API.get(`/qr-details/${id}`);
       const qrDetails = response.data.data[0];
+
       dispatch(activeTab(qrDetails?.qr_type ?? 'website'));
-      setQrName(qrDetails?.name);
-      setContent(qrDetails?.content);
-      setFromDate(qrDetails?.configuration?.from_date);
-      setToDate(qrDetails?.configuration?.to_date);
-      setScanLimit(qrDetails?.configuration?.scan_limit);
-      setPassword(qrDetails?.configuration?.password);
-      setConfirmPassword(qrDetails?.configuration?.password);
+
+      setValue('qrName', qrDetails?.name);
+      setValue('fromDate', qrDetails?.configuration?.from_date || '');
+      setValue('toDate', qrDetails?.configuration?.to_date || '');
+      setValue('scanLimit', qrDetails?.configuration?.scan_limit || null);
+      setValue('password', qrDetails?.configuration?.password || '');
+      setValue('confirmPassword', qrDetails?.configuration?.password || '');
+      setValue('content', qrDetails?.content || {});
+
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -117,21 +194,19 @@ const EditQR = () => {
     fetchQrDetails();
   }, [])
 
-  const handleEditQr = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const handleEditQr = async (data: EditFormInputs) => {
     try {
       setLoading(true);
       await API.put('/qr', {
         qr_id: id,
-        name: qrName,
+        name: data.qrName,
         qr_type: qrType,
-        content,
+        content: data.content,
         configuration: {
-          from_date: fromDate,
-          to_date: toDate,
-          scan_limit: scanLimit,
-          password,
+          from_date: data.fromDate,
+          to_date: data.toDate,
+          scan_limit: data.scanLimit,
+          password: data.password,
         }
       });
       navigate('/my-qr');
@@ -151,19 +226,19 @@ const EditQR = () => {
   const renderQRContent = () => {
     switch (qrType) {
       case "website":
-        return <WebsiteEditLogic content={content} setContent={setContent} />;
+        return <WebsiteEditLogic register={register} errors={errors} />;
       case "text":
-        return <TextEditLogic content={content} setContent={setContent} />;
+        return <TextEditLogic register={register} errors={errors} watch={watch} />;
       case "whatsapp":
-        return <WhatsappEditLogic content={content} setContent={setContent} />;
+        return <WhatsappEditLogic register={register} errors={errors} watch={watch} />;
       case "email":
-        return <EmailEditLogic content={content} setContent={setContent} />;
+        return <EmailEditLogic register={register} errors={errors} />;
       case "wifi":
-        return <WifiEditLogic content={content} setContent={setContent} />;
+        return <WifiEditLogic register={register} errors={errors} />;
       case "location":
-        return <LocationEditLogic content={content} setContent={setContent} />;
+        return <LocationEditLogic register={register} errors={errors} watch={watch} />;
       case "vcard":
-        return <VCardEditLogic content={content} setContent={setContent} />;
+        return <VCardEditLogic register={register} errors={errors} watch={watch} />;
       default:
         return null;
     }
@@ -182,7 +257,7 @@ const EditQR = () => {
       <div className="grow flex flex-col gap-2 p-2 overflow-auto">
         <Menubar heading='Edit QR'/>
 
-        <form className="grow bg-white rounded-md overflow-y-auto flex flex-col md:flex-row gap-8 p-2" onSubmit={handleEditQr}>
+        <form className="grow bg-white rounded-md overflow-y-auto flex flex-col md:flex-row gap-8 p-2" onSubmit={handleSubmit(handleEditQr)}>
           <div className="w-full md:w-2/3 flex flex-col gap-8 md:p-6 md:overflow-y-auto">
             <AnimatePresence>
               {["text", "wifi", "vcard"].includes(qrType) && (
@@ -201,6 +276,7 @@ const EditQR = () => {
 
             <NavLink to={'/my-qr'} className="flex items-center gap-1 !underline"><ArrowBack sx={{fontSize: '16px'}}/>Back</NavLink>
 
+            {/* QR Type Selection */}
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">1</span> Select the QR type</h3>
               <Select value={qrType} className="w-full lg:w-2/3" required
@@ -219,13 +295,19 @@ const EditQR = () => {
 
             <hr className="text-gray-300"/>
 
+            {/* Name Selection */}
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">2</span> Name your QR</h3>
-              <input type="text" placeholder="Enter name" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={qrName}onChange={(e) => setQrName(e.target.value)} required/>
+              <input type="text" placeholder="Enter name" 
+                className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                {...register("qrName", { required: "QR name is required" })}
+              />
+              {errors.qrName && <p className="text-red-500 text-sm">{errors.qrName.message}</p>}
             </div>
 
             <hr className="text-gray-300"/>
 
+            {/* Content Section */}
             <div className="flex flex-col gap-4">
               <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">3</span> Complete the content</h3>
               {renderQRContent()}
@@ -235,6 +317,7 @@ const EditQR = () => {
               <>
                 <hr className="text-gray-300"/>
 
+                {/* Customization Section */}
                 <div className="flex flex-col gap-4">
                   <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">4</span> Customize your QR</h3>
                   <div>
@@ -252,8 +335,32 @@ const EditQR = () => {
                           <div className="flex flex-col gap-3 p-3">
                             <p className="text-sm text-gray-600">Control when your QR code will be active. Set a start and end date to automatically enable or disable access. Useful for time-limited campaigns, events, or offers.</p>
                             <div className="grid grid-cols-2 gap-2">
-                              <input type="date" name="fromDate" id="fromDate" className="p-2 border border-gray-300 rounded" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} min={today}/>
-                              <input type="date" name="toDate" id="toDate" className="p-2 border border-gray-300 rounded" value={toDate} onChange={(e)=>setToDate(e.target.value)} min={fromDate || today} />
+                              <div>
+                                <input type="date" id="fromDate" min={today}
+                                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                                  {...register("fromDate", {
+                                    validate: (value) => {
+                                      const toDate = watch("toDate");
+                                      if (!value && toDate) return "Please select From Date";
+                                      return true;
+                                    },
+                                  })}
+                                />
+                                {errors.fromDate && (<p className="text-red-500 text-sm mt-1">{errors.fromDate.message}</p>)}
+                              </div>
+                              <div>
+                                <input type="date" id="toDate" min={fromDateValue || today}
+                                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                                  {...register("toDate", {
+                                    validate: (value) => {
+                                      const fromDate = watch("fromDate");
+                                      if (!value && fromDate) return "Please select From Date";
+                                      return true;
+                                    },
+                                  })}
+                                />
+                                {errors.toDate && (<p className="text-red-500 text-sm mt-1">{errors.toDate.message}</p>)}
+                              </div>
                             </div>
                           </div>
                         </motion.div>
@@ -272,7 +379,19 @@ const EditQR = () => {
                         >
                           <div className="flex flex-col gap-3 p-3">
                             <p className="text-sm text-gray-600">Restrict the number of times your QR code can be scanned. Once the limit is reached, users will no longer be able to access the linked content. Perfect for exclusive offers, limited trials, or controlled access.</p>
-                            <input type="number" name="scanLimit" id="scanLimit" placeholder="Limit number of scans" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={scanLimit || ''} onChange={(e)=>setScanLimit(e.target.value ? Number(e.target.value) : null)} min={scanLimit || 0}/>
+                            <div>
+                              <input type="number" id="scanLimit" min={scanLimitValue || 0}
+                                placeholder="Limit number of scans" 
+                                className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                                {...register("scanLimit", {
+                                  validate: (value) => {
+                                    if (value === null) return true;
+                                    return Number(value) > 0 || "Scan limit must be greater than 0";
+                                  },
+                                })}
+                              />
+                              {errors.scanLimit && <p className="text-red-500 text-sm mt-1">{errors.scanLimit.message}</p>}
+                            </div>
                           </div>
                         </motion.div>
                       }
@@ -291,8 +410,36 @@ const EditQR = () => {
                           <div className="flex flex-col gap-3 p-3">
                             <p className="text-sm text-gray-600">Protect your QR code with a password. Users will need to enter the correct password before they can view or access the linked content. Ideal for private documents, internal links, or sensitive materials.</p>
                             <div className="grid grid-cols-2 gap-2">
-                              <input type="password" name="password" id="password" placeholder="Set a password" className="p-2 border border-gray-300 rounded" value={password} onChange={(e)=>setPassword(e.target.value)} />
-                              <input type="text" name="confirmPassword" id="confirmPassword" placeholder="Confirm password" className="p-2 border border-gray-300 rounded" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)} />
+                              <div>
+                                <input type="password" id="password" 
+                                  placeholder="Set a password"
+                                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                                  {...register("password", {
+                                    validate: (value) => {
+                                      if (!value) return true;
+                                      if (value.length < 6) return "Password must be at least 6 characters";
+                                      return true;
+                                    }
+                                  })}
+                                />
+                                {errors.password && (<p className="text-red-500 text-sm mt-1">{errors.password.message}</p>)}
+                              </div>
+                              <div>
+                                <input type="text" id="confirmPassword"
+                                  placeholder="Confirm password"
+                                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                                  {...register("confirmPassword", {
+                                    validate: (value) => {
+                                      const password = watch("password");
+                                      if (!value && !password) return true;
+                                      if (!value && password) return "Please confirm your password";
+                                      if (value !== password) return "Passwords do not match";
+                                      return true;
+                                    }
+                                  })}
+                                />
+                                {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>}
+                              </div>
                             </div>
                           </div>
                         </motion.div>
