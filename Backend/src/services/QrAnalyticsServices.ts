@@ -40,8 +40,6 @@ export const scanAnalyticsLogic = async (id: number, clientIp: string | null, de
                 return { success: true, redirectURL };
             } else {
                 await pool.query(`UPDATE qr_codes SET state = 'Active' WHERE qr_id = ?;`, [id]);
-
-                return { success: true, message: 'QR code is now active.' }
             }
         }
 
