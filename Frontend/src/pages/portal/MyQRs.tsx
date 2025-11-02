@@ -452,18 +452,18 @@ const MyQRs = () => {
 
             <div className="flex items-center gap-4">
               <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500 flex items-center gap-2 border border-gray-200" onClick={()=>handleDelete(selectedRows)}>
-                <Delete /> Delete
+                <Delete /> <span className='hidden md:inline-block'>Delete</span>
               </button>
 
               {getSelectedStatus() === "Active" && (
                 <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500 flex items-center gap-2 border border-gray-200" onClick={() => handleStatus(selectedRows, "Paused")}>
-                  <PauseCircleOutline /> Pause
+                  <PauseCircleOutline /> <span className='hidden md:inline-block'>Pause</span>
                 </button>
               )}
 
               {getSelectedStatus() === "Paused" && (
                 <button className="text-blue-500 font-semibold px-4 py-2 rounded-full hover:bg-blue-50 transition duration-500 flex items-center gap-2 border border-gray-200" onClick={() => handleStatus(selectedRows, "Active")}>
-                  <PlayCircleOutlineRounded /> Resume
+                  <PlayCircleOutlineRounded /> <span className='hidden md:inline-block'>Resume</span>
                 </button>
               )}
             </div>

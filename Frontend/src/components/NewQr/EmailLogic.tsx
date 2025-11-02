@@ -1,16 +1,16 @@
 import React from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
-import type { EditFormInputs as BaseFormInputs } from "../../pages/portal/EditQR";
+import type { FormInputs as BaseFormInputs } from "../../pages/portal/NewQR";
 
-interface EmailFormInputs extends BaseFormInputs {
+interface FormInputs extends BaseFormInputs {
   emailContent?: string;
 }
 
 interface EmailLogicProps {
   setContent: Dispatch<SetStateAction<{ emailContent?: string }>>;
-  register: UseFormRegister<EmailFormInputs>;
-  errors?: FieldErrors<EmailFormInputs>;
+  register: UseFormRegister<FormInputs>;
+  errors?: FieldErrors<FormInputs>;
 }
 
 const EmailLogic: React.FC<EmailLogicProps> = ({ setContent, register, errors }) => {

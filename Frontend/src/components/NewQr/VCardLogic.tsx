@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import type { Dispatch, SetStateAction } from "react"
 import { PlayArrowRounded } from "@mui/icons-material"
 import { AnimatePresence, motion } from "framer-motion"
 import { AddRounded, DeleteRounded } from '@mui/icons-material'
+import { type UseFormRegister, type FieldErrors, useFieldArray, type Control } from "react-hook-form";
+import type { FormInputs as BaseFormInputs } from "../../pages/portal/NewQR";
 
 interface PhoneNumber {
   type: string,
   number: string
 }
 
-interface VCardContent {
+interface VCardFormInputs extends BaseFormInputs {
   firstName?: string,
   lastName?: string,
   phones?: PhoneNumber[],
@@ -25,65 +27,26 @@ interface VCardContent {
 }
 
 interface VCardLogicProps {
-  content: VCardContent;
-  setContent: Dispatch<SetStateAction<VCardContent>>;
+  content: { firstName?: string, lastName?: string, phones?: PhoneNumber[], email?: string,website?: string, locationStreet?: string, locationPostalCode?: string, locationCity?: string, locationState?: string, locationCountry?: string, company?: string, title?: string };
+  setContent: Dispatch<SetStateAction<{ firstName?: string, lastName?: string, phones?: PhoneNumber[], email?: string,website?: string, locationStreet?: string, locationPostalCode?: string, locationCity?: string, locationState?: string, locationCountry?: string, company?: string, title?: string }>>;
+  register: UseFormRegister<VCardFormInputs>;
+  errors?: FieldErrors<VCardFormInputs>;
+  control?: Control<VCardFormInputs>;
 }
 
-const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
+const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent, register, errors, control }) => {
   const [openName, setOpenName] = useState<boolean>(false);
   const [openInfo, setOpenInfo] = useState<boolean>(false);
   const [openLocation, setOpenLocation] = useState<boolean>(false);
   const [openCompany, setOpenCompany] = useState<boolean>(false);
 
-  // Name
-  const [firstName, setFirstName] = useState<string>('');
-  const [lastName, setLastName] = useState<string>('');
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "phones",
+  });
 
-  // Contact Info
-  const [phones, setPhones] = useState<PhoneNumber[]>([{
-    type: 'Mobile',
-    number: ''
-  }]);
-  const [email, setEmail] = useState<string>('');
-  const [website, setWebsite] = useState<string>('');
-
-  // Location
-  const [locationStreet, setLocationStreet] = useState<string>("");
-  const [locationPostalCode, setLocationPostalCode] = useState<string>("");
-  const [locationCity, setLocationCity] = useState<string>("");
-  const [locationState, setLocationState] = useState<string>("");
-  const [locationCountry, setLocationCountry] = useState<string>("");
-
-  //Company
-  const [company, setCompany] = useState<string>('');
-  const [title, setTitle] = useState<string>('');
-
-  useEffect(() => {
-    setContent({ firstName, lastName, phones, email, website, locationStreet, locationPostalCode, locationCity, locationState, locationCountry, company, title });
-  }, [firstName, lastName, phones, email, website, locationStreet, locationPostalCode, locationCity, locationState, locationCountry, company, title, setContent]);
-
-  useEffect(() => {
-    if (!content?.firstName) setFirstName('');
-    if (!content?.lastName) setLastName('');
-    if (!content?.phones) setPhones([]);
-    if (!content?.email) setEmail('');
-    if (!content?.website) setWebsite('');
-    if (!content?.locationStreet) setLocationStreet('');
-    if (!content?.locationPostalCode) setLocationPostalCode('');
-    if (!content?.locationCity) setLocationCity('');
-    if (!content?.locationState) setLocationState('');
-    if (!content?.locationCountry) setLocationCountry('');
-    if (!content?.company) setCompany('');
-    if (!content?.title) setTitle('');
-  }, [content]);
-
-  const handleAddPhone = () => {
-    setPhones([...phones, { type: 'Mobile', number: '' }]);
-  }
-
-  const handleRemovePhone = (index: number) => {
-    setPhones(phones.filter((__, i) => i !== index));
-  }
+  const handleAddPhone = () => append({ type: "Mobile", number: "" });
+  const handleRemovePhone = (index: number) => remove(index);
 
   return (
     <div className="flex flex-col">
@@ -102,12 +65,24 @@ const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
             <div className="grid grid-cols-2 gap-2 p-3">
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-semibold text-gray-500">First Name</label>
-                <input type="text" placeholder="E.g. John" className="p-2 border border-gray-300 rounded" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
+                <input type="text" placeholder="E.g. John" 
+                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                  {...register("firstName", {
+                    required: "First name is required",
+                    onChange: (e) => setContent((prev) => ({ ...prev, firstName: e.target.value }))
+                  })}
+                />
+                {errors?.firstName && (<p className="text-red-500 text-sm">{errors.firstName.message}</p>)}
               </div>
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-semibold text-gray-500">Last Name</label>
-                <input type="text" placeholder="E.g. Smith" className="p-2 border border-gray-300 rounded" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                <input type="text" placeholder="E.g. Smith" 
+                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                  {...register("lastName", {
+                    onChange: (e) => setContent((prev) => ({ ...prev, lastName: e.target.value }))
+                  })}
+                />
               </div>
             </div>
           </motion.div>
@@ -134,46 +109,72 @@ const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
                 </label>
               </div>
 
-              {phones.length > 0 &&
-                <div className="flex flex-col gap-2">
-                  {phones.map((phone, index) => (
-                    <div className="flex items-start md:items-center gap-4 bg-gray-100 rounded-md p-2" key={index}>
-                      <div className="grow flex items-center flex-wrap gap-2">
-                        <select name="type" id="type" value={phone.type} className="p-2 border border-gray-300 rounded"
-                          onChange={(e) => {
-                            const updatedPhones = [...phones];
-                            updatedPhones[index].type = e.target.value;
-                            setPhones(updatedPhones);
-                          }}
-                        >
-                          <option value="Mobile">Mobile</option>
-                          <option value="Home">Home</option>
-                          <option value="Work">Work</option>
-                        </select>
-                        <input type="text" placeholder="E.g. +91 9876543210" className="grow p-2 border border-gray-300 rounded" value={phone.number} required 
-                          onChange={(e) => {
-                            const updatedPhones = [...phones];
-                            updatedPhones[index].number = e.target.value;
-                            setPhones(updatedPhones);
-                          }}
-                        />
-                      </div>
-                      <div className="text-blue-500 hover:text-blue-700 p-1 border border-gray-300 rounded-full flex justify-center items-center cursor-pointer" onClick={() => handleRemovePhone(index)}>
-                        <DeleteRounded />
-                      </div>
-                    </div>
-                  ))}
+              {fields.map((field, index) => (
+                <div key={field.id} className="flex items-center gap-3 bg-gray-100 rounded-md p-2 overflow-x-auto">
+                  <select
+                    {...register(`phones.${index}.type` as const, {
+                      onChange: (e) => {
+                        const newPhones = [...(content.phones || [])];
+                        newPhones[index] = { ...newPhones[index], type: e.target.value };
+                        setContent((prev) => ({ ...prev, phones: newPhones }));
+                      }
+                    })}
+                    className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                    defaultValue={field.type || "Mobile"}
+                  >
+                    <option value="Mobile">Mobile</option>
+                    <option value="Home">Home</option>
+                    <option value="Work">Work</option>
+                  </select>
+
+                  <input
+                    {...register(`phones.${index}.number` as const, { 
+                      required: "Phone number is required",
+                      onChange: (e) => {
+                        const newPhones = [...(content.phones || [])];
+                        newPhones[index] = { ...newPhones[index], number: e.target.value };
+                        setContent((prev) => ({ ...prev, phones: newPhones }));
+                      }
+                    })}
+                    type="text"
+                    placeholder="E.g. +91 9876543210"
+                    className="grow p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                  />
+
+                  <div className="flex justify-center items-center text-blue-500 hover:text-blue-700 p-1 border border-gray-300 rounded-full cursor-pointer" onClick={() => handleRemovePhone(index)}>
+                    <DeleteRounded sx={{ fontSize: 18 }} />
+                  </div>
                 </div>
-              }
+              ))}
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-semibold text-gray-500">Email</label>
-                <input type="text" placeholder="E.g. example@gmail.com" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <input type="text" placeholder="E.g. example@gmail.com" 
+                  className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                  {...register("email", {
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Enter a valid email address",
+                    },
+                    onChange: (e) => setContent((prev) => ({ ...prev, email: e.target.value }))
+                  })}
+                />
+                {errors?.email && (<p className="text-red-500 text-sm">{errors.email.message}</p>)}
               </div>
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-semibold text-gray-500">Personal Website</label>
-                <input type="text" placeholder="E.g. www.example.com" className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" value={website} onChange={(e) => setWebsite(e.target.value)} />
+                <input type="text" placeholder="E.g. www.example.com" 
+                  className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                  {...register("website", {
+                    pattern: {
+                      value: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/[\w-./?%&=]*)?$/,
+                      message: "Enter a valid URL"
+                    },
+                    onChange: (e) => setContent((prev) => ({ ...prev, website: e.target.value }))
+                  })}
+                />
+                {errors?.website && (<p className="text-red-500 text-sm">{errors.website.message}</p>)}
               </div>
             </div>
           </motion.div>
@@ -196,37 +197,67 @@ const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
                   <label className="text-sm font-semibold text-gray-500">Street</label>
-                  <input type="text" placeholder="E.g. 403" value={locationStreet} onChange={(e) => setLocationStreet(e.target.value)} className="p-2 border border-gray-300 rounded" />
+                  <input type="text" placeholder="E.g. 403" 
+                    className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                    {...register("locationStreet", {
+                      onChange: (e) => setContent((prev) => ({ ...prev, locationStreet: e.target.value })),
+                    })}
+                  />
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-sm font-semibold text-gray-500">Postal Code</label>
-                  <input type="text" placeholder="E.g. 122001" value={locationPostalCode} onChange={(e) => setLocationPostalCode(e.target.value)} className="p-2 border border-gray-300 rounded" />
+                  <input type="text" placeholder="E.g. 122001" 
+                    className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                    {...register("locationPostalCode", {
+                      pattern: {
+                        value: /^[0-9]{5,6}$/,
+                        message: "Enter a valid postal code",
+                      },
+                      onChange: (e) => setContent((prev) => ({ ...prev, locationPostalCode: e.target.value })),
+                    })}
+                  />
+                  {errors?.locationPostalCode && (<p className="text-red-500 text-sm">{errors.locationPostalCode.message}</p>)}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
                   <label className="text-sm font-semibold text-gray-500">City</label>
-                  <input type="text" placeholder="E.g. Gurugram" value={locationCity} onChange={(e) => setLocationCity(e.target.value)} className="p-2 border border-gray-300 rounded" />
+                  <input type="text" placeholder="E.g. Gurugram"
+                    className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                    {...register("locationCity", {
+                      onChange: (e) => setContent((prev) => ({ ...prev, locationCity: e.target.value })),
+                    })}
+                  />
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-sm font-semibold text-gray-500">State</label>
-                  <input type="text" placeholder="E.g. Haryana" value={locationState} onChange={(e) => setLocationState(e.target.value)} className="p-2 border border-gray-300 rounded" />
+                  <input type="text" placeholder="E.g. Haryana" 
+                    className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200" 
+                    {...register("locationState", {
+                      onChange: (e) => setContent((prev) => ({ ...prev, locationState: e.target.value })),
+                    })}
+                  />
                 </div>
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-semibold text-gray-500">Country</label>
-                <input type="text" placeholder="E.g. India" value={locationCountry} onChange={(e) => setLocationCountry(e.target.value)} className="w-full lg:w-2/3 p-2 border border-gray-300 rounded" />
+                <input type="text" placeholder="E.g. India" 
+                  className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                  {...register("locationCountry", {
+                    onChange: (e) => setContent((prev) => ({ ...prev, locationCountry: e.target.value })),
+                  })}
+                />
               </div>
             </div>
 
-            {(locationStreet || locationCity) && (
-              <div className="mt-3">
+            {(content.locationStreet || content.locationCity) && (
+              <div className="my-3">
                 <iframe
                   title="Location Preview"
                   width="100%"
                   height="250"
                   className="rounded-xl border"
-                  src={`https://www.google.com/maps?q=${encodeURIComponent(`${locationStreet}, ${locationCity}, ${locationState}, ${locationCountry}`)}&output=embed`}
+                  src={`https://www.google.com/maps?q=${encodeURIComponent(`${content.locationStreet}, ${content.locationCity}, ${content.locationState}, ${content.locationCountry}`)}&output=embed`}
                 ></iframe>
               </div>
             )}
@@ -249,12 +280,22 @@ const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent }) => {
             <div className="grid grid-cols-2 gap-2 p-3">
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-semibold text-gray-500">Company</label>
-                <input type="text" placeholder="E.g. Company LLC" className="p-2 border border-gray-300 rounded" value={company} onChange={(e) => setCompany(e.target.value)} />
+                <input type="text" placeholder="E.g. Company LLC" 
+                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                  {...register("company", {
+                    onChange: (e) => setContent((prev) => ({ ...prev, company: e.target.value }))
+                  })}
+                />
               </div>
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-semibold text-gray-500">Title</label>
-                <input type="text" placeholder="E.g. Your profession/position" className="p-2 border border-gray-300 rounded" value={title} onChange={(e) => setTitle(e.target.value)} />
+                <input type="text" placeholder="E.g. Your profession/position" 
+                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                  {...register("title", {
+                    onChange: (e) => setContent((prev) => ({ ...prev, title: e.target.value }))
+                  })}
+                />
               </div>
             </div>
           </motion.div>
