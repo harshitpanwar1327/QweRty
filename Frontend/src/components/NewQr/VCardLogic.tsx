@@ -35,7 +35,7 @@ interface VCardLogicProps {
 }
 
 const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent, register, errors, control }) => {
-  const [openName, setOpenName] = useState<boolean>(false);
+  const [openName, setOpenName] = useState<boolean>(true);
   const [openInfo, setOpenInfo] = useState<boolean>(false);
   const [openLocation, setOpenLocation] = useState<boolean>(false);
   const [openCompany, setOpenCompany] = useState<boolean>(false);
@@ -45,8 +45,22 @@ const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent, register, 
     name: "phones",
   });
 
-  const handleAddPhone = () => append({ type: "Mobile", number: "" });
-  const handleRemovePhone = (index: number) => remove(index);
+  const handleAddPhone = () => {
+    const newPhone = { type: "Mobile", number: "" };
+    append(newPhone);
+    setContent((prev) => ({
+      ...prev,
+      phones: prev.phones ? [...prev.phones, newPhone] : [newPhone],
+    }));
+  };
+
+  const handleRemovePhone = (index: number) => {
+    remove(index);
+    setContent((prev) => ({
+      ...prev,
+      phones: prev.phones ? prev.phones.filter((_, i) => i !== index) : [],
+    }));
+  };
 
   return (
     <div className="flex flex-col">
@@ -110,39 +124,59 @@ const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent, register, 
               </div>
 
               {fields.map((field, index) => (
-                <div key={field.id} className="flex items-center gap-3 bg-gray-100 rounded-md p-2 overflow-x-auto">
-                  <select
-                    {...register(`phones.${index}.type` as const, {
-                      onChange: (e) => {
-                        const newPhones = [...(content.phones || [])];
-                        newPhones[index] = { ...newPhones[index], type: e.target.value };
-                        setContent((prev) => ({ ...prev, phones: newPhones }));
-                      }
-                    })}
-                    className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
-                    defaultValue={field.type || "Mobile"}
-                  >
-                    <option value="Mobile">Mobile</option>
-                    <option value="Home">Home</option>
-                    <option value="Work">Work</option>
-                  </select>
+                <div key={field.id} className="flex flex-col gap-2 bg-gray-100 rounded-md p-2 overflow-x-auto">
+                  <div className="flex justify-between items-center">
+                    <select
+                      {...register(`phones.${index}.type` as const, {
+                        onChange: (e) => {
+                          const newType = e.target.value;
+                          setContent((prev) => {
+                            const updatedPhones = [...(prev.phones || [])];
+                            updatedPhones[index] = { ...updatedPhones[index], type: newType };
+                            return { ...prev, phones: updatedPhones };
+                          });
+                        },
+                      })}
+                      className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                      defaultValue={field.type || "Mobile"}
+                    >
+                      <option value="Mobile">Mobile</option>
+                      <option value="Home">Home</option>
+                      <option value="Work">Work</option>
+                    </select>
 
-                  <input
-                    {...register(`phones.${index}.number` as const, { 
-                      required: "Phone number is required",
-                      onChange: (e) => {
-                        const newPhones = [...(content.phones || [])];
-                        newPhones[index] = { ...newPhones[index], number: e.target.value };
-                        setContent((prev) => ({ ...prev, phones: newPhones }));
-                      }
-                    })}
-                    type="text"
-                    placeholder="E.g. +91 9876543210"
-                    className="grow p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
-                  />
+                    <div
+                      className="flex justify-center items-center text-blue-500 hover:text-blue-700 p-1 cursor-pointer"
+                      onClick={() => handleRemovePhone(index)}
+                    >
+                      <DeleteRounded />
+                    </div>
+                  </div>
 
-                  <div className="flex justify-center items-center text-blue-500 hover:text-blue-700 p-1 border border-gray-300 rounded-full cursor-pointer" onClick={() => handleRemovePhone(index)}>
-                    <DeleteRounded sx={{ fontSize: 18 }} />
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="E.g. +91 9876543210"
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
+                      {...register(`phones.${index}.number` as const, {
+                        required: "Phone number is required",
+                        pattern: {
+                          value: /^\+[1-9]\d{6,14}$/,
+                          message: "Enter a valid number with country code (e.g. +919876543210)",
+                        },
+                        onChange: (e) => {
+                          const newNumber = e.target.value;
+                          setContent((prev) => {
+                            const updatedPhones = [...(prev.phones || [])];
+                            updatedPhones[index] = { ...updatedPhones[index], number: newNumber };
+                            return { ...prev, phones: updatedPhones };
+                          });
+                        },
+                      })}
+                    />
+                    {errors?.phones?.[index]?.number && (
+                      <p className="text-red-500 text-sm mt-1">{errors.phones[index]?.number?.message}</p>
+                    )}
                   </div>
                 </div>
               ))}

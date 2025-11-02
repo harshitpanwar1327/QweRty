@@ -27,14 +27,14 @@ const TextLogic: React.FC<TextLogicProps> = ({ content, setContent, register, er
         placeholder="Enter some text..."
         rows={5}
         className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
-        maxLength={2000}
+        maxLength={1500}
         {...register("textContent", {
           required: "Text content is required",
           onChange: (e) => setContent({ textContent: e.target.value })
         })}
       />
-      <div className={`text-sm ${content.textContent?.length === 2000 ? "text-red-500" : "text-gray-500"}`}>
-        {content.textContent?.length || 0}/2000 characters
+      <div className={`text-sm ${content.textContent?.length === 1500 ? "text-red-500" : "text-gray-500"}`}>
+        {content.textContent?.length || 0}/1500 characters
       </div>
       {errors?.textContent && (<p className="text-red-500 text-sm">{errors.textContent.message}</p>)}
     </div>

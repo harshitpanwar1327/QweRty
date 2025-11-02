@@ -402,11 +402,11 @@ const NewQR = () => {
                         >
                           <div className="flex flex-col gap-3 p-3">
                             <p className="text-sm text-gray-600">Protect your QR code with a password. Users will need to enter the correct password before they can view or access the linked content. Ideal for private documents, internal links, or sensitive materials.</p>
-                            <div className="grid grid-cols-2 gap-2">
+                            <div className="grid md:grid-cols-2 gap-2">
                               <div>
                                 <input type="password" id="password" 
                                   placeholder="Set a password" 
-                                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200" 
+                                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200" 
                                   {...register("password", {
                                     validate: (value) => {
                                       if (!value) return true;
@@ -420,7 +420,7 @@ const NewQR = () => {
                               <div>
                                 <input type="password" id="confirmPassword" 
                                   placeholder="Confirm password" 
-                                  className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200" 
+                                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200" 
                                   {...register("confirmPassword", {
                                     validate: (value) => {
                                       const password = watch("password");
