@@ -1,7 +1,7 @@
 import { useState, useEffect, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
-import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, PlayArrowRounded, ArrowBack } from "@mui/icons-material"
+import { Language, WhatsApp, Email, LocationOn, PlayArrowRounded, ArrowBack } from "@mui/icons-material"
 // import { People } from "@mui/icons-material"
 import { Select, MenuItem } from "@mui/material"
 import API from "../../util/API"
@@ -14,19 +14,13 @@ import { activeTab } from "../../features/qrType/QrTypeSlice.js"
 import { motion, AnimatePresence } from 'framer-motion'
 import { NavLink, useParams, useNavigate } from "react-router-dom"
 import WebsiteEditLogic from "../../components/EditQr/WebsiteEditLogic.js"
-import TextEditLogic from "../../components/EditQr/TextEditLogic.js"
 import WhatsappEditLogic from "../../components/EditQr/WhatsappEditLogic.js"
 import EmailEditLogic from "../../components/EditQr/EmailEditLogic.js"
-import WifiEditLogic from "../../components/EditQr/WifiEditLogic.js"
 import LocationEditLogic from "../../components/EditQr/LocationEditLogic.js"
-import VCardEditLogic from "../../components/EditQr/VCardEditLogic.js"
 import EmailImage from '../../assets/hero/Email.png'
 import LocationImage from '../../assets/hero/Location.png'
-import TextImage from '../../assets/hero/Text.png'
-import vCardImage from '../../assets/hero/vCard.png'
 import WebsiteImage from '../../assets/hero/Website.png'
 import WhatsappImage from '../../assets/hero/Whatsapp.png'
-import WifiImage from '../../assets/hero/Wifi.png'
 import { ArrowRight } from "lucide-react"
 import { useForm } from "react-hook-form"
 
@@ -38,12 +32,9 @@ interface QRTypeArray {
 
 const qrTypes: QRTypeArray[] = [
   { key: "website", icon: <Language fontSize="medium" />, label: "Website" },
-  { key: "text", icon: <TextFields fontSize="medium" />, label: "Text" },
   { key: "whatsapp", icon: <WhatsApp fontSize="medium" />, label: "WhatsApp" },
   { key: "email", icon: <Email fontSize="medium" />, label: "Email" },
-  { key: "wifi", icon: <Wifi fontSize="medium" />, label: "WiFi" },
   { key: "location", icon: <LocationOn fontSize="medium" />, label: "Location" },
-  { key: "vcard", icon: <AccountBox fontSize="medium" />, label: "vCard" },
   // { key: "social", icon: <People fontSize="medium" />, label: "Social Media" },
   // { key: "apps", icon: <Apps fontSize="medium" />, label: "Apps" },
   // { key: "feedback", icon: <Feedback fontSize="medium" />, label: "Feedback" },
@@ -57,12 +48,9 @@ const qrTypes: QRTypeArray[] = [
 
 const qrTypeImages: Record<string, string> = {
   website: WebsiteImage,
-  text: TextImage,
   whatsapp: WhatsappImage,
   email: EmailImage,
-  wifi: WifiImage,
   location: LocationImage,
-  vcard: vCardImage,
 };
 
 interface PhoneNumber {
@@ -227,18 +215,12 @@ const EditQR = () => {
     switch (qrType) {
       case "website":
         return <WebsiteEditLogic register={register} errors={errors} />;
-      case "text":
-        return <TextEditLogic register={register} errors={errors} watch={watch} />;
       case "whatsapp":
         return <WhatsappEditLogic register={register} errors={errors} watch={watch} />;
       case "email":
         return <EmailEditLogic register={register} errors={errors} />;
-      case "wifi":
-        return <WifiEditLogic register={register} errors={errors} />;
       case "location":
         return <LocationEditLogic register={register} errors={errors} watch={watch} />;
-      case "vcard":
-        return <VCardEditLogic register={register} errors={errors} watch={watch} />;
       default:
         return null;
     }
