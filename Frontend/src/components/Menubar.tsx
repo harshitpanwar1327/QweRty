@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Menu, QrCode, QrCode2, AccountCircle, KeyboardArrowDown, Logout } from "@mui/icons-material"
-// import { CreditCard, BarChart } from "@mui/icons-material"
+import { Menu, QrCode, QrCode2, AccountCircle, KeyboardArrowDown, Logout, BarChart } from "@mui/icons-material"
+// import { CreditCard } from "@mui/icons-material"
 import { motion, AnimatePresence } from 'framer-motion'
 import Swal from 'sweetalert2'
 import { auth } from '../util/Firebase.js'
@@ -133,10 +133,10 @@ const Menubar: React.FC<MenubarProps> = ({ heading }) => {
                   `cursor-pointer w-full flex !text-gray-600 mx-auto p-3 rounded-lg transition duration-300 ease-in hover:!text-pink-500 ${isActive ? "!text-pink-500 bg-pink-100" : ""}`}>
                   <li className="flex items-center gap-2"><QrCode /> My QR codes</li>
                 </NavLink>
-                {/* <NavLink to="/stats" className={({ isActive }) =>
+                <NavLink to="/stats" className={({ isActive }) =>
                   `cursor-pointer w-full flex !text-gray-600 mx-auto p-3 rounded-lg transition duration-300 ease-in hover:!text-pink-500 ${isActive ? "!text-pink-500 bg-pink-100" : ""}`}>
                   <li className="flex items-center gap-2"><BarChart /> Stats</li>
-                </NavLink> */}
+                </NavLink>
                 {/* <NavLink to="/plans" className={({ isActive }) =>
                   `cursor-pointer w-full flex !text-gray-600 mx-auto p-3 rounded-lg transition duration-300 ease-in hover:!text-pink-500 ${isActive ? "!text-pink-500 bg-pink-100" : ""}`}>
                   <li className="flex items-center gap-2"><CreditCard /> Plans and Pricings</li>

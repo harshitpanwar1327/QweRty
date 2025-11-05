@@ -59,7 +59,7 @@ const Filter: React.FC<FilterProp> = ({ setOpenFilterModal, setFilterData, curre
 
   return (
     <div className='fixed top-0 left-0 w-screen h-screen p-4 flex justify-end items-center bg-[#0000005a] z-10' onClick={()=>setOpenFilterModal(false)}>
-      <motion.div className="w-full md:w-1/2 lg:w-1/3 bg-white rounded-md shadow-md p-4 flex flex-col gap-4" onClick={(e)=>e.stopPropagation()}
+      <motion.div className="w-full md:w-1/2 lg:w-1/3 max-h-[90vh] bg-white rounded-md shadow-md p-4 flex flex-col gap-4 overflow-auto" onClick={(e)=>e.stopPropagation()}
         initial={{opacity: 0, x: '100%'}}
         animate={{opacity: 1, x: 0}}
         exit={{opacity: 0, x: '100%'}}
@@ -98,7 +98,9 @@ const Filter: React.FC<FilterProp> = ({ setOpenFilterModal, setFilterData, curre
         <hr className="text-gray-200"/>
         
         <div className="self-end flex items-center gap-4">
-          <button className="flex items-center gap-1 font-semibold text-blue-500 hover:text-blue-600  transition duration-300" onClick={handleClearFilter}><DeleteRounded /> Clear filters</button>
+          {(activeStatus.length > 0 || selectedType.length > 0) && (
+            <button className="flex items-center gap-1 font-semibold text-blue-500 hover:text-blue-600  transition duration-300" onClick={handleClearFilter}><DeleteRounded /> Clear filters</button>
+          )}
           <button className="bg-blue-500 hover:bg-blue-600 transition duration-300 py-2 px-3 text-white font-semibold rounded-full" onClick={handleResult}>See results</button>
         </div>
       </motion.div>

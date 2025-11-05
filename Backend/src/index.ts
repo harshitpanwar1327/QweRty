@@ -10,6 +10,7 @@ import UsersRoutes from './routes/UsersRoutes.js'
 import SubscriptionRoutes from './routes/SubscriptionRoutes.js'
 import QrCodesRoutes from './routes/QrCodesRoutes.js'
 import QrAnalyticsRoutes from './routes/QrAnalyticsRoutes.js'
+import QrStatsRoutes from './routes/QrStatsRoutes.js'
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use('/api', QrAnalyticsRoutes);
 app.use(authMiddleware);
 app.use('/api', SubscriptionRoutes);
 app.use('/api', QrCodesRoutes);
+app.use('/api', QrStatsRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
     res.status(404).send({message: "Route not exist!"});

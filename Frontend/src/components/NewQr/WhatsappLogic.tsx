@@ -42,13 +42,13 @@ const WhatsappLogic: React.FC<WhatsappLogicProps> = ({ content, setContent, regi
           placeholder="Enter a by default message..."
           rows={5}
           className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
-          maxLength={200}
+          maxLength={500}
           {...register("whatsappMessage", {
             onChange: (e) => setContent((prev) => ({ ...prev, whatsappMessage: e.target.value })),
           })}
         />
-        <div className={`text-sm ${ content.whatsappMessage?.length === 200 ? "text-red-500" : "text-gray-500" }`}>
-          {content.whatsappMessage?.length || 0}/200 characters
+        <div className={`text-sm ${ content.whatsappMessage?.length === 500 ? "text-red-500" : "text-gray-500" }`}>
+          {content.whatsappMessage?.length || 0}/500 characters
         </div>
         {errors?.whatsappMessage && (<p className="text-red-500 text-sm">{errors.whatsappMessage.message}</p>)}
       </div>

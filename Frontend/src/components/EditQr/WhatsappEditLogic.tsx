@@ -37,11 +37,11 @@ const WhatsappEditLogic: React.FC<WhatsappLogicProps> = ({ register, errors, wat
           placeholder="Enter a by default message..."
           rows={5}
           className="w-full lg:w-2/3 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
-          maxLength={200}
+          maxLength={500}
           {...register("content.whatsappMessage")}
         />
-        <div className={`text-sm ${whatsappMessage.length === 200 ? "text-red-500" : "text-gray-500"}`}>
-          {whatsappMessage.length}/200 characters
+        <div className={`text-sm ${whatsappMessage.length === 500 ? "text-red-500" : "text-gray-500"}`}>
+          {whatsappMessage.length}/500 characters
         </div>
       </div>
     </div>
