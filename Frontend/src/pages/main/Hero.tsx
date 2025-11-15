@@ -1,5 +1,5 @@
 import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn } from "@mui/icons-material"
-// import { People, PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, Feedback, Badge } from "@mui/icons-material"
+// import { People, Apps, PictureAsPdf, Image, Videocam, Event, QueueMusic, Feedback, Badge } from "@mui/icons-material"
 import Footer from "../../components/Footer.js"
 import Header from "../../components/Header.js"
 import Website from "../../section/Website.js"
@@ -61,7 +61,7 @@ const Hero = () => {
           <p className="mx-auto text-gray-500 md:text-lg lg:text-xl text-center">Whether it’s sharing a website, connecting to WiFi, opening a document, or launching an app — QweRty gives you the tools to create fully customizable QR codes that elevate your brand, improve customer engagement, and seamlessly bridge the gap between your physical and digital presence.</p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
           {qrTypes.map((item, index) => (
             <div key={index} className="border border-gray-300 rounded-xl flex flex-col items-center justify-center gap-2 p-4 shadow-sm hover:shadow-xl hover:scale-105 hover:border-pink-500 cursor-pointer transition duration-300" onClick={()=>handleQrButton(item.key)}>
               <div className="text-pink-500">{item.icon}</div>
@@ -79,14 +79,14 @@ const Hero = () => {
       <Location />
       <Contact />
       {/* <SocialMedia /> */}
-      {/* <App />
-      <Feedbacks />
-      <Pdf />
-      <Images />
-      <Video />
-      <MP3 />
-      <Events />
-      <ContactPlus /> */}
+      {/* <App /> */}
+      {/* <Feedbacks /> */}
+      {/* <Pdf /> */}
+      {/* <Images /> */}
+      {/* <Video /> */}
+      {/* <MP3 /> */}
+      {/* <Events /> */}
+      {/* <ContactPlus /> */}
 
       <Footer />
     </div>

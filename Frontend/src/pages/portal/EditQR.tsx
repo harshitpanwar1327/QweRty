@@ -2,7 +2,6 @@ import { useState, useEffect, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
 import { Language, WhatsApp, Email, LocationOn, PlayArrowRounded, ArrowBack } from "@mui/icons-material"
-// import { People } from "@mui/icons-material"
 import { Select, MenuItem } from "@mui/material"
 import API from "../../util/API"
 import axios from "axios"
@@ -17,6 +16,8 @@ import WebsiteEditLogic from "../../components/EditQr/WebsiteEditLogic.js"
 import WhatsappEditLogic from "../../components/EditQr/WhatsappEditLogic.js"
 import EmailEditLogic from "../../components/EditQr/EmailEditLogic.js"
 import LocationEditLogic from "../../components/EditQr/LocationEditLogic.js"
+// import SocialMediaEditLogic from "../../components/EditQr/SocialMediaEditLogic.js"
+// import AppsEditLogic from "../../components/EditQr/AppsEditLogic.js"
 import EmailImage from '../../assets/hero/Email.png'
 import LocationImage from '../../assets/hero/Location.png'
 import WebsiteImage from '../../assets/hero/Website.png'
@@ -53,17 +54,21 @@ const qrTypeImages: Record<string, string> = {
   location: LocationImage,
 };
 
-interface PhoneNumber {
-  type: string;
-  number: string;
-}
+// interface Contact {
+//   email?: string,
+//   telephone?: string,
+//   website?: string
+// }
 
 interface ContentInputs {
+  // Website
   websiteContent?: string;
-  textContent?: string;
+  // Email
   emailContent?: string;
+  // WhatsApp
   whatsappNumber?: string;
   whatsappMessage?: string;
+  // Location
   locationTab?: string;
   locationStreet?: string;
   locationArea?: string;
@@ -73,16 +78,12 @@ interface ContentInputs {
   locationCountry?: string;
   latitude?: string;
   longitude?: string;
-  wifiSsid?: string;
-  wifiPassword?: string;
-  wifiEncryption?: string;
-  firstName?: string;
-  lastName?: string;
-  phones?: PhoneNumber[];
-  email?: string;
-  website?: string;
-  company?: string;
-  title?: string;
+  // Social Media
+  // logo?: string,
+  // title?: string,
+  // socialLinks?: Record<string, string>,
+  // contact?: Contact
+  // Apps
 }
 
 export interface EditFormInputs {
@@ -106,7 +107,6 @@ const EditQR = () => {
       confirmPassword: '',
       content: {
         websiteContent: '',
-        textContent: '',
         emailContent: '',
         whatsappNumber: '',
         whatsappMessage: '',
@@ -119,16 +119,14 @@ const EditQR = () => {
         locationCountry: '',
         latitude: '',
         longitude: '',
-        wifiSsid: '',
-        wifiPassword: '',
-        wifiEncryption: '',
-        firstName: '',
-        lastName: '',
-        phones: [{ type: 'Mobile', number: '' }],
-        email: '',
-        website: '',
-        company: '',
-        title: '',
+        // logo: '',
+        // title: '',
+        // socialLinks: {},
+        // contact: {
+        //   telephone: '',
+        //   email: '',
+        //   website: ''
+        // }
       }
     }
   });
@@ -221,6 +219,10 @@ const EditQR = () => {
         return <EmailEditLogic register={register} errors={errors} />;
       case "location":
         return <LocationEditLogic register={register} errors={errors} watch={watch} />;
+      // case "social":
+      //   return <SocialMediaEditLogic register={register} errors={errors} />
+      // case "app":
+      //   return <AppsEditLogic />
       default:
         return null;
     }
@@ -407,7 +409,7 @@ const EditQR = () => {
                                 {errors.password && (<p className="text-red-500 text-sm mt-1">{errors.password.message}</p>)}
                               </div>
                               <div>
-                                <input type="text" id="confirmPassword"
+                                <input type="password" id="confirmPassword"
                                   placeholder="Confirm password"
                                   className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
                                   {...register("confirmPassword", {

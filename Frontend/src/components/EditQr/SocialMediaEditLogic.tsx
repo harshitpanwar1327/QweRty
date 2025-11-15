@@ -1,7 +1,6 @@
 import React, { useState } from "react"
-import type { Dispatch, SetStateAction } from "react"
-import type { FieldErrors, UseFormRegister } from "react-hook-form"
-import type { FormInputs as BaseFormInputs } from "../../pages/portal/NewQR"
+import type { UseFormRegister, FieldErrors } from "react-hook-form"
+import type { EditFormInputs } from "../../pages/portal/EditQR"
 import { InfoOutline, SpaceDashboard, KeyboardArrowRightRounded, PlayArrowRounded, DeleteRounded } from '@mui/icons-material'
 import { motion, AnimatePresence } from 'framer-motion'
 import { styled } from '@mui/material/styles'
@@ -9,23 +8,10 @@ import Button from '@mui/material/Button'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import * as Icons from '../../assets/socialMedia'
 
-interface Contact {
-  telephone?: string,
-  email?: string,
-  website?: string
-}
-
-interface SocialMediaFormInputs extends BaseFormInputs {
-  socialLogo?: File | null,
-  socialTitle?: string,
-  socialLinks?: Record<string, string>,
-  socialContact?: Contact
-}
-
 interface SocialMediaLogicProps {
-  setContent: Dispatch<SetStateAction<{ socialLogo?: File | null, socialTitle: string, socialLinks?: Record<string, string>, socialContact?: Contact }>>;
-  register: UseFormRegister<SocialMediaFormInputs>;
-  errors: FieldErrors<SocialMediaFormInputs>;
+  content?: EditFormInputs["content"];
+  register: UseFormRegister<EditFormInputs>;
+  errors?: FieldErrors<EditFormInputs>;
 }
 
 const VisuallyHiddenInput = styled('input')({
@@ -65,9 +51,9 @@ const socialPlatforms: SocialPlatforms[] = [
   { icon: Icons.Whatsapp, label: "Whatsapp" },
   { icon: Icons.X, label: "X" },
   { icon: Icons.YouTube, label: "YouTube" },
-]
+];
 
-const SocialMediaLogic: React.FC<SocialMediaLogicProps> = ({ setContent, register, errors }) => {
+const SocialMediaEditLogic: React.FC<SocialMediaLogicProps> = ({ register, errors }) => {
   const [openInformation, setOpenInformation] = useState<boolean>(false);
   const [openContent, setOpenContent] = useState<boolean>(false);
   const [openNetworks, setOpenNetworks] = useState<boolean>(false);
@@ -79,7 +65,6 @@ const SocialMediaLogic: React.FC<SocialMediaLogicProps> = ({ setContent, registe
   const handleFileChange = (file: File) => {
     const preview = URL.createObjectURL(file);
     setPreviewUrl(preview);
-    setContent(prev => ({ ...prev, logo: file }))
   };
 
   const handlePlatformSelect = (platform: SocialPlatforms) => {
@@ -89,19 +74,10 @@ const SocialMediaLogic: React.FC<SocialMediaLogicProps> = ({ setContent, registe
   };
 
   const handleInputChange = (platformName: string, value: string) => {
-    setContent(prev => ({ ...prev,
-      socialLinks: { ...prev.socialLinks, [platformName]: value }
-    }));
   };
 
   const handlePlatformDelete = (platformName: string) => {
     setSelectedPlatforms((prev) => prev.filter((p) => p.label !== platformName));
-    setContent((prev) => {
-      if (!prev.socialLinks) return prev;
-      const updatedLinks = { ...prev.socialLinks };
-      delete updatedLinks[platformName];
-      return { ...prev, socialLinks: updatedLinks };
-    });
   };
 
   return (
@@ -133,9 +109,9 @@ const SocialMediaLogic: React.FC<SocialMediaLogicProps> = ({ setContent, registe
                 <Button component="label" role={undefined} variant="contained" tabIndex={-1} startIcon={<CloudUploadIcon />}>
                   Upload files
                   <VisuallyHiddenInput type="file" accept="image/*"
-                    onChange={e => {
-                      const file = e.target.files?.[0]
-                      if (file) handleFileChange(file)
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileChange(file);
                     }}
                   />
                 </Button>
@@ -147,12 +123,11 @@ const SocialMediaLogic: React.FC<SocialMediaLogicProps> = ({ setContent, registe
                 <label className="text-sm font-semibold text-gray-500">Title</label>
                 <input type="text" placeholder="E.g. Company name" 
                   className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200"
-                  {...register("socialTitle", {
-                    required: "Title is required",
-                    onChange: (e) => setContent((prev) => ({ ...prev, title: e.target.value }))
+                  {...register("content.title", {
+                    required: "Title is required"
                   })}
                 />
-                {errors?.socialTitle && (<span className="text-red-500 text-xs">{errors.socialTitle?.message}</span>)}
+                {errors?.content?.title && (<span className="text-red-500 text-xs">{errors.content.title?.message}</span>)}
               </div>
             </motion.div>
           }
@@ -213,15 +188,15 @@ const SocialMediaLogic: React.FC<SocialMediaLogicProps> = ({ setContent, registe
                             <div className="flex flex-col gap-1">
                               <input type="text" placeholder="Enter your url or userId"
                                 className="w-full p-2 border border-gray-300 rounded"
-                                {...register(`socialLinks.${platform.label}`, {
+                                {...register(`content.socialLinks.${platform.label}`, {
                                   pattern: {
-                                    value: /^(https:\/\/)?([\w-]+\.)+[\w-]{2,}(\/[\w-./?%&=]*)?$/,
+                                    value: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/[\w-./?%&=]*)?$/,
                                     message: "Enter a valid URL"
                                   },
                                   onChange: (e) => handleInputChange(platform.label, e.target.value)
                                 })}
                               />
-                              {errors?.socialLinks?.[platform.label] && (<p className="text-red-500 text-sm">{errors.socialLinks?.[platform.label]?.message}</p>)}
+                              {errors?.content?.socialLinks?.[platform.label] && (<p className="text-red-500 text-sm">{errors.content.socialLinks?.[platform.label]?.message}</p>)}
                             </div>
                           </div>
                         ))}
@@ -248,49 +223,40 @@ const SocialMediaLogic: React.FC<SocialMediaLogicProps> = ({ setContent, registe
                         <label className="text-sm font-semibold text-gray-500">Telephone</label>
                         <input type="text" placeholder="E.g. +91 9876543210"
                           className="p-2 border border-gray-300 rounded"
-                          {...register("socialContact.telephone", {
+                          {...register("content.contact.telephone", {
                             pattern: {
                               value: /^\+[1-9]\d{6,14}$/,
                               message: "Enter a valid number with country code (e.g. +919876543210)"
-                            },
-                            onChange: (e) => {
-                              setContent((prev) => ({ ...prev, contact: { ...prev.socialContact, telephone: e.target.value } }));
                             }
                           })}
                         />
-                        {errors?.socialContact?.telephone && (<p className="text-red-500 text-sm">{errors.socialContact.telephone.message}</p>)}
+                        {errors?.content?.contact?.telephone && (<p className="text-red-500 text-sm">{errors.content.contact.telephone.message}</p>)}
                       </div>
                       <div className="flex flex-col gap-1">
                         <label className="text-sm font-semibold text-gray-500">Email</label>
                         <input type="text" placeholder="E.g. example@gmail.com"
                           className="p-2 border border-gray-300 rounded"
-                          {...register("socialContact.email", {
+                          {...register("content.contact.email", {
                             pattern: {
                               value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                               message: "Enter a valid email address",
-                            },
-                            onChange: (e) => {
-                              setContent((prev) => ({ ...prev, contact: { ...prev.socialContact, email: e.target.value } }));
                             }
                           })}
                         />
-                        {errors?.socialContact?.email && (<p className="text-red-500 text-sm">{errors.socialContact.email.message}</p>)}
+                        {errors?.content?.contact?.email && (<p className="text-red-500 text-sm">{errors.content.contact.email.message}</p>)}
                       </div>
                       <div className="flex flex-col gap-1">
                         <label className="text-sm font-semibold text-gray-500">Website</label>
                         <input type="text" placeholder="E.g. www.example.com" 
                           className="p-2 border border-gray-300 rounded"
-                          {...register("socialContact.website", {
+                          {...register("content.contact.website", {
                             pattern: {
                               value: /^https:\/\/([\w-]+(\.[\w-]+)+)(\/[\w-./?%&=]*)?$/,
                               message: "Enter a valid URL"
-                            },
-                            onChange: (e) => {
-                              setContent((prev) => ({ ...prev, contact: { ...prev.socialContact, website: e.target.value } }));
                             }
                           })}
                         />
-                        {errors?.socialContact?.website && (<p className="text-red-500 text-sm">{errors.socialContact.website.message}</p>)}
+                        {errors?.content?.contact?.website && (<p className="text-red-500 text-sm">{errors.content.contact.website.message}</p>)}
                       </div>
                     </div>
                   </motion.div>
@@ -304,4 +270,4 @@ const SocialMediaLogic: React.FC<SocialMediaLogicProps> = ({ setContent, registe
   )
 }
 
-export default SocialMediaLogic
+export default SocialMediaEditLogic

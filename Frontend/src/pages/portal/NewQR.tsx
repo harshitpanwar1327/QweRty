@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react"
 import NavigationBar from "../../components/NavigationBar"
 import Menubar from "../../components/Menubar"
 import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, Loop, PlayArrowRounded } from "@mui/icons-material"
-// import { People, PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, Feedback, Badge } from "@mui/icons-material"
+// import { People, Apps, PictureAsPdf, Image, Videocam, Event, QueueMusic, Feedback, Badge } from "@mui/icons-material"
 import { Select, MenuItem } from "@mui/material"
 import { ArrowRight, Download } from "lucide-react"
 import SampleQr from '../../assets/SampleQR.png'
@@ -23,7 +23,9 @@ import WifiLogic from "../../components/NewQr/WifiLogic.js"
 import LocationLogic from "../../components/NewQr/LocationLogic.js"
 import VCardLogic from "../../components/NewQr/VCardLogic.js"
 // import SocialMediaLogic from "../../components/NewQr/SocialMediaLogic.js"
+// import AppsLogic from "../../components/NewQr/AppsLogic.js"
 import { useForm, type SubmitHandler } from 'react-hook-form'
+import * as Icons from '../../assets/logo'
 
 interface QRTypeArray {
   key: string,
@@ -50,7 +52,22 @@ const qrTypes: QRTypeArray[] = [
   // { key: "vcardplus", icon: <Badge fontSize="medium" />, label: "vCard Plus" },
 ];
 
-const designTabsArray: string[] = ["Shape", "Level"];
+const designTabsArray: string[] = ["Shape", "Logo", "Level"];
+
+interface logosObject {
+  name: string,
+  icon: string
+}
+
+const logosArray: logosObject[] = [
+  {name: 'none', icon: Icons.None},
+  {name: 'website', icon: Icons.Website},
+  {name: 'whatsapp', icon: Icons.WhatsApp},
+  {name: 'email', icon: Icons.Email},
+  {name: 'wifi', icon: Icons.Wifi},
+  {name: 'location', icon: Icons.Location},
+  {name: 'vcard', icon: Icons.VCard}
+]
 
 interface levelObject {
   key: string,
@@ -109,6 +126,7 @@ const NewQR = () => {
   const [designTab, setDesignTab] = useState<string>('Shape');
   const [foregroundColor, setForegroundColor] = useState<string>('#000000');
   const [backgroundColor, setBackgroundColor] = useState<string>('#ffffff');
+  const [selectedLogo, setSelectedLogo] = useState<string>('none');
   const [errorCorrectionLevel, setErrorCorrectionLevel] = useState<string>('Q');
 
   // Configuration Section
@@ -124,11 +142,6 @@ const NewQR = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleGenerateQr: SubmitHandler<FormInputs> = async (data: FormInputs) => {
-    if(data.password!==data.confirmPassword) {
-      toast.error('Password and confirm password not match!');
-      return;
-    }
-
     try {
       setLoading(true);
       const qrPayload = {
@@ -141,6 +154,7 @@ const NewQR = () => {
             foregroundColor,
             backgroundColor,
           },
+          logo: selectedLogo,
           errorCorrectionLevel
         },
         configuration: {
@@ -151,9 +165,7 @@ const NewQR = () => {
         }
       };
 
-      const response = ["text", "wifi", "vcard"].includes(qrType)
-        ? await API.post("/static-qr", qrPayload)
-        : await API.post("/dynamic-qr", qrPayload);
+      const response = ["text", "wifi", "vcard"].includes(qrType) ? await API.post("/static-qr", qrPayload) : await API.post("/dynamic-qr", qrPayload);
       setQrPreview(response.data.qr_image);
       toast.success("QR generated successfully.");
 
@@ -197,7 +209,9 @@ const NewQR = () => {
       case "vcard":
         return <VCardLogic content={content} setContent={setContent} register={register} control={control} errors={errors} />;
       // case "social":
-      //   return <SocialMediaLogic content={content} setContent={setContent} register={register} errors={errors} />
+      //   return <SocialMediaLogic setContent={setContent} register={register} errors={errors} />
+      // case "apps":
+      //   return <AppsLogic setContent={setContent} register={register} errors={errors} />
       default:
         return null;
     }
@@ -297,6 +311,19 @@ const NewQR = () => {
                 </div>
               }
 
+              {designTab==='Logo' &&
+                <div className="flex flex-col gap-2 p-4 border border-gray-200 rounded-md">
+                  <p className="font-semibold">Select a logo</p>
+                  <div className="flex items-center gap-3 overflow-x-auto">
+                    {logosArray.map((logo, index) => (
+                      <div className={`p-1 border border-gray-200 rounded-md hover:bg-blue-50 ${selectedLogo === logo.name ? 'bg-blue-100' : ''}`} onClick={()=>setSelectedLogo(logo.name)}>
+                        <img key={index} src={logo.icon} alt={logo.name} className="w-10 cursor-pointer" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              }
+
               {designTab==='Level' &&
                 <div className="flex flex-wrap gap-5 p-4 bg-gray-100 rounded-md">
                   {levelTabsArray.map((level, index)=>(
@@ -319,7 +346,7 @@ const NewQR = () => {
                     </div>
                     <AnimatePresence>
                       {openTimeScheduling &&
-                        <motion.div
+                        <motion.div className="overflow-y-hidden"
                           initial={{opacity: 0, height: 0}}
                           animate={{opacity: 1, height: 'auto'}}
                           exit={{opacity: 0, height: 0}}
@@ -364,7 +391,7 @@ const NewQR = () => {
                     </div>
                     <AnimatePresence>
                       {openScanLimit &&
-                        <motion.div
+                        <motion.div className="overflow-y-hidden"
                           initial={{opacity: 0, height: 0}}
                           animate={{opacity: 1, height: 'auto'}}
                           exit={{opacity: 0, height: 0}}
@@ -394,7 +421,7 @@ const NewQR = () => {
                     </div>
                     <AnimatePresence>
                       {openPassword &&
-                        <motion.div
+                        <motion.div className="overflow-y-hidden"
                           initial={{opacity: 0, height: 0}}
                           animate={{opacity: 1, height: 'auto'}}
                           exit={{opacity: 0, height: 0}}
@@ -446,18 +473,18 @@ const NewQR = () => {
 
           {/* Download QR Section */}
           <div className="w-full md:w-1/3 rounded-md p-8 flex flex-col items-center gap-4 bg-gray-100">
-              <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">{['text', 'wifi', 'vcard'].includes(qrType)? 5: 6}</span> Generate QR</h3>
-              <img src={qrPreview || SampleQr} className="w-full bg-white rounded-lg shadow-lg p-2" alt='Qr' />
-              <button type="submit" className="flex items-center bg-black p-1 rounded-full hover:bg-black/85 group">
-                <p className='text-sm text-white px-3'>Generate QR</p>
-                <ArrowRight size={32} className='bg-white rounded-full p-2 -rotate-45 group-hover:rotate-0 transition duration-300 ease-in-out'/>
+            <h3 className="font-semibold flex items-center gap-2"><span className="bg-black text-white rounded-md px-2">{['text', 'wifi', 'vcard'].includes(qrType)? 5: 6}</span> Generate QR</h3>
+            <img src={qrPreview || SampleQr} className="w-full bg-white rounded-lg shadow-lg p-2" alt='Qr' />
+            <button type="submit" className="flex items-center bg-black p-1 rounded-full hover:bg-black/85 group">
+              <p className='text-sm text-white px-3'>Generate QR</p>
+              <ArrowRight size={32} className='bg-white rounded-full p-2 -rotate-45 group-hover:rotate-0 transition duration-300 ease-in-out'/>
+            </button>
+            {qrPreview &&
+              <button type="button" onClick={()=>setOpenDownload(true)} className="flex items-center bg-blue-500 p-1 rounded-full hover:bg-blue-700 group">
+                <p className='text-sm text-white px-3'>Download QR</p>
+                <Download size={32} className='bg-white rounded-full p-2 rotate-0 group-hover:rotate-180 transition duration-300 ease-in-out'/>
               </button>
-              {qrPreview &&
-                <button type="button" onClick={()=>setOpenDownload(true)} className="flex items-center bg-blue-500 p-1 rounded-full hover:bg-blue-700 group">
-                  <p className='text-sm text-white px-3'>Download QR</p>
-                  <Download size={32} className='bg-white rounded-full p-2 rotate-0 group-hover:rotate-180 transition duration-300 ease-in-out'/>
-                </button>
-              }
+            }
           </div>
         </form>
       </div>

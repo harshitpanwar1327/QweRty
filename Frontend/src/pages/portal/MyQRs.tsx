@@ -8,8 +8,8 @@ import TablePagination from '@mui/material/TablePagination'
 import { HashLoader } from "react-spinners"
 import { motion, AnimatePresence } from 'framer-motion'
 import ViewQr from '../../modals/MyQrs/ViewQr'
-import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, MoreVert, DownloadRounded, DeleteRounded, FilterAlt, SortRounded, EditRounded, Delete, PauseCircleOutline, PlayCircleOutlineRounded } from "@mui/icons-material"
-// import { PictureAsPdf, Image, Videocam, Apps, Event, QueueMusic, People, Feedback, Badge, Loop, PlayArrowRounded } from "@mui/icons-material"
+import { Language, AccountBox, WhatsApp, Email, Wifi, TextFields, LocationOn, MoreVert, DownloadRounded, DeleteRounded, FilterAlt, SortRounded, EditRounded, Delete, PauseCircleOutline, PlayCircleOutlineRounded, People, Apps } from "@mui/icons-material"
+// import { PictureAsPdf, Image, Videocam, Event, QueueMusic, Feedback, Badge, Loop, PlayArrowRounded } from "@mui/icons-material"
 // import { toast } from 'react-toastify'
 import Swal from 'sweetalert2'
 import DownloadQR from '../../modals/DownloadQR'
@@ -47,8 +47,8 @@ const qrTypes = {
   wifi: { icon: <Wifi sx={{fontSize: '16px'}} />, label: "WiFi" },
   location: { icon: <LocationOn sx={{fontSize: '16px'}} />, label: "Location" },
   vcard: { icon: <AccountBox sx={{fontSize: '16px'}} />, label: "vCard" },
-  // social: { icon: <People sx={{fontSize: '16px'}} />, label: "Social Media" },
-  // apps: { icon: <Apps sx={{fontSize: '16px'}} />, label: "Apps" },
+  social: { icon: <People sx={{fontSize: '16px'}} />, label: "Social Media" },
+  apps: { icon: <Apps sx={{fontSize: '16px'}} />, label: "Apps" },
   // feedback: { icon: <Feedback sx={{fontSize: '16px'}} />, label: "Feedback" },
   // pdf: { icon: <PictureAsPdf sx={{fontSize: '16px'}} />, label: "PDF" },
   // images: { icon: <Image sx={{fontSize: '16px'}} />, label: "Images" },

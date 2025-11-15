@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { scanAnalyticsLogic, verifyPasswordLogic } from '../services/QrAnalyticsServices.js';
+import { scanAnalyticsLogic, verifyPasswordLogic, getQrDataLogic } from '../services/QrAnalyticsServices.js';
 import requestIp from "request-ip";
 import useragent from "useragent";
 import dotenv from 'dotenv';
@@ -70,6 +70,26 @@ export const verifyPassword = async (req: Request<QrAnalyticsReqParams, {}, QrAn
             }
         } else {
             return res.json(response);
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({success:false,message:"Internal Server error!"});
+    }
+}
+
+export const getQrData = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        
+        if(!id){
+            return res.status(400).json({success: false, message: "Qr id not found!"});
+        }
+
+        const response = await getQrDataLogic(Number(id));
+        if(response.success) {
+            return res.status(200).json(response);
+        } else {
+            return res.status(400).json(response);
         }
     } catch (error) {
         console.log(error);

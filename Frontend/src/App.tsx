@@ -20,6 +20,7 @@ import ConfigTimeSchedule from './pages/qr/ConfigTimeSchedule.js'
 import ConfigScanLimit from './pages/qr/ConfigScanLimit.js'
 import ConfigPassword from './pages/qr/ConfigPassword.js'
 import SocialMedia from './pages/qr/SocialMedia.js'
+import Apps from './pages/qr/Apps.js'
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
         <Route path='/config/scanLimit' element={<ConfigScanLimit />}/>
         <Route path='/config/password/:id' element={<ConfigPassword />}/>
         <Route path='/social/:id' element={<SocialMedia />} />
+        <Route path='/apps/:id' element={<Apps />} />
 
         <Route element={<ProtectedRoutes/>}>
           <Route path='/my-qr' element={<MyQRs />}/>

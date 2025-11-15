@@ -35,7 +35,7 @@ interface VCardLogicProps {
 }
 
 const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent, register, errors, control }) => {
-  const [openName, setOpenName] = useState<boolean>(true);
+  const [openName, setOpenName] = useState<boolean>(false);
   const [openInfo, setOpenInfo] = useState<boolean>(false);
   const [openLocation, setOpenLocation] = useState<boolean>(false);
   const [openCompany, setOpenCompany] = useState<boolean>(false);
@@ -70,7 +70,7 @@ const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent, register, 
       </div>
       <AnimatePresence mode="wait">
         {openName &&
-          <motion.div
+          <motion.div className="overflow-hidden"
             initial={{opacity: 0, height: 0}}
             animate={{opacity: 1, height: 'auto'}}
             exit={{opacity: 0, height: 0}}
@@ -109,7 +109,7 @@ const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent, register, 
       </div>
       <AnimatePresence mode="wait">
         {openInfo &&
-          <motion.div
+          <motion.div className="overflow-hidden"
             initial={{opacity: 0, height: 0}}
             animate={{opacity: 1, height: 'auto'}}
             exit={{opacity: 0, height: 0}}
@@ -221,7 +221,7 @@ const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent, register, 
       </div>
       <AnimatePresence mode="wait">
         {openLocation &&
-          <motion.div className="flex flex-col"
+          <motion.div className="flex flex-col overflow-hidden"
             initial={{opacity: 0, height: 0}}
             animate={{opacity: 1, height: 'auto'}}
             exit={{opacity: 0, height: 0}}
@@ -305,7 +305,7 @@ const VCardLogic: React.FC<VCardLogicProps> = ({ content, setContent, register, 
       </div>
       <AnimatePresence mode="wait">
         {openCompany &&
-          <motion.div
+          <motion.div className="overflow-hidden"
             initial={{opacity: 0, height: 0}}
             animate={{opacity: 1, height: 'auto'}}
             exit={{opacity: 0, height: 0}}

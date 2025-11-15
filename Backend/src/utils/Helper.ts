@@ -1,5 +1,3 @@
-import axios from "axios";
-
 // Maps available subscription products with amount & duration (days)
 export const SubscriptionProducts: Record<string, { amount: number; duration: number }> = {
   "com.codeweave.freeQuarterly": { amount: 0, duration: 90 },
@@ -37,6 +35,8 @@ export const calculateAdjustedDays = (oldPlan: any, newPlanProductId: string): n
 };
 
 // Gets geolocation details (country, city) from IP using ipapi.co
+import axios from "axios";
+
 export const getLocationFromIP = async (ip: string | null): Promise<{ country: string | null; city: string | null }> => {
   if (!ip) return { country: null, city: null };
 
@@ -51,4 +51,41 @@ export const getLocationFromIP = async (ip: string | null): Promise<{ country: s
     console.warn("IP geolocation lookup failed:", error);
     return { country: null, city: null };
   }
+};
+
+// Generates a QR code with an optional logo overlay in the center
+import path from "path";
+import { fileURLToPath } from "url";
+import { createCanvas, loadImage } from "canvas";
+import QRCode from "qrcode";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export const generateQrWithLogo = async (payload: any, qrOptions: any, logoName: string) => {
+  const size = 1000;
+  const canvas = createCanvas(size, size);
+  const ctx = canvas.getContext("2d");
+  
+  QRCode.toCanvas(canvas, payload, qrOptions); 
+  
+  if (logoName && logoName!=='none') {
+    try {
+      const logoFile = path.join(__dirname, `../assets/logo/${logoName}.png`);
+      const logo = await loadImage(logoFile); 
+
+      const logoSize = size * 0.2;
+      const logoX = (size - logoSize) / 2;
+      const logoY = (size - logoSize) / 2;
+      
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(logoX - 10, logoY - 10, logoSize + 20, logoSize + 20);
+      
+      ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+    } catch (err) {
+      console.warn(`Logo "${logoName}" not found, skipping overlay`);
+    }
+  }
+
+  return canvas.toDataURL();
 };

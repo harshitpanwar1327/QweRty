@@ -94,6 +94,10 @@ export const scanAnalyticsLogic = async (id: number, clientIp: string | null, de
                 redirectURL = `${process.env.FRONTEND_URL}/#/social/${id}`;
                 break;
 
+            case "apps":
+                redirectURL = `${process.env.FRONTEND_URL}/#/apps/${id}`;
+                break;
+
             default:
                 throw new Error("Invalid QR type");
         }
@@ -162,6 +166,10 @@ export const verifyPasswordLogic = async (id: number, password: string, clientIp
                 redirectURL = `${process.env.FRONTEND_URL}/#/social/${id}`;
                 break;
 
+            case "apps":
+                redirectURL = `${process.env.FRONTEND_URL}/#/apps/${id}`;
+                break;
+
             default:
                 throw new Error("Invalid QR type");
         }
@@ -170,5 +178,17 @@ export const verifyPasswordLogic = async (id: number, password: string, clientIp
     } catch (error) {
         console.error(error);
         return { success: false, message: "Failed to verify password!" };
+    }
+}
+
+export const getQrDataLogic = async (id: number) => {
+    try {
+        const [rows]: any = await pool.query(`SELECT * FROM qr_codes WHERE qr_id = ?`, [id]);
+        const data = rows[0].content;
+
+        return { success: true, data };
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: "Social Media data not found!" };
     }
 }

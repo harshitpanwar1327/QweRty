@@ -1,5 +1,5 @@
 import { pool } from '../config/Database.js';
-import QRCode from "qrcode";
+import { generateQrWithLogo } from '../utils/Helper.js';
 
 interface FilterData {
     activeStatus: string[],
@@ -83,7 +83,14 @@ export const postStaticQrLogic = async (newQrData: any) => {
                 break;
 
             case "wifi":
-                actualPayload = `WIFI:T:${newQrData.content.wifiEncryption};S:${newQrData.content.wifiSsid};P:${newQrData.content.wifiPassword};;`;
+                const escape = (str = "") => str.replace(/([\\;,:"])/g, "\\$1");
+
+                const encryption = newQrData.content.wifiEncryption?.toUpperCase() === "NONE" ? "nopass" : "WPA";
+
+                const ssid = escape(newQrData.content.wifiSsid);
+                const password = escape(newQrData.content.wifiPassword);
+
+                actualPayload = `WIFI:T:${encryption};S:${ssid};P:${password};H:false;`;
                 break;
 
             case "vcard":
@@ -127,7 +134,7 @@ export const postStaticQrLogic = async (newQrData: any) => {
             scale: 10
         };
 
-        const qrImageBase64 = await QRCode.toDataURL(actualPayload, qrOptions);
+        const qrImageBase64 = await generateQrWithLogo(actualPayload, qrOptions, newQrData?.design?.logo);
 
         const query = `INSERT INTO qr_codes(user_id, name, qr_type, content, design, configuration, qr, state) VALUES (?, ?, ?, ?, ?, ?, ?, '-');`;
 
@@ -179,8 +186,21 @@ export const postDynamicQrLogic = async (newQrData: any) => {
 
             case "social":
                 actualPayload = JSON.stringify({
+                    socialLogo: newQrData.content.socialLogo || '',
+                    socialTitle: newQrData.content.socialTitle || '',
                     socialLinks: newQrData.content.socialLinks || [],
-                    contact: newQrData.content.contact || {}
+                    socialContact: newQrData.content.socialContact || {}
+                });
+                break;
+
+            case "apps":
+                actualPayload = JSON.stringify({
+                    appName: newQrData.content.appName,
+                    appCompany: newQrData.content.appCompany,
+                    appLogo: newQrData.content.appLogo || '',
+                    appDescription: newQrData.content.appDescription || '',
+                    appWebsite: newQrData.content.appWebsite || '',
+                    appLinks: newQrData.content.appLinks || [],
                 });
                 break;
 
@@ -223,7 +243,7 @@ export const postDynamicQrLogic = async (newQrData: any) => {
             scale: 10
         };
 
-        const qrImageBase64 = await QRCode.toDataURL(trackingUrl, qrOptions);
+        const qrImageBase64 = await generateQrWithLogo(trackingUrl, qrOptions, newQrData?.design?.logo);
 
         await pool.query(`UPDATE qr_codes SET qr = ? WHERE qr_id = ?`, [qrImageBase64, qr_id]);
 
